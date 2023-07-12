@@ -1,0 +1,58 @@
+.authContainer {
+  display: flex;
+  width: 100%;
+  padding: 2rem 10rem;
+  height: 80vh;
+  align-items: center;
+}
+
+.authColumn {
+  width: 50%;
+  padding: 15px;
+}
+
+.authHeader {
+  padding-bottom: 2rem;
+}
+
+.authHeader h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.authHeader p {
+  font-size: 1rem;
+  line-height: 2rem;
+  opacity: 0.5;
+}
+
+.authFormContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-bottom: 1.5rem;
+}
+
+.authFormContainer input[type="email"], 
+.authFormContainer input[type="password"] {
+  font-size: 1rem;
+  color: black;
+  padding: 15px;
+  margin-bottom: 1.5rem;
+  border: none;
+  border-bottom: solid 1px rgba(46, 48, 53, 0.2);
+  outline: none;
+}
+
+.authFormContainer input[type="submit"] {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background-color: var(--primaryColor);
+  padding: 15px;
+  border: solid 1px var(--primaryColor);
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+}
