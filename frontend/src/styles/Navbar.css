@@ -1,0 +1,43 @@
+.navbar {
+  width: 100%;
+  padding: 5vh 50px 0 50px;
+  position: fixed;
+  top: 0;
+  margin-bottom: auto;
+  z-index: 1;
+}
+
+.navContainer {
+  background-color: white;
+  min-height: 50px;
+  height: 7vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 50px;
+  border-radius: 50px;
+  box-shadow: 0px 4px 25px 0px rgba(0, 0, 0, 0.07);
+}
+
+.logo {
+  text-decoration: none;
+}
+
+.logo h1 {
+  font-size: 1.2rem;
+  color: black;
+  font-weight: 400;
+}
+
+.navLinksContainer {
+  display: flex;
+  gap: 4rem;
+  align-items: center;
+}
+
+.navLink {
+  font-size: 1rem;
+  font-weight: 400;
+  color: black;
+  text-decoration: none;
+}

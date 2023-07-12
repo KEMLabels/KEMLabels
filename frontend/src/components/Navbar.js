@@ -1,24 +1,33 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './css/Navbar.css';
+import React from "react";
+import "../styles/Global.css";
+import "../styles/Navbar.css";
+import { Link } from "react-router-dom";
 
 function Navbar() {
-
-    return (
-        <header id="header">
-            <div id="headContainer">
-                <a id="logo" href="/">
-                    <h2>LabelMaster</h2>
-                </a>
-
-                <div id="navbar">
-                    <ul id="navMenu">
-                        
-                    </ul>
-                </div>
-            </div>
-        </header>
-    );
+  return (
+    <nav className="navbar">
+      <div className="navContainer">
+        {/* TODO: Hamburger here */}
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Link to="/" className="logo">
+            {/* TODO: Change this to logo img later */}
+            <h1>LabelMaster</h1>
+          </Link>
+        </div>
+        <div className="navLinksContainer">
+          <Link className="navLink" to="/#pricingSec">
+            Pricing
+          </Link>
+          <Link className="navLink" to="/#faqSec">
+            FAQ
+          </Link>
+          <Link className="navLink" to="/signin">
+            Sign In
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
 }
 
 export default Navbar;
