@@ -1,42 +1,37 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import React, { useEffect, useState } from 'react'
+import { Link } from "react-router-dom";
+import axios from "../api/axios.js";
 import "../styles/Global.css";
 import Navbar from "../components/Navbar";
 
 function Signup() {
-  const history = useNavigate();
+
+  const[isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get('/getSessionInfo', { withCredentials: true })
+      .then(res => {
+        if (res.data.isLoggedIn) {
+          window.location.href = '/';
+          } else {
+            setIsLoading(false);
+          }
+      })
+      .catch(err => console.log(err))
+  }, [])
+
 
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  async function submit(e) {
+  const submit = async (e) => {
     e.preventDefault();
-
-    try {
-      await axios
-        .post("http://localhost:8081/Signup", {
-          userName,
-          email,
-          password,
-        })
-        .then((res) => {
-          if ((res.data = "exists")) {
-            history("/Signin");
-          } else {
-            alert("NOT WORKING!!!");
-          }
-        })
-        .catch((e) => {
-          alert("wrong details");
-          console.log(e);
-        });
-    } catch {
-      console.log(e);
-    }
+    const res = await axios.post('/Signup', { userName, email, password }, { withCredentials: true });
+    window.location.href = res.data.redirect;
   }
 
+  if(isLoading) return;
   return (
     <div>
       <Navbar />

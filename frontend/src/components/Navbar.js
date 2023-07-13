@@ -21,7 +21,7 @@ function Navbar() {
           <Link className="navLink" to="/#faqSec">
             FAQ
           </Link>
-          <Link className="navLink" to="/signin">
+          <Link className="navLink" to="/Signin">
             Sign In
           </Link>
         </div>

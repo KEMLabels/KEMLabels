@@ -1,14 +1,16 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+const express = require("express");
 const app = express();
-const bcrypt = require("bcrypt");
-const dotenv = require("dotenv");
+const cors = require('cors');
+const bcrypt = require("bcrypt")
+const axios = require('axios')
+const session = require('express-session');
+const dotenv = require("dotenv")
+const cookieParser = require('cookie-parser');
 dotenv.config();
-
-app.use(express.json());
-app.use('/', express.static(__dirname + '/public'));
-app.use(cors());
+require('express-async-errors');
+const mongoose = require('mongoose');
+mongoose.set('strictQuery', false);
+app.enable('trust proxy');
 
 const connectDB = async () => {
     try {
@@ -22,27 +24,65 @@ const connectDB = async () => {
 
 const User = require('./model/users.js');
 
+const MongoDBStore = require('connect-mongodb-session')(session);
+const store = new MongoDBStore({
+    uri: process.env.DB_STRING,
+    collection: 'sessions',
+  });
+
+app.use('/', express.static(__dirname + '/public'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000/");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+  
+const whitelist = ['http://localhost:8081', 'http://localhost:3000']
+app.use(cors({
+    origin: whitelist,
+    methods: ['POST', 'GET', 'PATCH', 'OPTIONS'],
+    credentials: true
+}));
+
+app.use(session({
+    name: 'sessionID',
+    secret: 'strongass',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 600000,
+        httpOnly: true,
+        // secure: true,
+        // sameSite: 'none',
+    },
+    store: store,
+}));
+
+
+async function handleErr(err, req, res, next) {
+    console.log(err.message)
+    return res.json({ errMsg: err.message })
+}
+
 app.post('/Signin', async (req, res) => {
-    const{email,password} = req.body
+    const { email, password } = req.body
 
     const data = {
-        email:email,
-        password:password
+        email: email,
+        password: password
     }
 
-    User.findOne({
-        email: data.email.toLowerCase()
-    }, function (err, user) {
-        if (err) {
-            console.log(err);
-            res.json("redirect");
-        }
-        if (!user) {
-            res.json("NoEmailExist");
-        } else {
-            return auth(req, res, user, data.password);
-        }
-    });
+    var emailAddress = data.email.toLowerCase();
+
+    let user = await User.findOne({ email: emailAddress })
+    if (!user)
+        throw new Error('This user does not exist');
+    else
+        auth(req, res, user, data.password);
 })
 
 function auth(req, res, user, enteredPassword) {
@@ -55,24 +95,40 @@ function auth(req, res, user, enteredPassword) {
         } else {
             req.session.user = user;
             req.session.isLoggedIn = true;
+            res.json({ redirect: '/' });
         }
     })
 }
 
-app.post('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) console.log(err);
-    });
-    res.json("redirect");
+app.get('/getSessionInfo', (req, res) => {
+    res.json({
+        isLoggedIn: req.session.isLoggedIn
+    })
 })
 
+app.get('/getUserData', (req, res) => {
+    if(!req.session.user) {
+        return null;
+    }
+    res.json({
+        userData: req.session.user
+    })
+})
+
+// app.post('/logout', (req, res) => {
+//     req.session.destroy((err) => {
+//         if (err) console.log(err);
+//     });
+//     res.json("redirect");
+// })
+
 app.post("/Signup", async (req, res) => {
-    const{userName, email,password} = req.body
+    const { userName, email, password } = req.body
 
     const data = {
         userName: userName,
-        email:email,
-        password:password
+        email: email,
+        password: password
     }
 
     const userNameExists = await User.findOne({ userName: data.userName })
@@ -90,11 +146,12 @@ app.post("/Signup", async (req, res) => {
     });
     new_user.save()
 
-    // req.session.user = new_user;
-    // req.session.isLoggedIn = true;
-    res.json("redirect");
+    req.session.user = new_user;
+    req.session.isLoggedIn = true;
+    res.json({redirect: '/'});
 })
 
+app.use(handleErr);
 
 connectDB().then(() => {
     app.listen(process.env.PORT, () => {
