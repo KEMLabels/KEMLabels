@@ -1,3 +1,4 @@
+@import url("https://use.typekit.net/qsy2bkp.css");
 :root {
   --primaryColor: #6942f5;
   /* --secondaryColor: #; */
@@ -14,7 +15,7 @@
 }
 
 body {
-  font-family: "Arial", sans-serif;
+  font-family: "quiet-sans", sans-serif;
   margin: 0;
   padding: 0;
 }
