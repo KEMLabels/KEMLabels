@@ -1,0 +1,61 @@
+import React, { useState } from "react";
+import { FaBars } from "react-icons/fa";
+import { IoCloseSharp } from "react-icons/io5";
+import { Link } from "react-router-dom";
+import "../styles/Global.css";
+import "../styles/Navbar.css";
+
+function HamburgerMenu({sessionStatus = false}) {
+  const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
+  console.log(sessionStatus);
+  return (
+    <div className="mobileNav">
+      <button
+        className="iconButton"
+        style={{ marginTop: "5px" }}
+        onClick={() => setShowHamburgerMenu(true)}
+      >
+        <FaBars size={24} />
+      </button>
+      <div className={`hamburgerMenu ${showHamburgerMenu ? "active" : ""}`}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Link to="/" className="logo">
+            {/* TODO: Change this to logo img later */}
+            <h1>LabelMaster</h1>
+          </Link>
+
+          <button
+            className="iconButton"
+            onClick={() => setShowHamburgerMenu(false)}
+          >
+            <IoCloseSharp size={24} style={{ marginTop: "5px" }} />
+          </button>
+        </div>
+        <div className="mobNavLinksContainer">
+          <Link className="navLink" to="/#pricing">
+            Pricing
+          </Link>
+          <Link className="navLink" to="/#faq">
+            FAQ
+          </Link>
+          <Link className="navLink" to="/Signin">
+            Sign In
+          </Link>
+          {sessionStatus && (
+            <Link
+              className="navLink"
+              onClick={(e) => {
+                e.preventDefault();
+                // TODO: logout
+              }}
+            >
+              Logout
+            </Link>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default HamburgerMenu;

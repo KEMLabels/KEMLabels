@@ -40,4 +40,109 @@
   font-weight: 400;
   color: black;
   text-decoration: none;
+  transition: all 0.1s ease-in-out;
+}
+
+.navLink:hover {
+  opacity: 0.7;
+}
+
+.navCorner {
+  display: none;
+  height: auto;
+  width: 1.5rem;
+}
+
+.mobileNav {
+  display: none;
+  align-self: center;
+}
+
+.mobNavLinksContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.iconButton {
+  border: none;
+  background-color: transparent;
+}
+
+.hamburgerMenu {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 90%;
+  height: 100vh;
+  background-color: white;
+  padding: 3rem 2.5rem;
+  transform: translateX(-100%);
+  transition: all 0.6s ease-in-out;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+.hamburgerMenu.active {
+  transform: translateX(0);
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    padding: 3vh 20px 0 20px;
+  }
+
+  .navContainer {
+    padding: 20px 30px;
+  }
+
+  .navLinksContainer {
+    gap: 3.5rem;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .logo h1 {
+    font-size: 1.8rem;
+  }
+
+  .navContainer {
+    height: auto;
+  }
+
+  .navLinksContainer {
+    display: none;
+  }
+
+  .navLink {
+    font-size: 1.3rem;
+  }
+
+  .navCorner {
+    display: block;
+  }
+
+  .mobileNav {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .navbar {
+    padding: 0;
+  }
+
+  .navContainer {
+    padding: 20px;
+    border-radius: 0;
+    border-bottom: solid 1px #E5E5E5;
+    box-shadow: none;
+  }
+
+  .hamburgerMenu {
+    padding: 2.5rem 2rem;
+  }
 }

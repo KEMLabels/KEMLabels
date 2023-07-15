@@ -34,7 +34,7 @@
   padding-bottom: 1.5rem;
 }
 
-.authFormContainer input[type="email"], 
+.authFormContainer input[type="email"],
 .authFormContainer input[type="password"] {
   font-size: 1rem;
   color: black;
