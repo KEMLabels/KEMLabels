@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 
@@ -56,9 +56,9 @@ function HamburgerMenu({ sessionStatus = false }) {
           <Link className="navLink" to="/#faq">
             FAQ
           </Link>
-          <Link className="navLink" to="/Signin">
+          <NavLink className="navLink" to="/Signin" activeClassName="active">
             Sign In
-          </Link>
+          </NavLink>
           {sessionStatus && (
             <Link
               className="navLink"

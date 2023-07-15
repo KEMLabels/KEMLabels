@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "../api/axios";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
@@ -34,9 +34,9 @@ function Navbar() {
           <Link className="navLink" to="/#faq">
             FAQ
           </Link>
-          <Link className="navLink" to="/Signin">
+          <NavLink className="navLink" to="/Signin" activeClassName="active">
             Sign In
-          </Link>
+          </NavLink>
           {isLoggedIn && (
             <Link
               className="navLink"
@@ -49,7 +49,7 @@ function Navbar() {
             </Link>
           )}
         </div>
-        <div className="navCorner"/>
+        <div className="navCorner" />
       </div>
     </nav>
   );
