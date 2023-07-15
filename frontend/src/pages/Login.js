@@ -4,10 +4,13 @@ import { BiErrorCircle } from "react-icons/bi";
 import axios from "../api/axios";
 import "../styles/Auth.css";
 import Navbar from "../components/Navbar";
+import Button from "../components/Button";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(true);
-  const [errMsg, seterrMsg] = useState(null);
+  const [errMsg, seterrMsg] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     axios
@@ -22,8 +25,6 @@ export default function Login() {
       .catch((err) => console.log(err));
   }, []);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
@@ -59,6 +60,7 @@ export default function Login() {
                 type="email"
                 onChange={(e) => {
                   setEmail(e.target.value);
+                  seterrMsg("");
                 }}
                 placeholder="Email"
               />
@@ -66,6 +68,7 @@ export default function Login() {
                 type="password"
                 onChange={(e) => {
                   setPassword(e.target.value);
+                  seterrMsg("");
                 }}
                 placeholder="Password"
               />
@@ -78,7 +81,7 @@ export default function Login() {
               >
                 Forgot password?
               </Link>
-              <input type="submit" onClick={submit} value="Sign In" />
+              <Button btnType="submit" onClickEvent={submit} text="Sign In" />
             </form>
             <div style={{ width: "100%", textAlign: "center" }}>
               <span style={{ opacity: 0.5 }}>Don't have an account? </span>

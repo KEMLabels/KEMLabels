@@ -50,23 +50,6 @@
   outline: none;
 }
 
-.authFormContainer input[type="submit"] {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: white;
-  background-color: var(--primaryColor);
-  padding: 12px;
-  border: solid 1px var(--primaryColor);
-  border-radius: 10px;
-  outline: none;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-
-.authFormContainer input[type="submit"]:hover {
-  opacity: 0.8;
-}
-
 .errorMessageContainer {
   display: flex;
   width: 100%;
