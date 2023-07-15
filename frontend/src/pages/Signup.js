@@ -4,7 +4,7 @@ import axios from "../api/axios.js";
 import "../styles/Global.css";
 import Navbar from "../components/Navbar";
 
-function Signup() {
+export default function Signup() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -81,5 +81,3 @@ function Signup() {
     </div>
   );
 }
-
-export default Signup;

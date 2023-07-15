@@ -5,7 +5,7 @@ import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
 
-function Navbar() {
+export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -54,5 +54,3 @@ function Navbar() {
     </nav>
   );
 }
-
-export default Navbar;

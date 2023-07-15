@@ -4,7 +4,7 @@ import "../styles/Global.css";
 import "../styles/Home.css";
 import Navbar from "../components/Navbar";
 
-function Home() {
+export default function Home() {
   const [userData, setUserData] = useState(null);
   useEffect(() => {
     axios.get('/getSessionInfo', {withCredentials: true})
@@ -36,5 +36,3 @@ function Home() {
     </div>
   );
 }
-
-export default Home;

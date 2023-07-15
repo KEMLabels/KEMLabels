@@ -5,7 +5,7 @@ import { Link, NavLink } from "react-router-dom";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 
-function HamburgerMenu({ sessionStatus = false }) {
+export default function HamburgerMenu({ sessionStatus = false }) {
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
   // Hides menu when user clicks outside of menu
@@ -75,5 +75,3 @@ function HamburgerMenu({ sessionStatus = false }) {
     </div>
   );
 }
-
-export default HamburgerMenu;

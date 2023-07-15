@@ -5,7 +5,7 @@ import axios from "../api/axios";
 import "../styles/Auth.css";
 import Navbar from "../components/Navbar";
 
-function Login() {
+export default function Login() {
   const [isLoading, setIsLoading] = useState(true);
   const [errMsg, seterrMsg] = useState(null);
 
@@ -94,5 +94,3 @@ function Login() {
     </div>
   );
 }
-
-export default Login;
