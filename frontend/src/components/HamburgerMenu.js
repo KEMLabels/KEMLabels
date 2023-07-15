@@ -5,9 +5,18 @@ import { Link } from "react-router-dom";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 
-function HamburgerMenu({sessionStatus = false}) {
+function HamburgerMenu({ sessionStatus = false }) {
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
-  console.log(sessionStatus);
+
+  // Hides menu when user clicks outside of menu
+  function HideHamburgerOnWindowClick() {
+    window.onclick = (e) => {
+      if (showHamburgerMenu && !e.target.matches(".hamburgerMenu")) {
+        setShowHamburgerMenu(false);
+      }
+    };
+  }
+
   return (
     <div className="mobileNav">
       <button
@@ -17,8 +26,17 @@ function HamburgerMenu({sessionStatus = false}) {
       >
         <FaBars size={24} />
       </button>
-      <div className={`hamburgerMenu ${showHamburgerMenu ? "active" : ""}`}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div
+        className={`hamburgerMenu ${showHamburgerMenu ? "active" : ""}`}
+        onTransitionEnd={HideHamburgerOnWindowClick}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Link to="/" className="logo">
             {/* TODO: Change this to logo img later */}
             <h1>LabelMaster</h1>
