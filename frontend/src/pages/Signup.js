@@ -1,25 +1,24 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios.js";
 import "../styles/Global.css";
 import Navbar from "../components/Navbar";
 
 function Signup() {
-
-  const[isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/getSessionInfo', { withCredentials: true })
-      .then(res => {
+    axios
+      .get("/getSessionInfo", { withCredentials: true })
+      .then((res) => {
         if (res.data.isLoggedIn) {
-          window.location.href = '/';
-          } else {
-            setIsLoading(false);
-          }
+          window.location.href = "/";
+        } else {
+          setIsLoading(false);
+        }
       })
-      .catch(err => console.log(err))
-  }, [])
-
+      .catch((err) => console.log(err));
+  }, []);
 
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,11 +26,15 @@ function Signup() {
 
   const submit = async (e) => {
     e.preventDefault();
-    const res = await axios.post('/Signup', { userName, email, password }, { withCredentials: true });
+    const res = await axios.post(
+      "/Signup",
+      { userName, email, password },
+      { withCredentials: true }
+    );
     window.location.href = res.data.redirect;
-  }
+  };
 
-  if(isLoading) return;
+  if (isLoading) return;
   return (
     <div>
       <Navbar />

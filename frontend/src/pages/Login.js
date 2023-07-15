@@ -1,40 +1,42 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
 import "../styles/Auth.css";
 import Navbar from "../components/Navbar";
 
 function Login() {
-  const[isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [errMsg, seterrMsg] = useState(null);
 
   useEffect(() => {
-    axios.get('/getSessionInfo', { withCredentials: true })
-      .then(res => {
+    axios
+      .get("/getSessionInfo", { withCredentials: true })
+      .then((res) => {
         if (res.data.isLoggedIn) {
-        window.location.href = '/';
+          window.location.href = "/";
         } else {
           setIsLoading(false);
         }
       })
-      .catch(err => console.log(err))
-  }, [])
-
+      .catch((err) => console.log(err));
+  }, []);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const submit = async (e) => {
     e.preventDefault();
-    const res = await axios.post('/Signin', { email, password }, { withCredentials: true });
-    console.log(res.data)
-    if(res.data.errMsg)
-    seterrMsg(res.data.errMsg)
-    else
-    window.location.href = res.data.redirect;
-  }
+    const res = await axios.post(
+      "/Signin",
+      { email, password },
+      { withCredentials: true }
+    );
+    console.log(res.data);
+    if (res.data.errMsg) seterrMsg(res.data.errMsg);
+    else window.location.href = res.data.redirect;
+  };
 
-  if(isLoading) return;
+  if (isLoading) return;
   return (
     <div>
       <Navbar />
