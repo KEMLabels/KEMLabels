@@ -2,7 +2,9 @@
 
 :root {
   --primaryColor: #6942f5;
-  /* --secondaryColor: #; */
+  --secondaryColor: #4F2DCF;
+  --linkColor: #2B4E7B;
+  --errorColor: #FF0033;
 }
 
 * {
@@ -29,4 +31,16 @@ body {
   font-weight: 600;
   color: var(--primaryColor);
   text-decoration: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.linkAlt {
+  font-weight: 400;
+  color: var(--linkColor);
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.link:hover, .linkAlt:hover {
+  opacity: 0.7;
 }

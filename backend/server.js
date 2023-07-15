@@ -80,7 +80,7 @@ app.post('/Signin', async (req, res) => {
 
     let user = await User.findOne({ email: emailAddress })
     if (!user)
-        throw new Error('This user does not exist');
+        throw new Error('Incorrect email or password.');
     else
         auth(req, res, user, data.password);
 })

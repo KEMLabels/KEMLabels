@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { BiErrorCircle } from "react-icons/bi";
 import axios from "../api/axios";
 import "../styles/Auth.css";
 import Navbar from "../components/Navbar";
@@ -47,6 +48,12 @@ function Login() {
               <h1>Login</h1>
               <p>Welcome back! Please enter your details.</p>
             </div>
+            {errMsg && (
+              <div className="errorMessageContainer">
+                <BiErrorCircle size={24} color="#FF0033" />
+                <p>{errMsg}</p>
+              </div>
+            )}
             <form action="POST" className="authFormContainer">
               <input
                 type="email"
@@ -64,9 +71,8 @@ function Login() {
               />
               <Link
                 to="/forgotpassword"
+                className="linkAlt"
                 style={{
-                  color: "black",
-                  textDecoration: "none",
                   marginBottom: "3rem",
                 }}
               >
@@ -79,7 +85,6 @@ function Login() {
               <Link to="/signup" className="link">
                 Sign Up
               </Link>
-              {errMsg && <p>{errMsg}</p>}
             </div>
           </div>
           {/* graphic here */}

@@ -34,9 +34,14 @@
   padding-bottom: 1.5rem;
 }
 
+.authFormContainer input {
+  font-family: "quiet-sans", sans-serif;
+}
+
 .authFormContainer input[type="email"],
 .authFormContainer input[type="password"] {
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 300;
   color: black;
   padding: 15px;
   margin-bottom: 1.5rem;
@@ -46,13 +51,36 @@
 }
 
 .authFormContainer input[type="submit"] {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: white;
   background-color: var(--primaryColor);
-  padding: 15px;
+  padding: 12px;
   border: solid 1px var(--primaryColor);
   border-radius: 10px;
   outline: none;
   cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.authFormContainer input[type="submit"]:hover {
+  opacity: 0.8;
+}
+
+.errorMessageContainer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: solid 1px var(--errorColor);
+  border-radius: 0.25rem;
+}
+
+.errorMessageContainer p {
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1rem;
+  color: var(--errorColor);
+  padding-left: 5px;
 }
