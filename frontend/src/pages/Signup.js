@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios.js";
 import "../styles/Global.css";
-import Navbar from "../components/Navbar";
+import PageLayout from "../components/PageLayout.js";
 
 export default function Signup() {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,48 +36,45 @@ export default function Signup() {
 
   if (isLoading) return;
   return (
-    <div>
-      <Navbar />
-      <div className="wrapper">
-        <div className="signup">
-          <form action="POST">
-            <input
-              type="text"
-              onChange={(e) => {
-                setUserName(e.target.value);
-              }}
-              placeholder="userName"
-              name=""
-              id=""
-            />
-            <input
-              type="text"
-              onChange={(e) => {
-                setEmail(e.target.value);
-              }}
-              placeholder="Email"
-              name=""
-              id=""
-            />
-            <input
-              type="text"
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-              placeholder="Password"
-              name=""
-              id=""
-            />
+    <PageLayout title="Sign Up">
+      <div className="signup">
+        <form action="POST">
+          <input
+            type="text"
+            onChange={(e) => {
+              setUserName(e.target.value);
+            }}
+            placeholder="userName"
+            name=""
+            id=""
+          />
+          <input
+            type="text"
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+            placeholder="Email"
+            name=""
+            id=""
+          />
+          <input
+            type="text"
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+            placeholder="Password"
+            name=""
+            id=""
+          />
 
-            <input type="submit" onClick={submit} />
-          </form>
-          <br />
-          <p>
-            If you have an account you can login: <Link to="/signin">Here</Link>
-          </p>
-          <br />
-        </div>
+          <input type="submit" onClick={submit} />
+        </form>
+        <br />
+        <p>
+          If you have an account you can login: <Link to="/signin">Here</Link>
+        </p>
+        <br />
       </div>
-    </div>
+    </PageLayout>
   );
 }
