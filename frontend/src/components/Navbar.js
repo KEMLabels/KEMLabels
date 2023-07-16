@@ -5,7 +5,7 @@ import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
 
-export default function Navbar() {
+export default function Navbar({ hideNavAndFooter = false }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${hideNavAndFooter ? "navHidden" : ""}`}>
       <div className="navContainer">
         <HamburgerMenu sessionStatus={isLoggedIn} />
         <div style={{ display: "flex", alignItems: "center" }}>
