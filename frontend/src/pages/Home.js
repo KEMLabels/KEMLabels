@@ -3,6 +3,8 @@ import axios from "../api/axios";
 import "../styles/Global.css";
 import "../styles/Home.css";
 import PageLayout from "../components/PageLayout";
+import Accordion from "../components/Accordion";
+import FaqJson from "../content/faq.json";
 
 export default function Home() {
   const [userData, setUserData] = useState(null);
@@ -28,15 +30,25 @@ export default function Home() {
       <div className="hero">
         <div className="heroColumn">
           {/* TOOD: Replace text afterwards */}
-          <h1 style={{ color: "white", fontSize: "3rem" }}>Welcome to LabelMaster</h1>
-          {userData && <h2 style={{ color: "white", fontWeight: 400 }}>Your email address is {userData.email}</h2>}
+          <h1 style={{ color: "white", fontSize: "3rem" }}>
+            Welcome to LabelMaster
+          </h1>
+          {userData && (
+            <h2 style={{ color: "white", fontWeight: 400 }}>
+              Your email address is {userData.email}
+            </h2>
+          )}
         </div>
         <div className="heroColumn">
-          <img src="/media/hero.svg" width="100%" alt="Illustration of a delivery man."/>
-        </div> 
+          <img
+            src="/media/hero.svg"
+            width="100%"
+            alt="Illustration of a delivery man."
+          />
+        </div>
       </div>
       <div id="faq">
-        
+        <Accordion value={FaqJson}></Accordion>
       </div>
     </PageLayout>
   );

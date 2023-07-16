@@ -12,3 +12,52 @@
   width: 50%;
   padding: 1rem;
 }
+
+#faq {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 5rem;
+}
+
+.accordion {
+  width: 80%;
+}
+
+.accordionItem {
+  margin-bottom: 1rem;
+  border-radius: 0.25rem;
+}
+
+.accordionItem.active .accordionHeading {
+  color: var(--primaryColor);
+  font-weight: 600;
+}
+
+.accordionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: 400;
+  background-color: white;
+  color: #444;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.accordionHeading:hover {
+  opacity: 0.8;
+}
+
+.accordionPanel {
+  font-size: 1rem;
+  font-weight: 300;
+  color: black;
+  line-height: 2rem;
+  padding: 1.5rem 1rem;
+}
