@@ -1,12 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "../api/axios";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
 
+const useScrollToLocation = () => {
+  const scrolledRef = useRef(false);
+  const { hash, pathname } = useLocation();
+  const hashRef = useRef(hash);
+
+  useEffect(() => {
+    if (pathname === "/") window.scrollTo({ top: 0, behavior: "smooth" });
+    if (hash) {
+      // We want to reset if the hash has changed
+      if (hashRef.current !== hash) {
+        hashRef.current = hash;
+        scrolledRef.current = false;
+      }
+
+      // only attempt to scroll if we haven't yet (this could have just reset above if hash changed)
+      const id = hash.replace("#", "");
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        scrolledRef.current = true;
+      }
+    }
+  });
+};
+
 export default function Navbar({ hideNavAndFooter = false }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useScrollToLocation();
 
   useEffect(() => {
     axios

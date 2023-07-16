@@ -27,7 +27,7 @@ export default function Home() {
 
   return (
     <PageLayout isLandingPage>
-      <div className="hero">
+      <div id="home" className="hero">
         <div className="heroColumn">
           {/* TOOD: Replace text afterwards */}
           <h1 style={{ color: "white", fontSize: "3rem" }}>
