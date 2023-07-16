@@ -2,8 +2,12 @@
   display: flex;
   width: 100%;
   padding: 2rem 10rem;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1800px;
   min-height: 100vh;
   align-items: center;
+  gap: 3rem;
 }
 
 .authColumn {
@@ -33,6 +37,10 @@
   flex-direction: column;
   width: 100%;
   padding-bottom: 1.5rem;
+}
+
+.authFormContainer button {
+  margin-top: 3rem;
 }
 
 .errorMessageContainer {
@@ -66,4 +74,55 @@
   width: 100%;
   align-items: center;
   gap: 4px;
+}
+
+@media screen and (max-width: 1200px) {
+  .authContainer {
+    padding: 2rem 3rem;
+    max-width: none;
+    gap: 0;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .authContainer {
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .authColumn {
+    width: 100%;
+  }
+
+  .authColumn:not(:first-child) {
+    display: none;
+  }
+}
+
+
+@media screen and (max-width: 576px) {
+  .authContainer {
+    min-height: 100vh;
+    padding: 2rem 1.5rem;
+  }
+
+  .authColumn {
+    padding: 0;
+  }
+
+  .backToHome {
+    display: none;
+  }
+
+  .authHeader h1 {
+    font-size: 2rem;
+  }
+
+  .authFormContainer a.linkAlt {
+    margin-bottom: 1.5rem;
+  }
+
+  .authFormContainer button {
+    margin-top: 1rem;
+  }
 }

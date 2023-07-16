@@ -80,12 +80,7 @@ export default function Login() {
             <Link to="/forgotpassword" className="linkAlt">
               Forgot password?
             </Link>
-            <Button
-              btnType="submit"
-              onClickEvent={submit}
-              text="Sign in"
-              customStyle={{ marginTop: "3rem" }}
-            />
+            <Button btnType="submit" onClickEvent={submit} text="Sign in" />
           </form>
           <div style={{ width: "100%", textAlign: "center" }}>
             <span style={{ opacity: 0.5 }}>Don't have an account? </span>
@@ -94,8 +89,14 @@ export default function Login() {
             </Link>
           </div>
         </div>
-        {/* graphic here */}
-        <div className="authColumn"></div>
+        <div className="authColumn">
+          {/* TODO: Replace graphic */}
+          <img
+            src="/media/hero.svg"
+            width="100%"
+            alt="Illustration of a delivery man."
+          />
+        </div>
       </div>
     </PageLayout>
   );

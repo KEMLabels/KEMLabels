@@ -88,7 +88,6 @@ export default function Signup() {
               btnType="submit"
               onClickEvent={submit}
               text="Create account"
-              customStyle={{ marginTop: "3rem" }}
             />
           </form>
           <div style={{ width: "100%", textAlign: "center" }}>
@@ -98,8 +97,14 @@ export default function Signup() {
             </Link>
           </div>
         </div>
-        {/* graphic here */}
-        <div className="authColumn"></div>
+        <div className="authColumn">
+          {/* TODO: Replace graphic */}
+          <img
+            src="/media/hero.svg"
+            width="100%"
+            alt="Illustration of a delivery man."
+          />
+        </div>
       </div>
     </PageLayout>
   );
