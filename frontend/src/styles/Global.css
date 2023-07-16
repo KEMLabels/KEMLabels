@@ -109,3 +109,20 @@ body {
   margin-left: -2rem;
   cursor: pointer;
 }
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+  padding: 1rem;
+  min-height: 5vh;
+}
+
+.footer p {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1rem;
+  opacity: 0.9;
+}

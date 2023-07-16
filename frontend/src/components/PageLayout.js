@@ -1,7 +1,7 @@
 import React from "react";
 import { Helmet } from "react-helmet";
 import Navbar from "./Navbar";
-// import Footer from './Footer';
+import Footer from './Footer';
 
 export default function PageLayout({
   title,
@@ -23,7 +23,7 @@ export default function PageLayout({
       </Helmet>
       {!hideNavAndFooter && <Navbar />}
       <div className={hideNavAndFooter ? "" : "wrapper"}>{children}</div>
-      {/* {!hideNavAndFooter && <Footer />} */}
+      {!hideNavAndFooter && <Footer />}
     </>
   );
 }

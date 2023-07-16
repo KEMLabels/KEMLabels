@@ -36,7 +36,7 @@ export default function Signup() {
 
   if (isLoading) return;
   return (
-    <PageLayout title="Sign Up">
+    <PageLayout title="Sign Up" hideNavAndFooter>
       <div className="signup">
         <form action="POST">
           <input

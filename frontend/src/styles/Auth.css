@@ -2,7 +2,7 @@
   display: flex;
   width: 100%;
   padding: 2rem 10rem;
-  height: 80vh;
+  min-height: 100vh;
   align-items: center;
 }
 
@@ -23,6 +23,7 @@
 
 .authHeader p {
   font-size: 1rem;
+  font-weight: 400;
   line-height: 2rem;
   opacity: 0.5;
 }
@@ -51,4 +52,18 @@
   color: var(--errorColor);
   padding-left: 5px;
   margin-bottom: 2px;
+}
+
+.backToHome {
+  padding-bottom: 2rem;
+}
+
+.backToHome a {
+  display: flex;
+  font-size: 18px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  align-items: center;
+  gap: 4px;
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BiErrorCircle } from "react-icons/bi";
+import { GoArrowLeft } from "react-icons/go";
 import axios from "../api/axios";
 import "../styles/Auth.css";
 import Button from "../components/Button";
@@ -40,9 +41,15 @@ export default function Login() {
 
   if (isLoading) return;
   return (
-    <PageLayout title="Login">
+    <PageLayout title="Login" hideNavAndFooter>
       <div className="authContainer">
         <div className="authColumn">
+          <div className="backToHome">
+            <Link to="/" className="link">
+              <GoArrowLeft size={18} style={{ marginTop: "2px" }} />
+              <p>Return to Home</p>
+            </Link>
+          </div>
           <div className="authHeader">
             <h1>Login</h1>
             <p>Welcome back! Please enter your details.</p>
