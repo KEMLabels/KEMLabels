@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaTag, FaQuestionCircle, FaSignInAlt, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
 import { Link, NavLink } from "react-router-dom";
 import "../styles/Global.css";
@@ -51,13 +51,16 @@ export default function HamburgerMenu({ sessionStatus = false }) {
         </div>
         <div className="mobNavLinksContainer">
           <Link className="navLink" to="/#pricing">
-            Pricing
+            <FaTag />
+            <span>Pricing</span>
           </Link>
           <Link className="navLink" to="/#faq">
-            FAQ
+            <FaQuestionCircle />
+            <span>FAQ</span>
           </Link>
           <NavLink className="navLink" to="/Signin" activeclassname="active">
-            Sign In
+            <FaSignInAlt />
+            <span>Sign In</span>
           </NavLink>
           {sessionStatus && (
             <Link
@@ -70,6 +73,19 @@ export default function HamburgerMenu({ sessionStatus = false }) {
               Logout
             </Link>
           )}
+        </div>
+        <div className="mobContact">
+          <p>Contact us at:</p>
+          <div className="contactInfo">
+            <a href="tel:6041231234">
+              <FaPhoneAlt size={16} />
+              <span>6041231234</span>
+            </a>
+            <a href="mailto:labelmaster@gmail.com">
+              <FaEnvelope size={16} />
+              <span>labelmaster@gmail.com</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>

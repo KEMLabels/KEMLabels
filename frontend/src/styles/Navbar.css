@@ -75,6 +75,32 @@
   margin-top: 3rem;
 }
 
+.mobContact {
+  font-size: 1.2rem;
+  margin: auto -2rem 0;
+  padding: 1rem 2rem 0;
+  border-top: solid 1px #EFEFEF;
+}
+
+.mobContact .contactInfo {
+  display: flex;
+  width: 100%;
+  padding-top: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.mobContact .contactInfo a {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.8);
+  text-decoration: none;
+}
+
 .iconButton {
   border: none;
   background-color: transparent;
@@ -89,7 +115,7 @@
   width: 90%;
   height: 100vh;
   background-color: white;
-  padding: 3rem 2.5rem;
+  padding: 3rem 2rem;
   transform: translateX(-100%);
   transition: all 0.6s ease-in-out;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
@@ -131,7 +157,20 @@
   }
 
   .navLink {
+    display: flex;
+    width: 100%;
+    align-items: center;
     font-size: 1.3rem;
+  }
+
+  .navLink svg {
+    width: 18px;
+    height: 18px;
+    margin-top: 5px;
+  }
+
+  .navLink span {
+    padding-left: 1rem;
   }
 
   .navCorner {
