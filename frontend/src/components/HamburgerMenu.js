@@ -56,7 +56,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
           <Link className="navLink" to="/#faq">
             FAQ
           </Link>
-          <NavLink className="navLink" to="/Signin" activeClassName="active">
+          <NavLink className="navLink" to="/Signin" activeclassname="active">
             Sign In
           </NavLink>
           {sessionStatus && (

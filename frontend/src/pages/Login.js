@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { BiErrorCircle } from "react-icons/bi";
 import { GoArrowLeft } from "react-icons/go";
 import axios from "../api/axios";
+import "../styles/Global.css";
 import "../styles/Auth.css";
 import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
@@ -76,16 +77,15 @@ export default function Login() {
               }}
               placeholder="Password"
             />
-            <Link
-              to="/forgotpassword"
-              className="linkAlt"
-              style={{
-                marginBottom: "3rem",
-              }}
-            >
+            <Link to="/forgotpassword" className="linkAlt">
               Forgot password?
             </Link>
-            <Button btnType="submit" onClickEvent={submit} text="Sign In" />
+            <Button
+              btnType="submit"
+              onClickEvent={submit}
+              text="Sign in"
+              customStyle={{ marginTop: "3rem" }}
+            />
           </form>
           <div style={{ width: "100%", textAlign: "center" }}>
             <span style={{ opacity: 0.5 }}>Don't have an account? </span>
