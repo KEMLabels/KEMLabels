@@ -22,7 +22,13 @@ export default function PageLayout({
         {description && <meta name="description" content={description} />}
       </Helmet>
       <Navbar hideNavAndFooter={hideNavAndFooter} />
-      <div className={`wrapper ${hideNavAndFooter ? "navHidden" : ""}`}>{children}</div>
+      <div
+        className={`wrapper ${
+          hideNavAndFooter || isLandingPage ? "navHidden" : ""
+        }`}
+      >
+        {children}
+      </div>
       {!hideNavAndFooter && <Footer />}
     </>
   );

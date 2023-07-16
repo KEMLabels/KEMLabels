@@ -25,13 +25,19 @@ export default function Home() {
 
   return (
     <PageLayout isLandingPage>
-      <header className="header">
-        <h1>Welcome</h1>
-        {userData && <h2>Your email address is {userData.email}</h2>}
-      </header>
-      <main className="main-content">
-        {/* Rest of your content goes here */}
-      </main>
+      <div className="hero">
+        <div className="heroColumn">
+          {/* TOOD: Replace text afterwards */}
+          <h1 style={{ color: "white", fontSize: "3rem" }}>Welcome to LabelMaster</h1>
+          {userData && <h2 style={{ color: "white", fontWeight: 400 }}>Your email address is {userData.email}</h2>}
+        </div>
+        <div className="heroColumn">
+          <img src="/media/hero.svg" width="100%" alt="Illustration of a delivery man."/>
+        </div> 
+      </div>
+      <div id="faq">
+        
+      </div>
     </PageLayout>
   );
 }
