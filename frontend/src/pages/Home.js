@@ -29,15 +29,8 @@ export default function Home() {
     <PageLayout isLandingPage>
       <div id="home" className="hero">
         <div className="heroColumn">
-          {/* TOOD: Replace text afterwards */}
-          <h1 style={{ color: "white", fontSize: "3rem" }}>
-            Welcome to LabelMaster
-          </h1>
-          {userData && (
-            <h2 style={{ color: "white", fontWeight: 400 }}>
-              Your email address is {userData.email}
-            </h2>
-          )}
+          <h1>Shipping Made Simple</h1>
+          <p>Fast, Reliable Shipping Delivered to Your Doorstep!</p>
         </div>
         <div className="heroColumn">
           <img
@@ -48,6 +41,7 @@ export default function Home() {
         </div>
       </div>
       <div id="faq">
+        <h1>Frequently Asked Questions</h1>
         <Accordion value={FaqJson}></Accordion>
       </div>
     </PageLayout>

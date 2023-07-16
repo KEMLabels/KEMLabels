@@ -136,4 +136,8 @@ body {
   .wrapper.navHidden {
     margin-top: 5rem;
   }
+
+  .footer p {
+    font-size: 0.9rem;
+  }
 }
