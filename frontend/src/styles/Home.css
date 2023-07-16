@@ -28,11 +28,6 @@
   border-radius: 0.25rem;
 }
 
-.accordionItem.active .accordionHeading {
-  color: var(--primaryColor);
-  font-weight: 600;
-}
-
 .accordionHeading {
   display: flex;
   align-items: center;
@@ -41,7 +36,7 @@
   font-weight: 400;
   background-color: white;
   color: black;
-  padding: 18px;
+  padding: 1.1rem;
   width: 100%;
   text-align: left;
   border: none;
@@ -60,4 +55,19 @@
   color: black;
   line-height: 2rem;
   padding: 1.5rem 1rem;
+  animation: accordionPanelFadeIn 0.6s ease-in-out;
+}
+
+.accordionItem.active .accordionHeading {
+  color: var(--primaryColor);
+}
+
+@keyframes accordionPanelFadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
