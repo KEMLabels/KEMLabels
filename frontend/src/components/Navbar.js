@@ -34,7 +34,7 @@ export default function Navbar() {
           <Link className="navLink" to="/#faq">
             FAQ
           </Link>
-          <NavLink className="navLink" to="/Signin" activeClassName="active">
+          <NavLink className="navLink" to="/signin" activeClassName="active">
             Sign In
           </NavLink>
           {isLoggedIn && (

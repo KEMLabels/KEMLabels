@@ -5,6 +5,7 @@ import axios from "../api/axios";
 import "../styles/Auth.css";
 import Navbar from "../components/Navbar";
 import Button from "../components/Button";
+import { InputField, PasswordField } from "../components/Field";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(true);
@@ -56,17 +57,16 @@ export default function Login() {
               </div>
             )}
             <form action="POST" className="authFormContainer">
-              <input
-                type="email"
-                onChange={(e) => {
+              <InputField
+                fieldType="email"
+                onChangeEvent={(e) => {
                   setEmail(e.target.value);
                   seterrMsg("");
                 }}
                 placeholder="Email"
               />
-              <input
-                type="password"
-                onChange={(e) => {
+              <PasswordField
+                onChangeEvent={(e) => {
                   setPassword(e.target.value);
                   seterrMsg("");
                 }}
