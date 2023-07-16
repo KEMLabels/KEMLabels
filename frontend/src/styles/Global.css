@@ -79,12 +79,12 @@ body {
   display: flex;
   flex-direction: row;
   width: 100%;
-  font-family: "quiet-sans", sans-serif;
   margin-bottom: 1.5rem;
   align-items: center;
 }
 
 .fieldContainer .fieldInput {
+  font-family: "quiet-sans", sans-serif;
   font-size: 1.1rem;
   font-weight: 300;
   color: black;

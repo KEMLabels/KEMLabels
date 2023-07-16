@@ -34,10 +34,6 @@
   padding-bottom: 1.5rem;
 }
 
-.authFormContainer input {
-  font-family: "quiet-sans", sans-serif;
-}
-
 .errorMessageContainer {
   display: flex;
   width: 100%;
