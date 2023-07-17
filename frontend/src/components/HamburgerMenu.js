@@ -4,6 +4,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import { Link, NavLink } from "react-router-dom";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
+import axios from "../api/axios"
 
 export default function HamburgerMenu({ sessionStatus = false }) {
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
@@ -58,16 +59,19 @@ export default function HamburgerMenu({ sessionStatus = false }) {
             <FaQuestionCircle />
             <span>FAQ</span>
           </Link>
-          <NavLink className="navLink" to="/Signin" activeclassname="active">
+          {!sessionStatus && <NavLink className="navLink" to="/Signin" activeclassname="active">
             <FaSignInAlt />
             <span>Sign In</span>
-          </NavLink>
+          </NavLink>}
           {sessionStatus && (
             <Link
               className="navLink"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
-                // TODO: logout
+                await axios.get('/logout', { withCredentials: true })
+                sessionStatus = false;
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = '/';
               }}
             >
               Logout

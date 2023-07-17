@@ -30,14 +30,21 @@ export default function Login() {
 
   const submit = async (e) => {
     e.preventDefault();
-    const res = await axios.post(
-      "/Signin",
-      { email, password },
-      { withCredentials: true }
-    );
-    console.log(res.data);
-    if (res.data.errMsg) seterrMsg(res.data.errMsg);
-    else window.location.href = res.data.redirect;
+    if (email === "" || password === "") {
+      seterrMsg("All fields are required.");
+      return;
+    }
+      const res = await axios.post(
+        "/Signin",
+        { email, password },
+        { withCredentials: true }
+      );
+      console.log(res.data);
+      if (res.data.errMsg) seterrMsg(res.data.errMsg);
+      else {
+        localStorage.setItem('isLoggedIn', true);
+        window.location.href = res.data.redirect;
+      }
   };
 
   if (isLoading) return;
@@ -66,14 +73,12 @@ export default function Login() {
               fieldType="email"
               onChangeEvent={(e) => {
                 setEmail(e.target.value);
-                seterrMsg("");
               }}
               placeholder="Email"
             />
             <PasswordField
               onChangeEvent={(e) => {
                 setPassword(e.target.value);
-                seterrMsg("");
               }}
               placeholder="Password"
             />
@@ -84,7 +89,7 @@ export default function Login() {
           </form>
           <div style={{ width: "100%", textAlign: "center" }}>
             <span style={{ opacity: 0.5 }}>Don't have an account? </span>
-            <Link to="/signup" className="link">
+            <Link to="/Signup" className="link">
               Sign Up
             </Link>
           </div>

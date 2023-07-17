@@ -82,22 +82,18 @@ app.post('/Signin', async (req, res) => {
     if (!user)
         throw new Error('Incorrect email or password.');
     else
-        auth(req, res, user, data.password);
+        return auth(req, res, user, data.password);
 })
 
-function auth(req, res, user, enteredPassword) {
-    bcrypt.compare(enteredPassword, user.password, function (err, comp) {
-        if (err) {
-            console.log(err);
-            res.json("redirect");
-        } else if (comp === false) {
-            res.json("wrongPassword");
-        } else {
-            req.session.user = user;
-            req.session.isLoggedIn = true;
-            res.json({ redirect: '/' });
-        }
-    })
+async function auth(req, res, user, enteredPassword) {
+    const comparePass = await bcrypt.compare(enteredPassword, user.password);
+    if(!comparePass) {
+        throw new Error('Incorrect email or password.');
+    } else {
+        req.session.user = user;
+        req.session.isLoggedIn = true;
+        res.json({ redirect: '/' });
+    }
 }
 
 app.get('/getSessionInfo', (req, res) => {
@@ -115,12 +111,10 @@ app.get('/getUserData', (req, res) => {
     })
 })
 
-// app.post('/logout', (req, res) => {
-//     req.session.destroy((err) => {
-//         if (err) console.log(err);
-//     });
-//     res.json("redirect");
-// })
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    return res.json({ redirect: '/' })
+})
 
 app.post("/Signup", async (req, res) => {
     const { userName, email, password } = req.body
@@ -132,9 +126,9 @@ app.post("/Signup", async (req, res) => {
     }
 
     const userNameExists = await User.findOne({ userName: data.userName })
-    if (userNameExists) res.json("userNameExists");
+    if (userNameExists) throw new Error('This username is already taken.');
     const emailExists = await User.findOne({ email: data.email })
-    if (emailExists) res.json("emailExists");
+    if (emailExists) throw new Error('This email is already taken.');
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt);

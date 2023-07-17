@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import axios from "../api/axios";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
+import { AuthContext } from "./AuthProvider";
 
 const useScrollToLocation = () => {
   const scrolledRef = useRef(false);
@@ -31,17 +32,8 @@ const useScrollToLocation = () => {
 };
 
 export default function Navbar({ hideNavAndFooter = false }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   useScrollToLocation();
-
-  useEffect(() => {
-    axios
-      .get("/getSessionInfo", { withCredentials: true })
-      .then((res) => {
-        res.data.isLoggedIn ? setIsLoggedIn(true) : setIsLoggedIn(false);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+  const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
 
   return (
     <nav className={`navbar ${hideNavAndFooter ? "navHidden" : ""}`}>
@@ -60,15 +52,18 @@ export default function Navbar({ hideNavAndFooter = false }) {
           <Link className="navLink" to="/#faq">
             FAQ
           </Link>
-          <NavLink className="navLink" to="/signin" activeclassname="active">
+          {!isLoggedIn && <NavLink className="navLink" to="/Signin" activeclassname="active">
             Sign In
-          </NavLink>
+          </NavLink>}
           {isLoggedIn && (
             <Link
               className="navLink"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
-                // TODO: logout
+                await axios.get('/logout', { withCredentials: true })
+                setIsLoggedIn(false);
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = '/';
               }}
             >
               Logout
