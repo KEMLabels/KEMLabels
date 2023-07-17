@@ -26,7 +26,7 @@ function InputField({
         defaultValue={initialValue}
         placeholder={placeholder}
         disabled={disabled}
-        autocomplete
+        // autoComplete
         onChange={(e) => {
           if (onChangeEvent) onChangeEvent(e);
         }}
