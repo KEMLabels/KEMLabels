@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaBars, FaTag, FaQuestionCircle, FaSignInAlt, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
+import { FaBars, FaTag, FaQuestionCircle, FaSignInAlt, FaPhoneAlt, FaEnvelope, FaSignOutAlt } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
 import { Link, NavLink } from "react-router-dom";
 import "../styles/Global.css";
@@ -74,7 +74,8 @@ export default function HamburgerMenu({ sessionStatus = false }) {
                 window.location.href = '/';
               }}
             >
-              Logout
+              <FaSignOutAlt />
+              <span>Logout</span>
             </Link>
           )}
         </div>
