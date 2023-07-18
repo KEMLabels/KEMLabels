@@ -73,12 +73,14 @@ export default function Login() {
               fieldType="email"
               onChangeEvent={(e) => {
                 setEmail(e.target.value);
+                seterrMsg("");
               }}
               placeholder="Email"
             />
             <PasswordField
               onChangeEvent={(e) => {
                 setPassword(e.target.value);
+                seterrMsg("");
               }}
               placeholder="Password"
             />
@@ -89,7 +91,7 @@ export default function Login() {
           </form>
           <div style={{ width: "100%", textAlign: "center" }}>
             <span style={{ opacity: 0.5 }}>Don't have an account? </span>
-            <Link to="/Signup" className="link">
+            <Link to="/signup" className="link">
               Sign Up
             </Link>
           </div>

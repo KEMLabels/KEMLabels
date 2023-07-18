@@ -28,19 +28,19 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const store = new MongoDBStore({
     uri: process.env.DB_STRING,
     collection: 'sessions',
-  });
+});
 
 app.use('/', express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "http://localhost:3000/");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
-  });
-  
+});
+
 const whitelist = ['http://localhost:8081', 'http://localhost:3000']
 app.use(cors({
     origin: whitelist,
@@ -68,7 +68,7 @@ async function handleErr(err, req, res, next) {
     return res.json({ errMsg: err.message })
 }
 
-app.post('/Signin', async (req, res) => {
+app.post('/signin', async (req, res) => {
     const { email, password } = req.body
 
     const data = {
@@ -87,7 +87,7 @@ app.post('/Signin', async (req, res) => {
 
 async function auth(req, res, user, enteredPassword) {
     const comparePass = await bcrypt.compare(enteredPassword, user.password);
-    if(!comparePass) {
+    if (!comparePass) {
         throw new Error('Incorrect email or password.');
     } else {
         req.session.user = user;
@@ -103,7 +103,7 @@ app.get('/getSessionInfo', (req, res) => {
 })
 
 app.get('/getUserData', (req, res) => {
-    if(!req.session.user) {
+    if (!req.session.user) {
         return null;
     }
     res.json({
@@ -116,7 +116,7 @@ app.get('/logout', (req, res) => {
     return res.json({ redirect: '/' })
 })
 
-app.post("/Signup", async (req, res) => {
+app.post("/signup", async (req, res) => {
     const { userName, email, password } = req.body
 
     const data = {
@@ -126,9 +126,9 @@ app.post("/Signup", async (req, res) => {
     }
 
     const userNameExists = await User.findOne({ userName: data.userName })
-    if (userNameExists) throw new Error('This username is already taken.');
+    if (userNameExists) throw new Error('This username is already associated with an account.');
     const emailExists = await User.findOne({ email: data.email })
-    if (emailExists) throw new Error('This email is already taken.');
+    if (emailExists) throw new Error('This email is already associated with an account.');
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt);
@@ -142,7 +142,7 @@ app.post("/Signup", async (req, res) => {
 
     req.session.user = new_user;
     req.session.isLoggedIn = true;
-    res.json({redirect: '/'});
+    res.json({ redirect: '/' });
 })
 
 app.use(handleErr);

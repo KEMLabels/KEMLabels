@@ -59,7 +59,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
             <FaQuestionCircle />
             <span>FAQ</span>
           </Link>
-          {!sessionStatus && <NavLink className="navLink" to="/Signin" activeclassname="active">
+          {!sessionStatus && <NavLink className="navLink" to="/signin" activeclassname="active">
             <FaSignInAlt />
             <span>Sign In</span>
           </NavLink>}
