@@ -16,6 +16,7 @@ function InputField({
 }) {
   return (
     <div className={`fieldContainer ${className}`}>
+      {/* <label htmlFor={id} className="fieldLabel">{label}</label> */}
       <input
         id={id}
         className={`fieldInput ${className} ${disabled ? "disabled" : ""}`}
@@ -48,6 +49,7 @@ function PasswordField({
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div className={`fieldContainer ${className}`}>
+      {/* <label htmlFor={id} className="fieldLabel">{label}</label> */}
       <input
         id={id}
         className={`fieldInput ${className} ${disabled ? "disabled" : ""}`}

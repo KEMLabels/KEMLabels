@@ -87,6 +87,16 @@ body {
   align-items: center;
 }
 
+/* .fieldContainer .fieldLabel {
+  font-family: "quiet-sans", sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: black;
+  width: 100%;
+  transform: translateY(50px);
+  z-index: -1;
+} */
+
 .fieldContainer .fieldInput {
   font-family: "quiet-sans", sans-serif;
   font-size: 1.1rem;
@@ -97,6 +107,11 @@ body {
   border: none;
   border-bottom: solid 1px rgba(46, 48, 53, 0.2);
   outline: none;
+  transition: all 0.3s ease-in-out;
+}
+
+.fieldContainer .fieldInput:focus {
+  border-bottom: solid 1px var(--primaryColor);
 }
 
 .fieldContainer .fieldInput.disabled {
