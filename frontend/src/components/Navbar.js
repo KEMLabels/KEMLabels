@@ -46,8 +46,8 @@ export default function Navbar({ hideNavAndFooter = false }) {
           </Link>
         </div>
         <div className="navLinksContainer">
-          <Link className="navLink" to="/#pricing">
-            Pricing
+          <Link className="navLink" to="/#howitworks">
+          How It Works
           </Link>
           <Link className="navLink" to="/#faq">
             FAQ

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaBars, FaTag, FaQuestionCircle, FaSignInAlt, FaPhoneAlt, FaEnvelope, FaSignOutAlt } from "react-icons/fa";
+import { FaBars, FaQuestionCircle, FaSignInAlt, FaPhoneAlt, FaEnvelope, FaSignOutAlt, FaLayerGroup } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
 import { Link, NavLink } from "react-router-dom";
 import "../styles/Global.css";
@@ -51,9 +51,9 @@ export default function HamburgerMenu({ sessionStatus = false }) {
           </button>
         </div>
         <div className="mobNavLinksContainer">
-          <Link className="navLink" to="/#pricing">
-            <FaTag />
-            <span>Pricing</span>
+          <Link className="navLink" to="/#howitworks">
+            <FaLayerGroup />
+            <span>How It Works</span>
           </Link>
           <Link className="navLink" to="/#faq">
             <FaQuestionCircle />
