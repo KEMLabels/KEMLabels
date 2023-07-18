@@ -69,6 +69,7 @@ export default function Signup() {
             <InputField
               onChangeEvent={(e) => {
                 setUserName(e.target.value);
+                seterrMsg("");
               }}
               placeholder="Username"
             />
@@ -76,12 +77,14 @@ export default function Signup() {
               fieldType="email"
               onChangeEvent={(e) => {
                 setEmail(e.target.value);
+                seterrMsg("");
               }}
               placeholder="Email"
             />
             <PasswordField
               onChangeEvent={(e) => {
                 setPassword(e.target.value);
+                seterrMsg("");
               }}
               placeholder="Password"
             />
@@ -93,7 +96,7 @@ export default function Signup() {
           </form>
           <div style={{ width: "100%", textAlign: "center" }}>
             <span style={{ opacity: 0.5 }}>Already have an account? </span>
-            <Link to="/Signin" className="link">
+            <Link to="/signin" className="link">
               Sign In
             </Link>
           </div>

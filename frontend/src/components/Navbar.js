@@ -52,7 +52,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
           <Link className="navLink" to="/#faq">
             FAQ
           </Link>
-          {!isLoggedIn && <NavLink className="navLink" to="/Signin" activeclassname="active">
+          {!isLoggedIn && <NavLink className="navLink" to="/signin" activeclassname="active">
             Sign In
           </NavLink>}
           {isLoggedIn && (
