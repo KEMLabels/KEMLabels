@@ -11,7 +11,7 @@ import PageLayout from "../components/PageLayout";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(true);
-  const [errMsg, seterrMsg] = useState("");
+  const [errMsg, setErrMsg] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -31,7 +31,7 @@ export default function Login() {
   const submit = async (e) => {
     e.preventDefault();
     if (email === "" || password === "") {
-      seterrMsg("All fields are required.");
+      setErrMsg("All fields are required.");
       return;
     }
       const res = await axios.post(
@@ -40,7 +40,7 @@ export default function Login() {
         { withCredentials: true }
       );
       console.log(res.data);
-      if (res.data.errMsg) seterrMsg(res.data.errMsg);
+      if (res.data.errMsg) setErrMsg(res.data.errMsg);
       else {
         localStorage.setItem('isLoggedIn', true);
         window.location.href = res.data.redirect;
@@ -73,16 +73,20 @@ export default function Login() {
               fieldType="email"
               onChangeEvent={(e) => {
                 setEmail(e.target.value);
-                seterrMsg("");
+                setErrMsg("");
               }}
               placeholder="Email"
+              minLength={3}
+              maxLength={100}
             />
             <PasswordField
               onChangeEvent={(e) => {
                 setPassword(e.target.value);
-                seterrMsg("");
+                setErrMsg("");
               }}
               placeholder="Password"
+              minLength={8}
+              maxLength={50}
             />
             <Link to="/forgotpassword" className="linkAlt">
               Forgot password?

@@ -10,6 +10,8 @@ function InputField({
   title = "",
   initialValue = "",
   placeholder = "",
+  minLength,
+  maxLength,
   onChangeEvent,
   customStyle,
   disabled = false,
@@ -27,6 +29,9 @@ function InputField({
         defaultValue={initialValue}
         placeholder={placeholder}
         disabled={disabled}
+        minLength={minLength || null}
+        maxLength={maxLength || null} 
+        // required
         onChange={(e) => {
           if (onChangeEvent) onChangeEvent(e);
         }}
@@ -41,6 +46,8 @@ function PasswordField({
   name = "",
   initialValue = "",
   placeholder = "",
+  minLength,
+  maxLength,
   onChangeEvent,
   customStyle,
   disabled = false,
@@ -59,6 +66,8 @@ function PasswordField({
         defaultValue={initialValue}
         placeholder={placeholder}
         disabled={disabled}
+        minLength={minLength || null}
+        maxLength={maxLength || null} 
         onChange={(e) => {
           if (onChangeEvent) onChangeEvent(e);
         }}

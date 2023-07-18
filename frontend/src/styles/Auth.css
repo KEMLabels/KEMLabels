@@ -76,6 +76,17 @@
   gap: 4px;
 }
 
+.passwordRequirements {
+  font-size: 1rem;
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+.passwordRequirements ul {
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+
 @media screen and (max-width: 1200px) {
   .authContainer {
     padding: 2rem 3rem;
@@ -103,7 +114,7 @@
 @media screen and (max-width: 576px) {
   .authContainer {
     min-height: 100vh;
-    padding: 2rem 1.5rem;
+    padding: 10rem 2rem 4rem
   }
 
   .authColumn {
@@ -123,6 +134,6 @@
   }
 
   .authFormContainer button {
-    margin-top: 1rem;
+    margin-top: 2rem;
   }
 }

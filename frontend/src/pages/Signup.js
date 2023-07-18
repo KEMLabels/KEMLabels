@@ -11,7 +11,7 @@ import PageLayout from "../components/PageLayout.js";
 
 export default function Signup() {
   const [isLoading, setIsLoading] = useState(true);
-  const [errMsg, seterrMsg] = useState("");
+  const [errMsg, setErrMsg] = useState("");
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,18 +29,59 @@ export default function Signup() {
       .catch((err) => console.log(err));
   }, []);
 
+  function validateFields() {
+    // regex
+    const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
+    const emailRegex = /^([a-z0-9_.-]+)@([\da-z\.-]+)\.([a-z.]{2,6})$/g;
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~])(?=.*[A-Z])(?=.*[a-z]).*$/;
+
+    if (userName === "" || email === "" || password === "") {
+      setErrMsg("All fields are required.");
+      return false;
+    }
+
+    // username validation
+    if (userName.length < 3 || userName.length > 50) {
+      setErrMsg("Username must be between 3 and 50 characters.");
+      return false;
+    } else if (!usernameRegex.test(userName)) {
+      setErrMsg(
+        "Invalid username. Only alphabets, numbers, dash, underscores, and periods are allowed."
+      );
+      return false;
+    }
+
+    // email validation
+    if (email.length < 3 || email.length > 100) {
+      setErrMsg("Email must be between 3 and 100 characters.");
+      return false;
+    } else if (!emailRegex.test(email)) {
+      setErrMsg("Invalid email.");
+      return false;
+    }
+
+    // password validation
+    if (password.length < 8 || password.length > 50) {
+      setErrMsg("Password must be between 8 and 50 characters.");
+      return false;
+    } else if (!passwordRegex.test(password)) {
+      setErrMsg(
+        "Password must contain at least one uppercase letter, one number, and one special character."
+      );
+      return false;
+    }
+    return true;
+  }
+
   const submit = async (e) => {
     e.preventDefault();
-    if (userName === "" || email === "" || password === "") {
-      seterrMsg("All fields are required.");
-      return;
-    }
+    if (!validateFields()) return;
     const res = await axios.post(
       "/Signup",
       { userName, email, password },
       { withCredentials: true }
     );
-    if (res.data.errMsg) seterrMsg(res.data.errMsg);
+    if (res.data.errMsg) setErrMsg(res.data.errMsg);
     else window.location.href = res.data.redirect;
   };
 
@@ -69,25 +110,40 @@ export default function Signup() {
             <InputField
               onChangeEvent={(e) => {
                 setUserName(e.target.value);
-                seterrMsg("");
+                setErrMsg("");
               }}
               placeholder="Username"
+              minLength={3}
+              maxLength={50}
             />
             <InputField
               fieldType="email"
               onChangeEvent={(e) => {
                 setEmail(e.target.value);
-                seterrMsg("");
+                setErrMsg("");
               }}
               placeholder="Email"
+              minLength={3}
+              maxLength={100}
             />
             <PasswordField
               onChangeEvent={(e) => {
                 setPassword(e.target.value);
-                seterrMsg("");
+                setErrMsg("");
               }}
               placeholder="Password"
+              minLength={8}
+              maxLength={50}
             />
+            <div className="passwordRequirements">
+              <p>Password must include:</p>
+              <ul>
+                <li>At least 8 characters</li>
+                <li>At least 1 uppercase letter</li>
+                <li>At least 1 number</li>
+                <li>At least 1 special character</li>
+              </ul>
+            </div>
             <Button
               btnType="submit"
               onClickEvent={submit}
