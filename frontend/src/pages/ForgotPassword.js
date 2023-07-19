@@ -8,12 +8,13 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
+import { BiErrorCircle } from "react-icons/bi";
 
 export default function ForgotPassword() {
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
-  const [resetPasswordStep, setResetPasswordStep] = useState("verifyEmail");
+  const [resetPasswordStep, setResetPasswordStep] = useState("verifyOTP");
   const [email, setEmail] = useState("");
   const [enteredOTP, setEnteredOTP] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +24,7 @@ export default function ForgotPassword() {
     number: true,
     specialChar: true,
   });
+  const [resentEmail, setResentEmail] = useState(false);
 
   // Validate password field during input change
   function validatePasswordOnTyping(password) {
@@ -76,12 +78,16 @@ export default function ForgotPassword() {
   };
 
   async function sendResetRequest() {
-    const res = await axios.post(
-      "/forgotpassword",
-      { email },
-      { withCredentials: true }
-    );
-    console.log(res.data);
+    setResentEmail(true);
+    setTimeout(() => {
+      setResentEmail(false);
+    }, 15000);
+    // const res = await axios.post(
+    //   "/forgotpassword",
+    //   { email },
+    //   { withCredentials: true }
+    // );
+    // console.log(res.data);
   }
 
   const validateOTP = async (e) => {
@@ -138,18 +144,40 @@ export default function ForgotPassword() {
           <div className="authHeader">
             <h1>Verify code</h1>
             <p>Please enter the 4 digit code from your email.</p>
-            {/* TODO: Set timeout so users dont spam, and only show this when verification code is sent */}
-            <Button
-              fill="outline"
-              onClickEvent={sendResetRequest}
-              text="Resend email"
-              customStyle={{
-                fontSize: "1rem",
-                fontWeight: "400",
-                padding: "6px 10px",
+            <div
+              style={{
+                display: "flex",
                 marginTop: "1rem",
+                flexWrap: "wrap",
+                gap: "1rem",
               }}
-            />
+            >
+              <Button
+                fill="outline"
+                onClickEvent={sendResetRequest}
+                text="Resend email"
+                disabled={resentEmail}
+                customStyle={{
+                  fontSize: "1rem",
+                  fontWeight: "400",
+                  padding: "6px 10px",
+                }}
+              />
+              {resentEmail && (
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontWeight: 300,
+                    color: "#FF0033",
+                    gap: "5px",
+                  }}
+                >
+                  <BiErrorCircle size={18} color="#FF0033" />
+                  Please wait to re-send another email
+                </span>
+              )}
+            </div>
           </div>
         );
       case "changePassword":
