@@ -87,6 +87,15 @@
   margin-top: 0.5rem;
 }
 
+.passwordRequirements ul li {
+  color: black;
+  transition: all 0.3s ease-in-out;
+}
+
+.passwordRequirements ul li.invalidPassword {
+  color: var(--errorColor);
+}
+
 @media screen and (max-width: 1200px) {
   .authContainer {
     padding: 2rem 3rem;
@@ -110,11 +119,10 @@
   }
 }
 
-
 @media screen and (max-width: 576px) {
   .authContainer {
     min-height: 100vh;
-    padding: 10rem 2rem 4rem
+    padding: 10rem 2rem 4rem;
   }
 
   .authColumn {

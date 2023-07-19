@@ -15,6 +15,12 @@ export default function Signup() {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordValid, setPasswordValid] = useState({
+    length: true,
+    uppercase: true,
+    number: true,
+    specialChar: true,
+  });
 
   useEffect(() => {
     axios
@@ -29,11 +35,24 @@ export default function Signup() {
       .catch((err) => console.log(err));
   }, []);
 
+  // Validate password field during input change
+  function validatePassword(password) {
+    const passwordValid = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      specialChar: /[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~]/.test(password),
+    };
+    setPasswordValid(passwordValid);
+  }
+
+  // Validate all fields before submitting
   function validateFields() {
     // regex
     const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
     const emailRegex = /^([a-z0-9_.-]+)@([\da-z.-]+)\.([a-z.]{2,6})$/g;
-    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~])(?=.*[A-Z])(?=.*[a-z]).*$/;
+    const passwordRegex =
+      /^(?=.*[0-9])(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
     if (userName === "" || email === "" || password === "") {
       setErrMsg("All fields are required.");
@@ -129,6 +148,7 @@ export default function Signup() {
             <PasswordField
               onChangeEvent={(e) => {
                 setPassword(e.target.value);
+                validatePassword(e.target.value);
                 setErrMsg("");
               }}
               placeholder="Password"
@@ -138,10 +158,22 @@ export default function Signup() {
             <div className="passwordRequirements">
               <p>Password must include:</p>
               <ul>
-                <li>At least 8 characters</li>
-                <li>At least 1 uppercase letter</li>
-                <li>At least 1 number</li>
-                <li>At least 1 special character</li>
+                <li className={passwordValid.length ? "" : "invalidPassword"}>
+                  At least 8 characters
+                </li>
+                <li
+                  className={passwordValid.uppercase ? "" : "invalidPassword"}
+                >
+                  At least 1 uppercase letter
+                </li>
+                <li className={passwordValid.number ? "" : "invalidPassword"}>
+                  At least 1 number
+                </li>
+                <li
+                  className={passwordValid.specialChar ? "" : "invalidPassword"}
+                >
+                  At least 1 special character
+                </li>
               </ul>
             </div>
             <Button
