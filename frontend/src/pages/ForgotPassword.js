@@ -14,7 +14,7 @@ export default function ForgotPassword() {
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
-  const [resetPasswordStep, setResetPasswordStep] = useState("verifyOTP");
+  const [resetPasswordStep, setResetPasswordStep] = useState("verifyEmail");
   const [email, setEmail] = useState("");
   const [enteredOTP, setEnteredOTP] = useState("");
   const [password, setPassword] = useState("");
