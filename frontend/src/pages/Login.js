@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BiErrorCircle } from "react-icons/bi";
 import { GoArrowLeft } from "react-icons/go";
 import axios from "../api/axios";
 import "../styles/Global.css";
@@ -8,6 +7,7 @@ import "../styles/Auth.css";
 import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
+import AlertMessage from "../components/alertMessage";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(true);
@@ -34,17 +34,17 @@ export default function Login() {
       setErrMsg("All fields are required.");
       return;
     }
-      const res = await axios.post(
-        "/Signin",
-        { email, password },
-        { withCredentials: true }
-      );
-      console.log(res.data);
-      if (res.data.errMsg) setErrMsg(res.data.errMsg);
-      else {
-        localStorage.setItem('isLoggedIn', true);
-        window.location.href = res.data.redirect;
-      }
+    const res = await axios.post(
+      "/Signin",
+      { email, password },
+      { withCredentials: true }
+    );
+    console.log(res.data);
+    if (res.data.errMsg) setErrMsg(res.data.errMsg);
+    else {
+      localStorage.setItem("isLoggedIn", true);
+      window.location.href = res.data.redirect;
+    }
   };
 
   if (isLoading) return;
@@ -62,12 +62,8 @@ export default function Login() {
             <h1>Login</h1>
             <p>Welcome back! Please enter your details.</p>
           </div>
-          {errMsg && (
-            <div className="errorMessageContainer">
-              <BiErrorCircle size={24} color="#FF0033" />
-              <p>{errMsg}</p>
-            </div>
-          )}
+
+          {errMsg && <AlertMessage msg={errMsg} type="error" />}
           <form action="POST" className="authFormContainer">
             <InputField
               fieldType="email"

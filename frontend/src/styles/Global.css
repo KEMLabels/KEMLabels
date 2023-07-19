@@ -6,6 +6,7 @@
   --linkColor: #2B4E7B;
   --errorColor: #FF0033;
   --successColor: #00CC66;
+  --infoColor: #0066FF;
 }
 
 * {
@@ -25,11 +26,11 @@ body {
 }
 
 .wrapper {
-  margin-top: 12vh;
+  padding-top: 12vh;
 }
 
 .wrapper.navHidden {
-  margin-top: 0;
+  padding-top: 0;
 }
 
 .link {
@@ -145,6 +146,47 @@ body {
   font-weight: 300;
   line-height: 1rem;
   opacity: 0.9;
+}
+
+.alertMessageContainer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.25rem;
+}
+
+.alertMessageContainer p {
+  font-size: 1.1rem;
+  font-weight: 300;
+  line-height: 1rem;
+  padding-left: 5px;
+  margin-bottom: 2px;
+}
+
+.alertMessageContainer.error {
+  border: solid 1px var(--errorColor);
+}
+
+.alertMessageContainer.error p {
+  color: var(--errorColor);
+}
+
+.alertMessageContainer.success {
+  border: solid 1px var(--successColor);
+}
+
+.alertMessageContainer.success p {
+  color: var(--successColor);
+}
+
+.alertMessageContainer.info {
+  border: solid 1px var(--infoColor);
+}
+
+.alertMessageContainer.success p {
+  color: var(--infoColor);
 }
 
 @media screen and (max-width: 576px) {

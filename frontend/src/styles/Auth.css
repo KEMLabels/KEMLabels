@@ -43,25 +43,6 @@
   margin-top: 3rem;
 }
 
-.errorMessageContainer {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  border: solid 1px var(--errorColor);
-  border-radius: 0.25rem;
-}
-
-.errorMessageContainer p {
-  font-size: 1.1rem;
-  font-weight: 300;
-  line-height: 1rem;
-  color: var(--errorColor);
-  padding-left: 5px;
-  margin-bottom: 2px;
-}
-
 .backToHome {
   padding-bottom: 2rem;
 }
@@ -122,7 +103,7 @@
 @media screen and (max-width: 576px) {
   .authContainer {
     min-height: 100vh;
-    padding: 10rem 2rem 4rem;
+    padding: 7rem 2rem 4rem;
   }
 
   .authColumn {

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BiErrorCircle } from "react-icons/bi";
 import { GoArrowLeft } from "react-icons/go";
 import axios from "../api/axios.js";
 import "../styles/Global.css";
@@ -8,6 +7,7 @@ import "../styles/Auth.css";
 import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout.js";
+import AlertMessage from "../components/alertMessage.js";
 
 export default function Signup() {
   const [isLoading, setIsLoading] = useState(true);
@@ -119,12 +119,7 @@ export default function Signup() {
             <h1>Create an account</h1>
             <p>Let's get started with a free account.</p>
           </div>
-          {errMsg && (
-            <div className="errorMessageContainer">
-              <BiErrorCircle size={24} color="#FF0033" />
-              <p>{errMsg}</p>
-            </div>
-          )}
+          {errMsg && <AlertMessage msg={errMsg} type="error" />}
           <form action="POST" className="authFormContainer">
             <InputField
               onChangeEvent={(e) => {
