@@ -7,7 +7,7 @@ import "../styles/Auth.css";
 import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout.js";
-import AlertMessage from "../components/alertMessage.js";
+import AlertMessage from "../components/AlertMessage.js";
 
 export default function Signup() {
   const [isLoading, setIsLoading] = useState(true);
