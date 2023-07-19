@@ -6,6 +6,7 @@ const axios = require('axios')
 const session = require('express-session');
 const dotenv = require("dotenv")
 const cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
 dotenv.config();
 require('express-async-errors');
 const mongoose = require('mongoose');
@@ -23,6 +24,13 @@ const connectDB = async () => {
 }
 
 const User = require('./model/users.js');
+
+const tempCode = new mongoose.Schema({
+    passcode: { type: Number },
+    createdAt: { type: Date, expires: '5m', default: Date.now }
+});
+const tempCodeModule = mongoose.model('OTP', tempCode);
+const tempCodeModuleModify = new tempCodeModule;
 
 const MongoDBStore = require('connect-mongodb-session')(session);
 const store = new MongoDBStore({
@@ -62,6 +70,13 @@ app.use(session({
     store: store,
 }));
 
+const transporter = nodemailer.createTransport({
+    service: 'hotmail',
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+    }
+});
 
 async function handleErr(err, req, res, next) {
     console.log(err.message)
@@ -140,9 +155,112 @@ app.post("/signup", async (req, res) => {
     });
     new_user.save()
 
+    sendSignUpConfirmationEmail(data.email);
+
     req.session.user = new_user;
     req.session.isLoggedIn = true;
     res.json({ redirect: '/' });
+})
+
+function sendSignUpConfirmationEmail(emailAddress) {
+    const signUpConfirmationEmail = {
+        from: process.env.MAIL_USER,
+        to: emailAddress,
+        subject: 'You have a new patient waiting for you!',
+        html: `<div style="display:flex;width:100%;background:#09C5A3;"><img src="cid:logo" style="width:15%;margin:auto;padding:1.5rem 1rem 1rem;object-fit:contain;object-position:center center;"></div>
+        <div style="display:flex;width:100%;background:#09C5A3;margin-bottom:2rem;"><h1 style="text-align:center;color:#FFF;text-transform:capitalize;font-size:2rem;font-weight:700;padding-top:1rem;padding-bottom:1rem;width: 100%;">You have a new patient waiting for you!</h1></div>
+        <p style="font-size:14px;color:#000;">Thank you for signing up with us!</p><p style="font-size:14px;color:#000;">Cheers</p>`,
+    }
+    transporter.sendMail(signUpConfirmationEmail, function (err, info) {
+        if (err) console.log(err)
+    });
+}
+
+app.post("/emailExists", async (req,res) => {
+    const { email } = req.body
+
+    const data = {
+        email: email
+    }
+
+    const emailExists =  await User.findOne({ email: data.email })
+    if (!emailExists) throw new Error('This email is not associated with an account.');
+    else res.json({emailExists});
+})
+
+app.post("/forgotpassword", async (req, res) => {
+    const { email } = req.body
+    const otp = Math.floor(1000 + Math.random() * 9000);    
+    tempCodeModuleModify.passcode = otp;
+    tempCodeModuleModify.save();
+    sendOTPEmail(otp, email);
+})
+
+function sendOTPEmail(OTPPasscode, emailAddress) {
+    const sendOneTimePasscodeEmail = {
+        from: process.env.MAIL_USER,
+        to: emailAddress,
+        subject: 'Your One Time Passcode',
+        html: `<div style="display:flex;width:100%;background:#09C5A3;"><img src="cid:logo" style="width:15%;margin:auto;padding:1.5rem 1rem 1rem;object-fit:contain;object-position:center center;"></div>
+        <div style="display:flex;width:100%;background:#09C5A3;margin-bottom:2rem;"><h1 style="text-align:center;color:#FFF;text-transform:capitalize;font-size:2rem;font-weight:700;padding-top:1rem;padding-bottom:1rem;width: 100%;">You have a new patient waiting for you!</h1></div>
+        <p style="font-size:14px;color:#000;">Your OTP is: ${OTPPasscode} </p><p style="font-size:14px;color:#000;">Cheers</p>`,
+    }
+    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
+        if (err) console.log(err)
+    });
+}
+
+app.post("/checkOTP", (req, res) => {
+    const { enteredOTP } = req.body
+
+    console.log('entered code: ' + enteredOTP);
+    console.log('correct code: ' + tempCodeModuleModify.passcode);
+    if(Number(enteredOTP) === Number(tempCodeModuleModify.passcode)) throw new Error('SUCCESS');
+    else throw new Error('WRONG CODE');
+})
+
+app.post("/updateUserPass", async (req, res) => {
+    const { email, password } = req.body
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const userData =  await User.findOne({ email: email })
+    
+    User.updateOne({
+        "_id": userData._id.toString()
+    }, {
+        "password": hashedPassword
+    })
+    .then((obj) => {
+        console.log("Updated Password");
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+
+    sendChangePasswordConfirmation(email);
+
+    res.json({ redirect: '/signin' });
+
+})
+
+function sendChangePasswordConfirmation(emailAddress) {
+    const changePassConfirmation = {
+        from: process.env.MAIL_USER,
+        to: emailAddress,
+        subject: 'Your One Time Passcode',
+        html: `<div style="display:flex;width:100%;background:#09C5A3;"><img src="cid:logo" style="width:15%;margin:auto;padding:1.5rem 1rem 1rem;object-fit:contain;object-position:center center;"></div>
+        <div style="display:flex;width:100%;background:#09C5A3;margin-bottom:2rem;"><h1 style="text-align:center;color:#FFF;text-transform:capitalize;font-size:2rem;font-weight:700;padding-top:1rem;padding-bottom:1rem;width: 100%;">You have a new patient waiting for you!</h1></div>
+        <p style="font-size:14px;color:#000;">Your password has been changed. </p><p style="font-size:14px;color:#000;">Cheers</p>`,
+    }
+    transporter.sendMail(changePassConfirmation, function (err, info) {
+        if (err) console.log(err)
+    });
+}
+
+app.get('*', (req, res) => {
+    throw new Error('PAGE NOT FOUND');
 })
 
 app.use(handleErr);

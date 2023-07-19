@@ -15,6 +15,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    credits: {
+        type: Number,
+        default: 0 
+    },
+    verified: {
+        type: Boolean,
+        default: false
+    },
     isAdmin: {
         type: Boolean,
         default: false
