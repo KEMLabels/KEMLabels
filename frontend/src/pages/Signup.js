@@ -36,7 +36,7 @@ export default function Signup() {
   }, []);
 
   // Validate password field during input change
-  function validatePassword(password) {
+  function validatePasswordOnTyping(password) {
     const passwordValid = {
       length: password.length >= 8,
       uppercase: /[A-Z]/.test(password),
@@ -143,7 +143,7 @@ export default function Signup() {
             <PasswordField
               onChangeEvent={(e) => {
                 setPassword(e.target.value);
-                validatePassword(e.target.value);
+                validatePasswordOnTyping(e.target.value);
                 setErrMsg("");
               }}
               placeholder="Password"

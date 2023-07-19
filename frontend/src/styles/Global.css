@@ -155,6 +155,7 @@ body {
   padding: 1rem;
   margin-bottom: 1.5rem;
   border-radius: 0.25rem;
+  transition: all 0.3s ease-in-out;
 }
 
 .alertMessageContainer p {
@@ -185,7 +186,7 @@ body {
   border: solid 1px var(--infoColor);
 }
 
-.alertMessageContainer.success p {
+.alertMessageContainer.info p {
   color: var(--infoColor);
 }
 
