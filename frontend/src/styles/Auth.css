@@ -77,6 +77,33 @@
   color: var(--errorColor);
 }
 
+.otpContainer {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 1rem;
+}
+
+.otpContainer .otpInputContainer {
+  height: 75px;
+  width: 280px;
+}
+
+.otpContainer .otpText {
+  font-size: 2rem;
+  line-height: 4rem;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+}
+
+.otpContainer .inactiveText {
+  background-color: #ececec;
+}
+
+.otpContainer .selectedText {
+  outline: solid 1px var(--infoColor);
+  color: var(--infoColor);
+}
+
 @media screen and (max-width: 1200px) {
   .authContainer {
     padding: 2rem 3rem;
@@ -124,5 +151,13 @@
 
   .authFormContainer button {
     margin-top: 2rem;
+  }
+
+  .otpContainer .otpInputContainer {
+    width: 270px;
+  }
+
+  .otpContainer .otpText {
+    font-size: 1.8rem;
   }
 }

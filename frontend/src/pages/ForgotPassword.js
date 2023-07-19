@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
+import VerificationInput from "react-verification-input";
 import axios from "../api/axios";
 import "../styles/Global.css";
 import "../styles/Auth.css";
@@ -218,15 +219,24 @@ export default function ForgotPassword() {
       case "verifyOTP":
         return (
           <>
-            <InputField
-              onChangeEvent={(e) => {
-                setEnteredOTP(e.target.value);
-                setErrMsg("");
-              }}
-              minLength={0}
-              maxLength={9999}
-              placeholder="Verification code"
-            />
+            <div className="otpContainer">
+              <VerificationInput
+                length={4}
+                autoFocus
+                placeholder="*"
+                validChars="0-9"
+                classNames={{
+                  container: "otpInputContainer",
+                  character: "otpText",
+                  characterInactive: "inactiveText",
+                  characterSelected: "selectedText",
+                }}
+                onChange={(value) => {
+                  setEnteredOTP(value);
+                  setErrMsg("");
+                }}
+              />
+            </div>
             <Button
               btnType="submit"
               onClickEvent={validateOTP}
@@ -296,7 +306,7 @@ export default function ForgotPassword() {
             <div className="backToHome">
               <Link to="/signin" className="link">
                 <GoArrowLeft size={18} style={{ marginTop: "2px" }} />
-                <p>Go back</p>
+                <p>Back to login</p>
               </Link>
             </div>
           )}
