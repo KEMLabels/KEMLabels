@@ -215,8 +215,7 @@ app.post("/checkOTP", (req, res) => {
 
     console.log('entered code: ' + enteredOTP);
     console.log('correct code: ' + tempCodeModuleModify.passcode);
-    if(Number(enteredOTP) === Number(tempCodeModuleModify.passcode)) throw new Error('SUCCESS');
-    else throw new Error('WRONG CODE');
+    if(Number(enteredOTP) !== Number(tempCodeModuleModify.passcode)) throw new Error('Incorrect code. Please try again.');
 })
 
 app.post("/updateUserPass", async (req, res) => {
