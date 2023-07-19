@@ -6,6 +6,7 @@ export default function Button({
   className = "",
   fill = "solid",
   onClickEvent,
+  disabled = false,
   text,
   children,
   customStyle,
@@ -17,6 +18,7 @@ export default function Button({
         fill === "solid" ? "solid" : "outline"
       }`}
       style={{ ...customStyle }}
+      disabled={disabled}
       onClick={(e) => {
         if (onClickEvent) onClickEvent(e);
       }}

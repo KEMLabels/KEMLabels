@@ -81,6 +81,20 @@ body {
   color: white;
 }
 
+.labelMasterBtn:disabled {
+  background-color: #d7d7d7;
+  border-color: #cbcbcb;
+  color: #856ed7;
+  opacity: 0.7;
+}
+
+.labelMasterBtn:disabled:hover {
+  background-color: #e6e6e6;
+  border-color: #dbdbdb;
+  color: #a68dff;
+  opacity: 1;
+}
+
 .fieldContainer {
   display: flex;
   flex-direction: row;
