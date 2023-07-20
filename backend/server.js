@@ -256,10 +256,12 @@ function sendOTPEmail(OTPPasscode, emailAddress) {
 
 app.post("/checkOTP", (req, res) => {
     const { enteredOTP } = req.body
-
     console.log('entered code: ' + enteredOTP);
     console.log('correct code: ' + tempCodeModuleModify.passcode);
-    if(Number(enteredOTP) !== Number(tempCodeModuleModify.passcode)) throw new Error('Incorrect code. Please try again.');
+    if(Number(enteredOTP) !== Number(tempCodeModuleModify.passcode)) {
+        throw new Error('Incorrect code. Please try again.');
+    }
+    res.status(200).json("success");
 })
 
 app.post("/updateUserPass", async (req, res) => {

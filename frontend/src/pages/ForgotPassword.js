@@ -72,9 +72,6 @@ export default function ForgotPassword() {
       document.getElementById("resetPasswordForm").reset();
       setResetPasswordStep("verifyOTP");
       setInfoMsg("Email has been sent. Please check your inbox.");
-      setTimeout(() => {
-        setInfoMsg("");
-      }, 2000);
     }
   };
 
@@ -83,12 +80,12 @@ export default function ForgotPassword() {
     setTimeout(() => {
       setResentEmail(false);
     }, 15000);
-    // const res = await axios.post(
-    //   "/forgotpassword",
-    //   { email },
-    //   { withCredentials: true }
-    // );
-    // console.log(res.data);
+    const res = await axios.post(
+      "/forgotpassword",
+      { email },
+      { withCredentials: true }
+    );
+    console.log(res.data);
   }
 
   const validateOTP = async (e) => {
@@ -98,15 +95,20 @@ export default function ForgotPassword() {
       { enteredOTP },
       { withCredentials: true }
     );
-    console.log(res.data.errMsg);
-    if (res.data.errMsg) setErrMsg(res.data.errMsg);
+
+    console.log(res);
+    setInfoMsg("");
+
+    if (res.data.errMsg) {
+      setErrMsg(res.data.errMsg);
+    } 
     else {
       document.getElementById("resetPasswordForm").reset();
       setResetPasswordStep("changePassword");
       setSuccessMsg("Verification successful.");
       setTimeout(() => {
         setSuccessMsg("");
-      }, 2000);
+      }, 5000);
     }
   };
 
@@ -120,11 +122,11 @@ export default function ForgotPassword() {
     );
     if (res.data.errMsg) setErrMsg(res.data.errMsg);
     else {
-      setSuccessMsg("Password updated successfully.");
+      setSuccessMsg("Password updated successfully! Redirecting you to home...");
       setTimeout(() => {
         setSuccessMsg("");
         window.location.href = res.data.redirect;
-      }, 2000);
+      }, 3000);
     }
   };
 
