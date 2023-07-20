@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
-import axios from "../api/axios.js";
+import axios from "../api/axios";
 import "../styles/Global.css";
 import "../styles/Auth.css";
 import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
-import PageLayout from "../components/PageLayout.js";
-import AlertMessage from "../components/alertMessage.js";
+import PageLayout from "../components/PageLayout";
+import AlertMessage from "../components/AlertMessageCard";
 
 export default function Signup() {
   const [isLoading, setIsLoading] = useState(true);

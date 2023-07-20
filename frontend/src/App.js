@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
-import AuthProvider from "./components/AuthProvider"
+import AuthProvider from "./components/AuthProvider";
 import VerifyEmail from "./pages/VerifyEmail";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 

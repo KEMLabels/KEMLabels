@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { GoArrowLeft } from "react-icons/go";
+import { BiErrorCircle } from "react-icons/bi";
 import VerificationInput from "react-verification-input";
 import axios from "../api/axios";
 import "../styles/Global.css";
@@ -8,8 +9,7 @@ import "../styles/Auth.css";
 import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
-import AlertMessage from "../components/alertMessage";
-import { BiErrorCircle } from "react-icons/bi";
+import AlertMessage from "../components/AlertMessageCard";
 
 export default function ForgotPassword() {
   const [errMsg, setErrMsg] = useState("");
