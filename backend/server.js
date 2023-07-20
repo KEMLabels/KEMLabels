@@ -7,6 +7,7 @@ const session = require('express-session');
 const dotenv = require("dotenv")
 const cookieParser = require('cookie-parser');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 dotenv.config();
 require('express-async-errors');
 const mongoose = require('mongoose');
@@ -71,7 +72,7 @@ app.use(session({
 }));
 
 const transporter = nodemailer.createTransport({
-    service: 'hotmail',
+    service: 'gmail',
     auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS
@@ -147,34 +148,77 @@ app.post("/signup", async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt);
+    const token = crypto.randomBytes(32).toString("hex");
 
     const new_user = new User({
         userName: data.userName,
         email: data.email,
-        password: hashedPassword
+        password: hashedPassword,
+        token: token
     });
     new_user.save()
-
-    sendSignUpConfirmationEmail(data.email);
+    const url = `http://localhost:3000/users/${new_user._id}/verify/${token}`;
+    await sendSignUpConfirmationEmail(data.email, url);
 
     req.session.user = new_user;
     req.session.isLoggedIn = true;
-    res.json({ redirect: '/' });
-})
+    res.json({ redirect: '/verifyemail' });
+})  
 
-function sendSignUpConfirmationEmail(emailAddress) {
+async function sendSignUpConfirmationEmail(emailAddress, url) {
     const signUpConfirmationEmail = {
         from: process.env.MAIL_USER,
         to: emailAddress,
-        subject: 'You have a new patient waiting for you!',
+        subject: 'Sign up confirmation',
         html: `<div style="display:flex;width:100%;background:#09C5A3;"><img src="cid:logo" style="width:15%;margin:auto;padding:1.5rem 1rem 1rem;object-fit:contain;object-position:center center;"></div>
         <div style="display:flex;width:100%;background:#09C5A3;margin-bottom:2rem;"><h1 style="text-align:center;color:#FFF;text-transform:capitalize;font-size:2rem;font-weight:700;padding-top:1rem;padding-bottom:1rem;width: 100%;">You have a new patient waiting for you!</h1></div>
-        <p style="font-size:14px;color:#000;">Thank you for signing up with us!</p><p style="font-size:14px;color:#000;">Cheers</p>`,
+        <p style="font-size:14px;color:#000;">Thank you for signing up with us! Verify your acount here: ${url}</p><p style="font-size:14px;color:#000;">Cheers</p>`,
     }
     transporter.sendMail(signUpConfirmationEmail, function (err, info) {
         if (err) console.log(err)
     });
 }
+
+app.get('/users/:id/verify/:token', async (req, res) => {
+    try {
+        const user = await User.findOne({_id: req.params.id});
+        if(!user) throw new Error('Invalid Link');
+        console.log(user);
+
+        User.updateOne({
+            "_id": user._id.toString()
+        }, {
+            "verified": true
+        })
+        .then((obj) => {
+            console.log("User has been verified");
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+
+        return res.json({ redirect: '/' });
+    } catch (err) {
+        console.log(err);
+    }
+})
+
+app.get('/isUserVerified', async (req, res) => {
+    const user = await User.findOne({_id: req.session.user._id});
+    if(!user) throw new Error('An error occured.');
+    const verified = user.verified;
+
+    if(!verified) throw new Error('You must verify your account first.');
+    else res.json({ redirect: '/' });
+})
+
+app.get('/checkVerification', async(req, res) => {
+    const user = await User.findOne({_id: req.session.user._id});
+    if(!user) throw new Error('An error occured.');
+    const verified = user.verified;
+
+    if(!verified) throw new Error('User is not verified');
+})
 
 app.post("/emailExists", async (req,res) => {
     const { email } = req.body

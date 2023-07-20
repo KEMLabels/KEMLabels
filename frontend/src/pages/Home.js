@@ -1,11 +1,30 @@
-import React from "react";
+import React, {useEffect} from "react";
 import "../styles/Global.css";
 import "../styles/Home.css";
 import PageLayout from "../components/PageLayout";
 import Accordion from "../components/Accordion";
 import FaqJson from "../content/faq.json";
+import axios from '../api/axios'
 
 export default function Home() {
+  useEffect(() => {
+    axios
+      .get("/getSessionInfo", { withCredentials: true })
+      .then((res) => {
+        if (res.data.isLoggedIn) {
+          axios
+          .get("/checkVerification", { withCredentials: true })
+          .then((res) => {
+            if (res.data.errMsg) {
+              window.location.href = "/verifyEmail";
+            }
+          })
+          .catch((err) => console.log(err));
+        }
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
   return (
     <PageLayout isLandingPage>
       <div id="home" className="hero">

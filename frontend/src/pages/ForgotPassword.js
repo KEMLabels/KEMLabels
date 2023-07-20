@@ -8,7 +8,7 @@ import "../styles/Auth.css";
 import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
-import AlertMessage from "../components/AlertMessage";
+import AlertMessage from "../components/alertMessage";
 import { BiErrorCircle } from "react-icons/bi";
 
 export default function ForgotPassword() {
