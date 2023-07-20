@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "../api/axios";
-import AlertMessage from "../components/AlertMessageCard";
+import AlertMessage from "../components/AlertMessage";
 
 function EmailVerificationPage() {
   const [errMsg, setErrMsg] = useState("");
