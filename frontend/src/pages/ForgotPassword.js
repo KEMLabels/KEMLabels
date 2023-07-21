@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import { BiErrorCircle } from "react-icons/bi";
 import VerificationInput from "react-verification-input";
@@ -12,9 +13,12 @@ import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
 
 export default function ForgotPassword() {
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [resetPasswordStep, setResetPasswordStep] = useState("verifyEmail");
   const [email, setEmail] = useState("");
   const [enteredOTP, setEnteredOTP] = useState("");
@@ -26,6 +30,14 @@ export default function ForgotPassword() {
     specialChar: true,
   });
   const [resentEmail, setResentEmail] = useState(false);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      window.location.href = "/";
+    } else {
+      setIsLoading(false);
+    }
+  }, [isLoggedIn]);
 
   // Validate password field during input change
   function validatePasswordOnTyping(password) {
@@ -101,8 +113,7 @@ export default function ForgotPassword() {
 
     if (res.data.errMsg) {
       setErrMsg(res.data.errMsg);
-    } 
-    else {
+    } else {
       document.getElementById("resetPasswordForm").reset();
       setResetPasswordStep("changePassword");
       setSuccessMsg("Verification successful.");
@@ -122,7 +133,9 @@ export default function ForgotPassword() {
     );
     if (res.data.errMsg) setErrMsg(res.data.errMsg);
     else {
-      setSuccessMsg("Password updated successfully! Redirecting you to home...");
+      setSuccessMsg(
+        "Password updated successfully! Redirecting you to home..."
+      );
       setTimeout(() => {
         setSuccessMsg("");
         window.location.href = res.data.redirect;
@@ -293,6 +306,7 @@ export default function ForgotPassword() {
     }
   }
 
+  if (isLoading) return;
   return (
     <PageLayout title="Forgot Password">
       <div
