@@ -1,0 +1,2 @@
+export const SET_USER_EMAIL = "SET_USER_EMAIL";
+export const SET_USER_LOGGED_IN = "SET_USER_LOGGED_IN";
