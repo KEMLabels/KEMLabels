@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import axios from "../api/axios";
 import "../styles/Global.css";
@@ -8,25 +9,24 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
+import { setUserLoggedIn } from "../redux/actions/AuthAction";
 
 export default function Login() {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
   const [isLoading, setIsLoading] = useState(true);
   const [errMsg, setErrMsg] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    axios
-      .get("/getSessionInfo", { withCredentials: true })
-      .then((res) => {
-        if (res.data.isLoggedIn) {
-          window.location.href = "/";
-        } else {
-          setIsLoading(false);
-        }
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (isLoggedIn) {
+      window.location.href = "/";
+    } else {
+      setIsLoading(false);
+    }
+  }, [isLoggedIn]);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -42,7 +42,7 @@ export default function Login() {
     console.log(res.data);
     if (res.data.errMsg) setErrMsg(res.data.errMsg);
     else {
-      localStorage.setItem("isLoggedIn", true);
+      dispatch(setUserLoggedIn(true));
       window.location.href = res.data.redirect;
     }
   };

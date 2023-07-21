@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import axios from "../api/axios";
 import "../styles/Global.css";
@@ -8,8 +9,12 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
+import { setUserEmail, setUserLoggedIn } from "../redux/actions/AuthAction";
 
 export default function Signup() {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
   const [isLoading, setIsLoading] = useState(true);
   const [errMsg, setErrMsg] = useState("");
   const [userName, setUserName] = useState("");
@@ -23,17 +28,12 @@ export default function Signup() {
   });
 
   useEffect(() => {
-    axios
-      .get("/getSessionInfo", { withCredentials: true })
-      .then((res) => {
-        if (res.data.isLoggedIn) {
-          window.location.href = "/";
-        } else {
-          setIsLoading(false);
-        }
-      })
-      .catch((err) => console.log(err));
-  }, []);
+    if (isLoggedIn) {
+      window.location.href = "/";
+    } else {
+      setIsLoading(false);
+    }
+  }, [isLoggedIn]);
 
   // Validate password field during input change
   function validatePasswordOnTyping(password) {
@@ -101,7 +101,11 @@ export default function Signup() {
       { withCredentials: true }
     );
     if (res.data.errMsg) setErrMsg(res.data.errMsg);
-    else window.location.href = res.data.redirect;
+    else {
+      dispatch(setUserEmail(email));
+      dispatch(setUserLoggedIn(true));
+      window.location.href = res.data.redirect;
+    }
   };
 
   if (isLoading) return;

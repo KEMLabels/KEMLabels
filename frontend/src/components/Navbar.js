@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useRef } from "react";
-import axios from "../api/axios";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import axios from "../api/axios";
+import { setUserLoggedIn } from "../redux/actions/AuthAction";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
-import { AuthContext } from "./AuthProvider";
 
 const useScrollToLocation = () => {
   const scrolledRef = useRef(false);
@@ -33,7 +34,8 @@ const useScrollToLocation = () => {
 
 export default function Navbar({ hideNavAndFooter = false }) {
   useScrollToLocation();
-  const {isLoggedIn, setIsLoggedIn} = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   return (
     <nav className={`navbar ${hideNavAndFooter ? "navHidden" : ""}`}>
@@ -47,23 +49,24 @@ export default function Navbar({ hideNavAndFooter = false }) {
         </div>
         <div className="navLinksContainer">
           <Link className="navLink" to="/#howitworks">
-          How It Works
+            How It Works
           </Link>
           <Link className="navLink" to="/#faq">
             FAQ
           </Link>
-          {!isLoggedIn && <NavLink className="navLink" to="/signin" activeclassname="active">
-            Sign In
-          </NavLink>}
+          {!isLoggedIn && (
+            <NavLink className="navLink" to="/signin" activeclassname="active">
+              Sign In
+            </NavLink>
+          )}
           {isLoggedIn && (
             <Link
               className="navLink"
               onClick={async (e) => {
                 e.preventDefault();
-                await axios.get('/logout', { withCredentials: true })
-                setIsLoggedIn(false);
-                localStorage.removeItem('isLoggedIn');
-                window.location.href = '/';
+                await axios.get("/logout", { withCredentials: true });
+                dispatch(setUserLoggedIn(false));
+                window.location.href = "/";
               }}
             >
               Logout

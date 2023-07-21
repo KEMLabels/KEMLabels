@@ -1,12 +1,23 @@
 import React, { useState } from "react";
-import { FaBars, FaQuestionCircle, FaSignInAlt, FaPhoneAlt, FaEnvelope, FaSignOutAlt, FaLayerGroup } from "react-icons/fa";
-import { IoCloseSharp } from "react-icons/io5";
+import { useDispatch } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
+import {
+  FaBars,
+  FaQuestionCircle,
+  FaSignInAlt,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaSignOutAlt,
+  FaLayerGroup,
+} from "react-icons/fa";
+import { IoCloseSharp } from "react-icons/io5";
+import axios from "../api/axios";
+import { setUserLoggedIn } from "../redux/actions/AuthAction";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
-import axios from "../api/axios"
 
 export default function HamburgerMenu({ sessionStatus = false }) {
+  const dispatch = useDispatch();
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
   // Hides menu when user clicks outside of menu
@@ -59,19 +70,20 @@ export default function HamburgerMenu({ sessionStatus = false }) {
             <FaQuestionCircle />
             <span>FAQ</span>
           </Link>
-          {!sessionStatus && <NavLink className="navLink" to="/signin" activeclassname="active">
-            <FaSignInAlt />
-            <span>Sign In</span>
-          </NavLink>}
+          {!sessionStatus && (
+            <NavLink className="navLink" to="/signin" activeclassname="active">
+              <FaSignInAlt />
+              <span>Sign In</span>
+            </NavLink>
+          )}
           {sessionStatus && (
             <Link
               className="navLink"
               onClick={async (e) => {
                 e.preventDefault();
-                await axios.get('/logout', { withCredentials: true })
-                sessionStatus = false;
-                localStorage.removeItem('isLoggedIn');
-                window.location.href = '/';
+                await axios.get("/logout", { withCredentials: true });
+                dispatch(setUserLoggedIn(false));
+                window.location.href = "/";
               }}
             >
               <FaSignOutAlt />
@@ -82,6 +94,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
         <div className="mobContact">
           <p>Contact us at:</p>
           <div className="contactInfo">
+            {/* TOOD: Update contact info */}
             <a href="tel:6041231234">
               <FaPhoneAlt size={16} />
               <span>6041231234</span>
