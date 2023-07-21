@@ -1,28 +1,11 @@
-import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import React from "react";
 import "../styles/Global.css";
 import "../styles/Home.css";
 import PageLayout from "../components/PageLayout";
 import Accordion from "../components/Accordion";
 import FaqJson from "../content/faq";
-import axios from "../api/axios";
 
 export default function Home() {
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      axios
-        .get("/checkVerification", { withCredentials: true })
-        .then((res) => {
-          if (res.data.errMsg) {
-            window.location.href = "/verifyEmail";
-          }
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [isLoggedIn]);
-
   return (
     <PageLayout isLandingPage>
       <div id="home" className="hero">
