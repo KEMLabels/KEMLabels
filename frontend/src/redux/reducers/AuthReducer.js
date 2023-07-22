@@ -10,7 +10,10 @@ export const authInitialState = {
   email: null,
   isLoggedIn: false,
   verifyEmailAttempts: 0,
-  verifyForgetPassEmailAttempts: 0,
+  verifyForgetPassEmail: {
+    attempts: 0,
+    lastAttemptDateTime: "",
+  },
 };
 
 export default function AuthReducer(state = authInitialState, action) {
@@ -22,7 +25,10 @@ export default function AuthReducer(state = authInitialState, action) {
     case SET_VERIFY_EMAIL_ATTEMPTS:
       return { ...state, verifyEmailAttempts: action.payload };
     case SET_FORGET_PASS_EMAIL_ATTEMPTS:
-      return { ...state, verifyForgetPassEmailAttempts: action.payload };
+      return {
+        ...state,
+        verifyForgetPassEmail: action.payload,
+      };
     case CLEAR_USER:
       return authInitialState;
     default:

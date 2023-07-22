@@ -27,12 +27,13 @@ export const setVerifyEmailAttempts = (attempts) => (dispatch) => {
   });
 };
 
-export const setForgetPassEmailAttempts = (attempts) => (dispatch) => {
-  dispatch({
-    type: SET_FORGET_PASS_EMAIL_ATTEMPTS,
-    payload: attempts,
-  });
-};
+export const setForgetPassEmailAttempts =
+  (attempts, lastAttemptDateTime) => (dispatch) => {
+    dispatch({
+      type: SET_FORGET_PASS_EMAIL_ATTEMPTS,
+      payload: { attempts, lastAttemptDateTime },
+    });
+  };
 
 export const clearUser = () => (dispatch) => {
   dispatch({

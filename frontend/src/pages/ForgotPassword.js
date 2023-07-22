@@ -15,8 +15,8 @@ import { setForgetPassEmailAttempts } from "../redux/actions/AuthAction";
 
 export default function ForgotPassword() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const verifyForgetPassEmailAttempts = useSelector(
-    (state) => state.auth.verifyForgetPassEmailAttempts
+  const verifyForgetPassEmailState = useSelector(
+    (state) => state.auth.verifyForgetPassEmail
   );
 
   const dispatch = useDispatch();
@@ -37,12 +37,39 @@ export default function ForgotPassword() {
   const [resentEmail, setResentEmail] = useState(false);
 
   useEffect(() => {
+    if (verifyForgetPassEmailState.lastAttemptDateTime) {
+      const currentTime = Date.parse(getCurrentTimeInPST());
+      const lastAttemptTime = Date.parse(
+        verifyForgetPassEmailState.lastAttemptDateTime
+      );
+      const timeDifferenceInMinutes = Math.floor(
+        Math.abs(currentTime - lastAttemptTime) / 1000 / 60
+      );
+      // if it has been 3 hours since the last attempt, reset the attempts
+      if (timeDifferenceInMinutes >= 180) {
+        dispatch(setForgetPassEmailAttempts(0, ""));
+      }
+    }
     if (isLoggedIn) {
       window.location.href = "/";
     } else {
       setIsLoading(false);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, verifyForgetPassEmailState, dispatch]);
+
+  function getCurrentTimeInPST() {
+    const formatter = new Intl.DateTimeFormat("en", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: "America/Vancouver",
+    });
+    return formatter.format(new Date());
+  }
 
   // Validate password field during input change
   function validatePasswordOnTyping(password) {
@@ -94,12 +121,17 @@ export default function ForgotPassword() {
 
   async function sendInitialRequest() {
     setResentEmail(true);
-    if (verifyForgetPassEmailAttempts === 10) {
+    if (verifyForgetPassEmailState.attempts === 10) {
       setErrMsg(
         "You have exceeded the maximum number of attempts. Please try again later."
       );
     } else {
-      dispatch(setForgetPassEmailAttempts(verifyForgetPassEmailAttempts + 1));
+      dispatch(
+        setForgetPassEmailAttempts(
+          verifyForgetPassEmailState.attempts + 1,
+          getCurrentTimeInPST()
+        )
+      );
       setTimeout(() => {
         setResentEmail(false);
       }, 15000);
@@ -114,15 +146,27 @@ export default function ForgotPassword() {
 
   async function sendResetRequest() {
     setResentEmail(true);
-    setTimeout(() => {
-      setResentEmail(false);
-    }, 15000);
-    const res = await axios.post(
-      "/generateNewOTP",
-      { email },
-      { withCredentials: true }
-    );
-    console.log(res.data);
+    if (verifyForgetPassEmailState.attempts === 10) {
+      setErrMsg(
+        "You have exceeded the maximum number of attempts. Please try again later."
+      );
+    } else {
+      dispatch(
+        setForgetPassEmailAttempts(
+          verifyForgetPassEmailState.attempts + 1,
+          getCurrentTimeInPST()
+        )
+      );
+      setTimeout(() => {
+        setResentEmail(false);
+      }, 15000);
+      const res = await axios.post(
+        "/generateNewOTP",
+        { email },
+        { withCredentials: true }
+      );
+      console.log(res.data);
+    }
   }
 
   const validateOTP = async (e) => {
@@ -354,7 +398,7 @@ export default function ForgotPassword() {
           )}
           {renderHeading()}
           {successMsg && <AlertMessage msg={successMsg} type="success" />}
-          {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
+          {!errMsg && infoMsg && <AlertMessage msg={infoMsg} type="info" />}
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
 
           <form
