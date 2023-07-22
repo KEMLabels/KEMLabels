@@ -22,7 +22,17 @@ export default function Login() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      window.location.href = "/";
+      axios.get("/checkVerification", {
+        withCredentials: true,
+      })
+        .then((res) => {
+          if (res.data.errMsg) {
+            window.location.href = "/verifyemail";
+          } else {
+            window.location.href = "/";
+          }
+        })
+        .catch((err) => console.log(err));
     } else {
       setIsLoading(false);
     }
@@ -43,16 +53,6 @@ export default function Login() {
     else {
       dispatch(setUserLoggedIn(true));
       dispatch(setUserEmail(email));
-      axios
-        .get("/checkVerification", { withCredentials: true })
-        .then((res) => {
-          if (res.data.errMsg) {
-            window.location.href = "/verifyemail";
-          } else {
-            window.location.href = "/";
-          }
-        })
-        .catch((err) => console.log(err));
     }
   };
 

@@ -29,7 +29,17 @@ export default function Signup() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      window.location.href = "/";
+      axios.get("/checkVerification", {
+        withCredentials: true,
+      })
+        .then((res) => {
+          if (res.data.errMsg) {
+            window.location.href = "/verifyemail";
+          } else {
+            window.location.href = "/";
+          }
+        })
+        .catch((err) => console.log(err));
     } else {
       setIsLoading(false);
     }
@@ -104,14 +114,6 @@ export default function Signup() {
     else {
       dispatch(setUserEmail(email));
       dispatch(setUserLoggedIn(true));
-      axios
-        .get("/checkVerification", { withCredentials: true })
-        .then((res) => {
-          if (res.data.errMsg) {
-            window.location.href = "/verifyemail";
-          }
-        })
-        .catch((err) => console.log(err));
     }
   };
 
