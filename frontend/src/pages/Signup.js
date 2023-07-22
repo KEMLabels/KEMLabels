@@ -104,7 +104,14 @@ export default function Signup() {
     else {
       dispatch(setUserEmail(email));
       dispatch(setUserLoggedIn(true));
-      window.location.href = res.data.redirect;
+      axios
+        .get("/checkVerification", { withCredentials: true })
+        .then((res) => {
+          if (res.data.errMsg) {
+            window.location.href = "/verifyEmail";
+          }
+        })
+        .catch((err) => console.log(err));
     }
   };
 

@@ -43,7 +43,16 @@ export default function Login() {
     if (res.data.errMsg) setErrMsg(res.data.errMsg);
     else {
       dispatch(setUserLoggedIn(true));
-      window.location.href = res.data.redirect;
+      axios
+        .get("/checkVerification", { withCredentials: true })
+        .then((res) => {
+          if (res.data.errMsg) {
+            window.location.href = "/verifyEmail";
+          } else {
+            window.location.href = "/";
+          }
+        })
+        .catch((err) => console.log(err));
     }
   };
 
