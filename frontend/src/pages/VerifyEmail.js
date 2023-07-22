@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import axios from "../api/axios";
 import AlertMessage from "../components/AlertMessage";
 import PageLayout from "../components/PageLayout";
-import { useSelector } from "react-redux";
 import Button from "../components/Button";
 
 function VerifyEmail() {
@@ -23,6 +24,10 @@ function VerifyEmail() {
       });
     } else window.location.href = "/";
   }, [isLoggedIn, email]);
+
+  function resendEmail() {
+    // TODO: Resend email POST function
+  }
 
   return (
     <PageLayout title="Verify Email">
@@ -52,8 +57,10 @@ function VerifyEmail() {
           </div>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
-          <Button text="Resend email" customStyle={{ width: "100%" }} />
-          <Button text="Verify later" fill="outline" customStyle={{ marginTop: "1rem", width: "100%" }} />
+          <Button text="Resend email" customStyle={{ width: "100%" }} onClickEvent={resendEmail} />
+          <div style={{ textAlign: "center", width: "100%", marginTop: "1.5rem" }}>
+            <Link to="/" className="link">Verify later</Link>
+          </div>
         </div>
       </div>
     </PageLayout>
