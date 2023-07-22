@@ -108,7 +108,7 @@ export default function Signup() {
         .get("/checkVerification", { withCredentials: true })
         .then((res) => {
           if (res.data.errMsg) {
-            window.location.href = "/verifyEmail";
+            window.location.href = "/verifyemail";
           }
         })
         .catch((err) => console.log(err));

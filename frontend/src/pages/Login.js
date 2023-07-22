@@ -9,7 +9,7 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
-import { setUserLoggedIn } from "../redux/actions/AuthAction";
+import { setUserEmail, setUserLoggedIn } from "../redux/actions/AuthAction";
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -39,15 +39,15 @@ export default function Login() {
       { email, password },
       { withCredentials: true }
     );
-    console.log(res.data);
     if (res.data.errMsg) setErrMsg(res.data.errMsg);
     else {
       dispatch(setUserLoggedIn(true));
+      dispatch(setUserEmail(email));
       axios
         .get("/checkVerification", { withCredentials: true })
         .then((res) => {
           if (res.data.errMsg) {
-            window.location.href = "/verifyEmail";
+            window.location.href = "/verifyemail";
           } else {
             window.location.href = "/";
           }

@@ -208,7 +208,7 @@ app.get('/isUserVerified', async (req, res) => {
     if(!user) throw new Error('An error occured.');
     const verified = user.verified;
 
-    if(!verified) throw new Error('You must verify your account first.');
+    if(!verified) throw new Error('Please check your inbox for a verification link to verify your account.');
     else res.json({ redirect: '/' });
 })
 

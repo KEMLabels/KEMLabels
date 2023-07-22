@@ -3,8 +3,8 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
+import VerifyEmailConfirmation from "./pages/VerifyEmailConfirmation";
 import VerifyEmail from "./pages/VerifyEmail";
-import EmailVerificationPage from "./pages/EmailVerificationPage";
 
 export default function App() {
   return (
@@ -16,9 +16,9 @@ export default function App() {
         <Route path="/forgotpassword" element={<ForgotPassword />}></Route>
         <Route
           path="/users/:id/verify/:token"
-          element={<VerifyEmail />}
+          element={<VerifyEmailConfirmation />}
         ></Route>
-        <Route path="/verifyemail" element={<EmailVerificationPage />}></Route>
+        <Route path="/verifyemail" element={<VerifyEmail />}></Route>
         <Route path="*" element={<h1>404: Not Found</h1>}></Route>
         {/* TODO: Add error page */}
       </Routes>
