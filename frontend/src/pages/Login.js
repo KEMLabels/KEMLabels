@@ -22,9 +22,10 @@ export default function Login() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      axios.get("/checkVerification", {
-        withCredentials: true,
-      })
+      axios
+        .get("/checkVerification", {
+          withCredentials: true,
+        })
         .then((res) => {
           if (res.data.errMsg) {
             window.location.href = "/verifyemail";

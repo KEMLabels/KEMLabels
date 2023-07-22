@@ -1,8 +1,13 @@
-import { SET_USER_EMAIL, SET_USER_LOGGED_IN } from "../Types";
+import {
+  SET_USER_EMAIL,
+  SET_USER_LOGGED_IN,
+  SET_VERIFY_EMAIL_ATTEMPTS,
+} from "../Types";
 
 export const authInitialState = {
   email: null,
   isLoggedIn: false,
+  verifyEmailAttemps: 0,
 };
 
 export default function AuthReducer(state = authInitialState, action) {
@@ -11,6 +16,8 @@ export default function AuthReducer(state = authInitialState, action) {
       return { ...state, email: action.payload };
     case SET_USER_LOGGED_IN:
       return { ...state, isLoggedIn: action.payload };
+    case SET_VERIFY_EMAIL_ATTEMPTS:
+      return { ...state, verifyEmailAttemps: action.payload };
     default:
       return state;
   }

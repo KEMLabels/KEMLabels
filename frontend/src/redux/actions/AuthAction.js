@@ -1,4 +1,8 @@
-import { SET_USER_EMAIL, SET_USER_LOGGED_IN } from "../Types";
+import {
+  SET_USER_EMAIL,
+  SET_USER_LOGGED_IN,
+  SET_VERIFY_EMAIL_ATTEMPTS,
+} from "../Types";
 
 export const setUserEmail = (email) => (dispatch) => {
   dispatch({
