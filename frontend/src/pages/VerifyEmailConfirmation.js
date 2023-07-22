@@ -5,7 +5,7 @@ import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 
-function VerifyEmailConfirmation() {
+export default function VerifyEmailConfirmation() {
   const [validURL, setvalidURL] = useState(false);
   const param = useParams();
 
@@ -80,5 +80,3 @@ function VerifyEmailConfirmation() {
     </PageLayout>
   );
 }
-
-export default VerifyEmailConfirmation;
