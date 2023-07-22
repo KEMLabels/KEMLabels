@@ -15,9 +15,10 @@ function VerifyEmail() {
     if (isLoggedIn) {
       axios.get("/isUserVerified", { withCredentials: true }).then((res) => {
         if (res.data.errMsg) {
-          if (res.data.errMsg === "You must verify your account first.") {
+          if (res.data.errMsg === "Please check your inbox for a verification link to verify your account.") {
             setInfoMsg(res.data.errMsg);
-          } else setErrorMsg("An error occured. Please try again later.");
+          } 
+          else setErrorMsg("An error occured. Please try again later.");
         } else window.location.href = res.data.redirect;
       });
     } else window.location.href = "/";
