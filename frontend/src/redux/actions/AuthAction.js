@@ -20,12 +20,13 @@ export const setUserLoggedIn = (isLoggedIn) => (dispatch) => {
   });
 };
 
-export const setVerifyEmailAttempts = (attempts) => (dispatch) => {
-  dispatch({
-    type: SET_VERIFY_EMAIL_ATTEMPTS,
-    payload: attempts,
-  });
-};
+export const setVerifyEmailAttempts =
+  (attempts, lastAttemptDateTime) => (dispatch) => {
+    dispatch({
+      type: SET_VERIFY_EMAIL_ATTEMPTS,
+      payload: { attempts, lastAttemptDateTime },
+    });
+  };
 
 export const setForgetPassEmailAttempts =
   (attempts, lastAttemptDateTime) => (dispatch) => {

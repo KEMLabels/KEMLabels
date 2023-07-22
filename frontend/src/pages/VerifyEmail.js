@@ -14,11 +14,20 @@ function VerifyEmail() {
   const [resentEmail, setResentEmail] = useState(false);
   const email = useSelector((state) => state.auth.email);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const verifyEmailAttemps = useSelector(
-    (state) => state.auth.verifyEmailAttemps
-  );
+  const verifyEmailState = useSelector((state) => state.auth.verifyEmail);
 
   useEffect(() => {
+    if (verifyEmailState.lastAttemptDateTime) {
+      const currentTime = Date.parse(getCurrentTimeInPST());
+      const lastAttemptTime = Date.parse(verifyEmailState.lastAttemptDateTime);
+      const timeDifferenceInMinutes = Math.floor(
+        Math.abs(currentTime - lastAttemptTime) / 1000 / 60
+      );
+      // if it has been 3 hours since the last attempt, reset the attempts
+      if (timeDifferenceInMinutes >= 180) {
+        dispatch(setVerifyEmailAttempts(0, ""));
+      }
+    }
     if (isLoggedIn) {
       axios.get("/isUserVerified", { withCredentials: true }).then((res) => {
         if (res.data.errMsg) {
@@ -28,18 +37,37 @@ function VerifyEmail() {
         } else window.location.href = res.data.redirect;
       });
     } else window.location.href = "/";
-  }, [isLoggedIn]);
+  }, [isLoggedIn, verifyEmailState, dispatch]);
+
+  function getCurrentTimeInPST() {
+    const formatter = new Intl.DateTimeFormat("en", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: "America/Vancouver",
+    });
+    return formatter.format(new Date());
+  }
 
   const submit = async (e) => {
+    e.preventDefault();
     setErrMsg("Please wait to re-send another email");
     setResentEmail(true);
-    if (verifyEmailAttemps === 10) {
+    if (verifyEmailState.attempts === 10) {
       setErrMsg(
         "You have exceeded the maximum number of attempts. Please try again later."
       );
     } else {
-      dispatch(setVerifyEmailAttempts(verifyEmailAttemps + 1));
-      e.preventDefault();
+      dispatch(
+        setVerifyEmailAttempts(
+          verifyEmailState.attempts + 1,
+          getCurrentTimeInPST()
+        )
+      );
       axios
         .get("/generateToken", { withCredentials: true })
         .then((res) => {
