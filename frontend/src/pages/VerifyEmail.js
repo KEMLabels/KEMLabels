@@ -32,7 +32,7 @@ function VerifyEmail() {
     // TODO: Resend email POST function
     setErrMsg("Please wait to re-send another email");
     setResentEmail(true);
-    if (verifyEmailAttemps === 5) {
+    if (verifyEmailAttemps === 10) {
       setErrMsg(
         "You have exceeded the maximum number of attempts. Please try again later."
       );

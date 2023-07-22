@@ -2,12 +2,14 @@ import {
   SET_USER_EMAIL,
   SET_USER_LOGGED_IN,
   SET_VERIFY_EMAIL_ATTEMPTS,
+  SET_FORGET_PASS_EMAIL_ATTEMPTS,
 } from "../Types";
 
 export const authInitialState = {
   email: null,
   isLoggedIn: false,
-  verifyEmailAttemps: 0,
+  verifyEmailAttempts: 0,
+  verifyForgetPassEmailAttempts: 0,
 };
 
 export default function AuthReducer(state = authInitialState, action) {
@@ -17,7 +19,9 @@ export default function AuthReducer(state = authInitialState, action) {
     case SET_USER_LOGGED_IN:
       return { ...state, isLoggedIn: action.payload };
     case SET_VERIFY_EMAIL_ATTEMPTS:
-      return { ...state, verifyEmailAttemps: action.payload };
+      return { ...state, verifyEmailAttempts: action.payload };
+    case SET_FORGET_PASS_EMAIL_ATTEMPTS:
+      return { ...state, verifyForgetPassEmailAttempts: action.payload };
     default:
       return state;
   }

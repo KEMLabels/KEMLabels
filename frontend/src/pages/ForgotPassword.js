@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import { BiErrorCircle } from "react-icons/bi";
 import VerificationInput from "react-verification-input";
@@ -11,10 +11,15 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
+import { setForgetPassEmailAttempts } from "../redux/actions/AuthAction";
 
 export default function ForgotPassword() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const verifyForgetPassEmailAttempts = useSelector(
+    (state) => state.auth.verifyForgetPassEmailAttempts
+  );
 
+  const dispatch = useDispatch();
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
@@ -89,15 +94,22 @@ export default function ForgotPassword() {
 
   async function sendResetRequest() {
     setResentEmail(true);
-    setTimeout(() => {
-      setResentEmail(false);
-    }, 15000);
-    const res = await axios.post(
-      "/forgotpassword",
-      { email },
-      { withCredentials: true }
-    );
-    console.log(res.data);
+    if (verifyForgetPassEmailAttempts === 10) {
+      setErrMsg(
+        "You have exceeded the maximum number of attempts. Please try again later."
+      );
+    } else {
+      dispatch(setForgetPassEmailAttempts(verifyForgetPassEmailAttempts + 1));
+      setTimeout(() => {
+        setResentEmail(false);
+      }, 15000);
+      const res = await axios.post(
+        "/forgotpassword",
+        { email },
+        { withCredentials: true }
+      );
+      console.log(res.data);
+    }
   }
 
   const validateOTP = async (e) => {
