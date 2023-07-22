@@ -3,6 +3,7 @@ import {
   SET_USER_LOGGED_IN,
   SET_VERIFY_EMAIL_ATTEMPTS,
   SET_FORGET_PASS_EMAIL_ATTEMPTS,
+  CLEAR_USER,
 } from "../Types";
 
 export const authInitialState = {
@@ -22,6 +23,8 @@ export default function AuthReducer(state = authInitialState, action) {
       return { ...state, verifyEmailAttempts: action.payload };
     case SET_FORGET_PASS_EMAIL_ATTEMPTS:
       return { ...state, verifyForgetPassEmailAttempts: action.payload };
+    case CLEAR_USER:
+      return authInitialState;
     default:
       return state;
   }

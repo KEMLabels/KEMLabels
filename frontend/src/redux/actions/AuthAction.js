@@ -3,6 +3,7 @@ import {
   SET_USER_LOGGED_IN,
   SET_VERIFY_EMAIL_ATTEMPTS,
   SET_FORGET_PASS_EMAIL_ATTEMPTS,
+  CLEAR_USER,
 } from "../Types";
 
 export const setUserEmail = (email) => (dispatch) => {
@@ -33,3 +34,8 @@ export const setForgetPassEmailAttempts = (attempts) => (dispatch) => {
   });
 };
 
+export const clearUser = () => (dispatch) => {
+  dispatch({
+    type: CLEAR_USER,
+  });
+};
