@@ -1,32 +1,38 @@
 [
   {
-    "uid": 1,
-    "heading": "What harsh truths do you prefer to ignore?",
-    "content": "In pariatur ut do aliquip qui mollit aliqua exercitation consequat reprehenderit nostrud laborum voluptate veniam non dolore dolore aliqua incididunt amet nisi minim cillum elit."
+    "heading": "What is LabelMaster?",
+    "content": "LabelMaster is a company that provides shipping and logistics solutions to businesses and individuals. We offer a wide range of services to help you manage your shipments efficiently and securely."
   },
   {
-    "uid": 2,
-    "heading": "What harsh truths do you prefer to ignore?",
-    "content": "In pariatur ut do aliquip qui mollit aliqua exercitation consequat reprehenderit nostrud laborum voluptate veniam non dolore dolore aliqua incididunt amet nisi minim cillum elit."
+    "heading": "How do I create an account with LabelMaster?",
+    "content": "Creating an account with LabelMaster is easy. Simply visit our website and click on the <a href=\"/signup\" class=\"link\">Sign Up</a> button. Follow the instructions to provide your details, and you'll be ready to start using our services."
   },
   {
-    "uid": 3,
-    "heading": "What harsh truths do you prefer to ignore?",
-    "content": "In pariatur ut do aliquip qui mollit aliqua exercitation consequat reprehenderit nostrud laborum voluptate veniam non dolore dolore aliqua incididunt amet nisi minim cillum elit."
+    "heading": "What services does LabelMaster offer?",
+    "content": "LabelMaster offers various shipping and logistics services, including package handling, customs documentation support, hazardous materials management, and more. However, for tracking shipments, we redirect you to <a href=\"https://www.17track.net\" target=\"_blank\" class=\"link\">17track.net</a>, a reliable tracking service that covers shipments from various carriers worldwide."
   },
   {
-    "uid": 4,
-    "heading": "What harsh truths do you prefer to ignore?",
-    "content": "In pariatur ut do aliquip qui mollit aliqua exercitation consequat reprehenderit nostrud laborum voluptate veniam non dolore dolore aliqua incididunt amet nisi minim cillum elit."
+    "heading": "How can I track my shipments?",
+    "content": "To track your shipments, we recommend <a href=\"https://www.17track.net\" target=\"_blank\" class=\"link\">17track.net</a>. Simply visit their website and enter the tracking number provided to you. You'll get real-time updates on the status of your package from multiple carriers."
   },
   {
-    "uid": 5,
-    "heading": "What harsh truths do you prefer to ignore?",
-    "content": "In pariatur ut do aliquip qui mollit aliqua exercitation consequat reprehenderit nostrud laborum voluptate veniam non dolore dolore aliqua incididunt amet nisi minim cillum elit."
+    "heading": "Is my personal information safe with LabelMaster?",
+    "content": "Absolutely. We take data privacy and security seriously. Your personal information is protected using industry-standard security measures. For more details, please refer to our <a href=\"/privacypolicy\" class=\"link\">Privacy Policy</a>."
   },
   {
-    "uid": 6,
-    "heading": "What harsh truths do you prefer to ignore?",
-    "content": "In pariatur ut do aliquip qui mollit aliqua exercitation consequat reprehenderit nostrud laborum voluptate veniam non dolore dolore aliqua incididunt amet nisi minim cillum elit."
+    "heading": "Can I use LabelMaster for international shipments?",
+    "content": "Yes, LabelMaster supports both domestic and international shipments. We provide comprehensive customs documentation support and ensure smooth international shipping processes."
+  },
+  {
+    "heading": "What payment methods does LabelMaster accept?",
+    "content": "We accept various payment methods, including credit cards, debit cards, and Crypto (With a 10% deposit bonus!)."
+  },
+  {
+    "heading": "Are there any restrictions on the items I can ship with LabelMaster?",
+    "content": "While we support a wide range of shipments, some items may be restricted in your country due to safety or legal reasons. It's essential to check our list of prohibited items before sending your packages."
+  },
+  {
+    "heading": "How can I contact LabelMaster's customer support?",
+    "content": "You can reach our customer support team via email at <a href=\"mailto:labelmaster@gmail.com\" class=\"link\">labelmaster@gmail.com</a> or by calling  <a href=\"tel:6041231234\" class=\"link\">604-123-1234</a>. We are available to assist you with any inquiries or concerns you may have."
   }
 ]

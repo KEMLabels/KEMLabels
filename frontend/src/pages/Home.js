@@ -23,6 +23,7 @@ export default function Home() {
       </div>
       <div id="faq">
         <h1>Frequently Asked Questions</h1>
+        <p>If you have any other questions not covered here, please feel free to contact us, and we'll be happy to assist you.</p>
         <Accordion value={FaqJson}></Accordion>
       </div>
     </PageLayout>

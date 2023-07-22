@@ -27,31 +27,33 @@ export default function Accordion({ value }) {
       allowZeroExpanded
       onChange={handleActiveAccordion}
     >
-      {value?.map(({ uid, heading, content }) => (
-        <AccordionItem
-          key={uid}
-          uuid={`item${uid}`}
-          className={`accordionItem ${
-            activeAccordion && activeAccordion[0] === `item${uid}`
-              ? "active"
-              : ""
-          }`}
-        >
-          <AccordionItemHeading>
-            <AccordionItemButton className="accordionHeading">
-              {heading}
-              {activeAccordion && activeAccordion[0] === `item${uid}` ? (
-                <FaChevronUp size={16} />
-              ) : (
-                <FaChevronDown size={16} opacity={0.8} />
-              )}
-            </AccordionItemButton>
-          </AccordionItemHeading>
-          <AccordionItemPanel className="accordionPanel">
-            {content}
-          </AccordionItemPanel>
-        </AccordionItem>
-      ))}
+      {value?.map(({ heading, content }, i) => {
+        return (
+          <AccordionItem
+            key={i}
+            uuid={`item${i}`}
+            className={`accordionItem ${
+              activeAccordion && activeAccordion[0] === `item${i}`
+                ? "active"
+                : ""
+            }`}
+          >
+            <AccordionItemHeading>
+              <AccordionItemButton className="accordionHeading">
+                {heading}
+                {activeAccordion && activeAccordion[0] === `item${i}` ? (
+                  <FaChevronUp size={16} />
+                ) : (
+                  <FaChevronDown size={16} opacity={0.8} />
+                )}
+              </AccordionItemButton>
+            </AccordionItemHeading>
+            <AccordionItemPanel className="accordionPanel">
+              <div dangerouslySetInnerHTML={{ __html: content }} />
+            </AccordionItemPanel>
+          </AccordionItem>
+        );
+      })}
     </AccordionNative>
   );
 }
