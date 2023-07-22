@@ -80,14 +80,14 @@ export default function ForgotPassword() {
     console.log(res.data);
     if (res.data.errMsg) setErrMsg(res.data.errMsg);
     else {
-      sendResetRequest();
+      sendInitialRequest();
       document.getElementById("resetPasswordForm").reset();
       setResetPasswordStep("verifyOTP");
       setInfoMsg("Email has been sent. Please check your inbox.");
     }
   };
 
-  async function sendResetRequest() {
+  async function sendInitialRequest() {
     setResentEmail(true);
     setTimeout(() => {
       setResentEmail(false);
@@ -100,11 +100,24 @@ export default function ForgotPassword() {
     console.log(res.data);
   }
 
+  async function sendResetRequest() {
+    setResentEmail(true);
+    setTimeout(() => {
+      setResentEmail(false);
+    }, 15000);
+    const res = await axios.post(
+      "/generateNewOTP",
+      { email },
+      { withCredentials: true }
+    );
+    console.log(res.data);
+  }
+
   const validateOTP = async (e) => {
     e.preventDefault();
     const res = await axios.post(
       "/checkOTP",
-      { enteredOTP },
+      { enteredOTP, email },
       { withCredentials: true }
     );
 
@@ -116,6 +129,7 @@ export default function ForgotPassword() {
     } else {
       document.getElementById("resetPasswordForm").reset();
       setResetPasswordStep("changePassword");
+      setErrMsg("");
       setSuccessMsg("Verification successful.");
       setTimeout(() => {
         setSuccessMsg("");
@@ -134,7 +148,7 @@ export default function ForgotPassword() {
     if (res.data.errMsg) setErrMsg(res.data.errMsg);
     else {
       setSuccessMsg(
-        "Password updated successfully! Redirecting you to home..."
+        "Password updated successfully! Redirecting you to the login page..."
       );
       setTimeout(() => {
         setSuccessMsg("");

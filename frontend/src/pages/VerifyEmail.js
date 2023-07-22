@@ -25,8 +25,14 @@ function VerifyEmail() {
     } else window.location.href = "/";
   }, [isLoggedIn, email]);
 
-  function resendEmail() {
-    // TODO: Resend email POST function
+  const submit = async (e) => {
+    e.preventDefault();
+    axios
+    .get("/generateToken", { withCredentials: true })
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => console.log(err));
   }
 
   return (
@@ -57,10 +63,8 @@ function VerifyEmail() {
           </div>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
-          <Button text="Resend email" customStyle={{ width: "100%" }} onClickEvent={resendEmail} />
-          <div style={{ textAlign: "center", width: "100%", marginTop: "1.5rem" }}>
-            <Link to="/" className="link">Verify later</Link>
-          </div>
+          <Button btnType="button" text="Resend email" onClickEvent={submit} customStyle={{ width: "100%" }} />
+          <Button text="Verify later" fill="outline" customStyle={{ marginTop: "1rem", width: "100%" }} />
         </div>
       </div>
     </PageLayout>

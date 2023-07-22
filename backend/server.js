@@ -25,13 +25,8 @@ const connectDB = async () => {
 }
 
 const User = require('./model/users.js');
-
-const tempCode = new mongoose.Schema({
-    passcode: { type: Number },
-    createdAt: { type: Date, expires: '5m', default: Date.now }
-});
-const tempCodeModule = mongoose.model('OTP', tempCode);
-const tempCodeModuleModify = new tempCodeModule;
+const tempTokens = require('./model/tempToken.js');
+const tempOTPS = require('./model/tempOTPs.js');
 
 const MongoDBStore = require('connect-mongodb-session')(session);
 const store = new MongoDBStore({
@@ -148,22 +143,54 @@ app.post("/signup", async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt);
-    const token = crypto.randomBytes(32).toString("hex");
 
     const new_user = new User({
         userName: data.userName,
         email: data.email,
         password: hashedPassword,
-        token: token
     });
     new_user.save()
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const create_token = new tempTokens({
+        token: token,
+        userid: new_user._id
+    })
+    create_token.save()
     const url = `http://localhost:3000/users/${new_user._id}/verify/${token}`;
     await sendSignUpConfirmationEmail(data.email, url);
 
     req.session.user = new_user;
     req.session.isLoggedIn = true;
     res.json({ redirect: '/verifyemail' });
-})  
+})
+
+app.get("/generateToken", async (req, res) => {
+    const findToken = await tempTokens.findOne({ userid: req.session.user._id.toString() });
+    if (findToken) {
+        tempTokens.deleteOne({
+            _id: findToken._id.toString()
+        })
+            .then(function () {
+                console.log('successfuly deleted');
+            }).catch(function (error) {
+                console.log(error); // Failure
+            });
+    }
+    generateTokenHelper(req.session.user._id, req.session.user.email);
+})
+
+async function generateTokenHelper(userID, email) {
+    const token = crypto.randomBytes(32).toString("hex");
+    const create_token = new tempTokens({
+        token: token,
+        userid: userID
+    })
+    create_token.save()
+    const url = `http://localhost:3000/users/${userID}/verify/${token}`;
+    console.log(url);
+    sendSignUpConfirmationEmail(email, url);
+}
 
 async function sendSignUpConfirmationEmail(emailAddress, url) {
     const signUpConfirmationEmail = {
@@ -181,21 +208,31 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
 
 app.get('/users/:id/verify/:token', async (req, res) => {
     try {
-        const user = await User.findOne({_id: req.params.id});
-        if(!user) throw new Error('Invalid Link');
-        console.log(user);
+        const user = await User.findOne({ _id: req.params.id });
+        if (!user) throw new Error('Invalid Link');
+        const token = await tempTokens.findOne({ token: req.params.token });
+        if (!token) throw new Error('Invalid Link');
 
         User.updateOne({
             "_id": user._id.toString()
         }, {
             "verified": true
         })
-        .then((obj) => {
-            console.log("User has been verified");
+            .then((obj) => {
+                console.log("User has been verified");
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+
+        tempTokens.deleteOne({
+            token: req.params.token
         })
-        .catch((err) => {
-            console.log(err);
-        })
+            .then(function () {
+                console.log('successfuly deleted');
+            }).catch(function (error) {
+                console.log(error); // Failure
+            });
 
         return res.json({ redirect: '/' });
     } catch (err) {
@@ -204,41 +241,74 @@ app.get('/users/:id/verify/:token', async (req, res) => {
 })
 
 app.get('/isUserVerified', async (req, res) => {
-    const user = await User.findOne({_id: req.session.user._id});
-    if(!user) throw new Error('An error occured.');
+    const user = await User.findOne({ _id: req.session.user._id });
+    if (!user) throw new Error('An error occured.');
     const verified = user.verified;
 
-    if(!verified) throw new Error('Please check your inbox for a verification link to verify your account.');
+    if (!verified) throw new Error('Please check your inbox for a verification link to verify your account.');
     else res.json({ redirect: '/' });
 })
 
-app.get('/checkVerification', async(req, res) => {
-    const user = await User.findOne({_id: req.session.user._id});
-    if(!user) throw new Error('An error occured.');
+app.get('/checkVerification', async (req, res) => {
+    const user = await User.findOne({ _id: req.session.user._id });
+    if (!user) throw new Error('An error occured.');
     const verified = user.verified;
 
-    if(!verified) throw new Error('User is not verified');
+    if (!verified) throw new Error('User is not verified');
 })
 
-app.post("/emailExists", async (req,res) => {
+app.post("/emailExists", async (req, res) => {
     const { email } = req.body
 
     const data = {
         email: email
     }
 
-    const emailExists =  await User.findOne({ email: data.email })
+    const emailExists = await User.findOne({ email: data.email })
     if (!emailExists) throw new Error('This email is not associated with an account.');
-    else res.json({emailExists});
+    else res.json({ emailExists });
 })
 
 app.post("/forgotpassword", async (req, res) => {
     const { email } = req.body
-    const otp = Math.floor(1000 + Math.random() * 9000);    
-    tempCodeModuleModify.passcode = otp;
-    tempCodeModuleModify.save();
+    const otp = Math.floor(1000 + Math.random() * 9000);
+
+    const create_OTP = new tempOTPS({
+        passcode: otp,
+        email: email
+    })
+    create_OTP.save()
     sendOTPEmail(otp, email);
 })
+
+app.post("/generateNewOTP", async (req, res) => {
+    const { email } = req.body
+    const findOTP = await tempOTPS.findOne({ email: email });
+    if (findOTP) {
+        console.log(findOTP)
+        tempOTPS.deleteOne({
+            _id: findOTP._id.toString()
+        })
+            .then(function () {
+                generateOTPHelper(email);
+                console.log('successfuly deleted');
+            }).catch(function (error) {
+                console.log(error); // Failure
+            });
+    } else {
+        generateOTPHelper(email);
+    }
+})
+
+async function generateOTPHelper(email) {
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    const create_OTP = new tempOTPS({
+        passcode: otp,
+        email: email
+    })
+    create_OTP.save()
+    sendOTPEmail(otp, email);
+}
 
 function sendOTPEmail(OTPPasscode, emailAddress) {
     const sendOneTimePasscodeEmail = {
@@ -254,35 +324,47 @@ function sendOTPEmail(OTPPasscode, emailAddress) {
     });
 }
 
-app.post("/checkOTP", (req, res) => {
+app.post("/checkOTP", async (req, res) => {
     const { enteredOTP } = req.body
+    const { email } = req.body
     console.log('entered code: ' + enteredOTP);
-    console.log('correct code: ' + tempCodeModuleModify.passcode);
-    if(Number(enteredOTP) !== Number(tempCodeModuleModify.passcode)) {
+    const tempCode = await tempOTPS.findOne({email: email});
+    if(!tempCode) throw new Error("Invalid Code");
+    console.log('correct code: ' + tempCode.passcode);
+    if (Number(enteredOTP) !== Number(tempCode.passcode)) {
         throw new Error('Incorrect code. Please try again.');
+    } else {
+        tempOTPS.deleteOne({
+            passcode: enteredOTP
+        })
+            .then(function () {
+                console.log('successfuly deleted');
+            }).catch(function (error) {
+                console.log(error); // Failure
+            });
     }
     res.status(200).json("success");
 })
 
 app.post("/updateUserPass", async (req, res) => {
     const { email, password } = req.body
-    
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const userData =  await User.findOne({ email: email })
-    
+    const userData = await User.findOne({ email: email })
+
     User.updateOne({
         "_id": userData._id.toString()
     }, {
         "password": hashedPassword
     })
-    .then((obj) => {
-        console.log("Updated Password");
-    })
-    .catch((err) => {
-        console.log(err);
-    })
+        .then((obj) => {
+            console.log("Updated Password");
+        })
+        .catch((err) => {
+            console.log(err);
+        })
 
     sendChangePasswordConfirmation(email);
 
