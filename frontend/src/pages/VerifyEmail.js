@@ -14,7 +14,9 @@ function VerifyEmail() {
   const [resentEmail, setResentEmail] = useState(false);
   const email = useSelector((state) => state.auth.email);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const verifyEmailAttemps = useSelector((state) => state.auth.verifyEmailAttemps);
+  const verifyEmailAttemps = useSelector(
+    (state) => state.auth.verifyEmailAttemps
+  );
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -28,8 +30,7 @@ function VerifyEmail() {
     } else window.location.href = "/";
   }, [isLoggedIn]);
 
-  function resendEmail() {
-    // TODO: Resend email POST function
+  const submit = async (e) => {
     setErrMsg("Please wait to re-send another email");
     setResentEmail(true);
     if (verifyEmailAttemps === 10) {
@@ -38,12 +39,19 @@ function VerifyEmail() {
       );
     } else {
       dispatch(setVerifyEmailAttempts(verifyEmailAttemps + 1));
+      e.preventDefault();
+      axios
+        .get("/generateToken", { withCredentials: true })
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => console.log(err));
       setTimeout(() => {
         setResentEmail(false);
         setErrMsg("");
       }, 15000);
     }
-  }
+  };
 
   return (
     <PageLayout title="Verify Email">
@@ -74,9 +82,10 @@ function VerifyEmail() {
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
           <Button
+            btnType="button"
             text="Resend email"
+            onClickEvent={submit}
             customStyle={{ width: "100%" }}
-            onClickEvent={resendEmail}
             disabled={resentEmail}
           />
           <div
