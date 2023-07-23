@@ -19,7 +19,7 @@
 }
 
 .heroColumn h1 {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 600;
   color: white;
   margin-bottom: 1.5rem;
@@ -35,7 +35,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 5rem 5rem 3rem;
+  padding: 10rem 5rem 3rem;
 }
 
 .homeSecContainer h1 {
@@ -47,11 +47,58 @@
 }
 
 .homeSecContainer p {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 300;
   color: black;
   text-align: center;
   margin-bottom: 2.5rem;
+}
+
+.cardsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.5rem 5rem;
+}
+
+.cardsContainer .card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: white;
+  padding: 1rem;
+  width: 30%;
+  border: solid 1px #efefef;
+  border-radius: 0.75rem;
+  box-shadow: 0px 0px 16px rgba(180, 180, 180, 0.1);
+  transition: all 0.1s ease-in-out;
+}
+
+.cardsContainer .card:hover {
+  border-bottom: solid 3px var(--primaryColor);
+  transform: scale(1.05);
+}
+
+.cardsContainer .card img {
+  width: 100%;
+  object-fit: contain;
+  object-position: center center;
+  height: 16rem;
+}
+
+.cardsContainer .card .cardContent h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: black;
+  margin: 0.5rem 0;
+}
+
+.cardsContainer .card .cardContent p {
+  font-size: 1rem;
+  font-weight: 300;
+  color: black;
+  margin-bottom: 1rem;
 }
 
 .accordion {
@@ -108,6 +155,12 @@
   }
 }
 
+@media screen and (max-width: 1200px) {
+  .cardsContainer {
+    padding: 1.5rem 0;
+  }
+}
+
 @media screen and (max-width: 992px) {
   .heroColumn h1 {
     font-size: 2.5rem;
@@ -143,9 +196,41 @@
     font-size: 2rem;
     margin-top: 5rem;
   }
+
+  .cardsContainer {
+    flex-wrap: wrap;
+  }
+
+  .cardsContainer .card {
+    flex-direction: row;
+    width: 100%;
+    padding: 1rem 1.5rem;
+  }
+
+  .cardsContainer .card.reverse {
+    flex-direction: row-reverse;
+  }
+
+  .cardsContainer .card img {
+    height: 10rem;
+    width: 10rem;
+  }
+
+  .cardsContainer .card .cardContent {
+    width: 100%;
+    padding-left: 2rem;
+  }
+
+  .cardsContainer .card.reverse .cardContent {
+    padding-left: 0;
+    padding-right: 2rem;
+  }
+
+  .cardsContainer .card .cardContent h2,
+  .cardsContainer .card .cardContent p {
+    text-align: left;
+  }
 }
-
-
 
 @media screen and (max-width: 576px) {
   .hero {
@@ -171,12 +256,38 @@
     font-size: 1.2rem;
   }
 
-  #faq {
+  .homeSecContainer {
     padding: 0 1.25rem 5rem;
   }
 
-  #faq h1 {
-    margin-top: 7rem;
+  .homeSecContainer h1 {
+    margin-top: 10rem;
+  }
+
+  .homeSecContainer p {
+    font-size: 1rem;
+  }
+
+  .cardsContainer .card,
+  .cardsContainer .card.reverse {
+    flex-direction: column;
+    width: 100%;
+    padding: 1rem 1.5rem;
+  }
+
+  .cardsContainer .card img {
+    width: 100%;
+  }
+
+  .cardsContainer .card .cardContent,
+  .cardsContainer .card.reverse .cardContent {
+    width: 100%;
+    padding: 0;
+  }
+
+  .cardsContainer .card .cardContent h2,
+  .cardsContainer .card .cardContent p {
+    text-align: center;
   }
 
   .accordionHeading {
