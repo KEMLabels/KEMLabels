@@ -6,6 +6,7 @@ import { setUserLoggedIn } from "../redux/actions/AuthAction";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
+import Button from "./Button";
 
 const useScrollToLocation = () => {
   const scrolledRef = useRef(false);
@@ -55,9 +56,22 @@ export default function Navbar({ hideNavAndFooter = false }) {
             FAQ
           </Link>
           {!isLoggedIn && (
-            <NavLink className="navLink" to="/signin" activeclassname="active">
-              Sign In
-            </NavLink>
+            <>
+              <NavLink
+                className="navLink"
+                to="/signin"
+                activeclassname="active"
+              >
+                Sign In
+              </NavLink>
+              <Button
+                onClickEvent={() => {
+                  window.location.href = "/signup";
+                }}
+                text={"Get Started"}
+                customStyle={{ padding: "6px 12px", marginLeft: "-1rem" }}
+              />
+            </>
           )}
           {isLoggedIn && (
             <Link

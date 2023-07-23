@@ -9,6 +9,7 @@ import {
   FaEnvelope,
   FaSignOutAlt,
   FaLayerGroup,
+  FaUserPlus,
 } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
 import axios from "../api/axios";
@@ -71,10 +72,16 @@ export default function HamburgerMenu({ sessionStatus = false }) {
             <span>FAQ</span>
           </Link>
           {!sessionStatus && (
-            <NavLink className="navLink" to="/signin" activeclassname="active">
-              <FaSignInAlt />
-              <span>Sign In</span>
-            </NavLink>
+            <>
+              <NavLink className="navLink" to="/signin" activeclassname="active">
+                <FaSignInAlt />
+                <span>Sign In</span>
+              </NavLink>
+              <NavLink className="navLink" to="/signup" activeclassname="active">
+                <FaUserPlus />
+                <span>Get Started</span>
+              </NavLink>
+            </>
           )}
           {sessionStatus && (
             <Link
