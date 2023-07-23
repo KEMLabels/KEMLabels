@@ -26,14 +26,14 @@
   color: white;
 }
 
-#faq {
+.homeSecContainer {
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 5rem 5rem 3rem;
 }
 
-#faq h1 {
+.homeSecContainer h1 {
   font-size: 2.5rem;
   font-weight: 600;
   color: black;
@@ -41,7 +41,7 @@
   margin-bottom: 1.5rem;
 }
 
-#faq p {
+.homeSecContainer p {
   font-size: 1rem;
   font-weight: 300;
   color: black;
@@ -130,11 +130,11 @@
     font-size: 1rem;
   }
 
-  #faq {
+  .homeSecContainer {
     padding: 0 3rem 3rem;
   }
 
-  #faq h1 {
+  .homeSecContainer h1 {
     font-size: 2rem;
     margin-top: 5rem;
   }

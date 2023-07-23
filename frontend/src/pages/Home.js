@@ -21,7 +21,11 @@ export default function Home() {
           />
         </div>
       </div>
-      <div id="faq">
+      {/* TOOD: Add how it works section */}
+      {/* <div className="homeSecContainer" id="howitworks">
+        <h1>How It Works</h1>
+      </div> */}
+      <div className="homeSecContainer" id="faq">
         <h1>Frequently Asked Questions</h1>
         <p>If you have any other questions not covered here, please feel free to contact us, and we'll be happy to assist you.</p>
         <Accordion value={FaqJson}></Accordion>
