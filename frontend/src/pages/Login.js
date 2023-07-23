@@ -14,6 +14,7 @@ import { setUserEmail, setUserLoggedIn } from "../redux/actions/AuthAction";
 export default function Login() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const authState = useSelector((state) => state.auth);
 
   const [isLoading, setIsLoading] = useState(true);
   const [errMsg, setErrMsg] = useState("");
@@ -30,7 +31,7 @@ export default function Login() {
           if (res.data.errMsg) {
             window.location.href = "/verifyemail";
           } else {
-            window.location.href = "/";
+            window.location.href = res.data.redirect;
           }
         })
         .catch((err) => console.log(err));

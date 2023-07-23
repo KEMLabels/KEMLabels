@@ -37,7 +37,7 @@ export default function Signup() {
           if (res.data.errMsg) {
             window.location.href = "/verifyemail";
           } else {
-            window.location.href = "/";
+            window.location.href = res.data.redirect;
           }
         })
         .catch((err) => console.log(err));

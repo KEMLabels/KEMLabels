@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import axios from "../api/axios";
-import { setUserLoggedIn } from "../redux/actions/AuthAction";
+import { clearSession } from "../redux/actions/AuthAction";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
@@ -79,7 +79,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
               onClick={async (e) => {
                 e.preventDefault();
                 await axios.get("/logout", { withCredentials: true });
-                dispatch(setUserLoggedIn(false));
+                dispatch(clearSession());
                 window.location.href = "/";
               }}
             >

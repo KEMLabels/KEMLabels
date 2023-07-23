@@ -253,8 +253,8 @@ app.get('/checkVerification', async (req, res) => {
     const user = await User.findOne({ _id: req.session.user._id });
     if (!user) throw new Error('An error occured.');
     const verified = user.verified;
-
     if (!verified) throw new Error('User is not verified');
+    res.json({ redirect: '/' });
 })
 
 app.post("/emailExists", async (req, res) => {
