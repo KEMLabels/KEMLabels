@@ -28,22 +28,8 @@ export default function Signup() {
   });
 
   useEffect(() => {
-    if (isLoggedIn) {
-      axios
-        .get("/checkVerification", {
-          withCredentials: true,
-        })
-        .then((res) => {
-          if (res.data.errMsg) {
-            window.location.href = "/verifyemail";
-          } else {
-            window.location.href = res.data.redirect;
-          }
-        })
-        .catch((err) => console.log(err));
-    } else {
-      setIsLoading(false);
-    }
+    if (isLoggedIn) window.location.href = "/verifyemail";
+    else setIsLoading(false);
   }, [isLoggedIn]);
 
   // Validate password field during input change
