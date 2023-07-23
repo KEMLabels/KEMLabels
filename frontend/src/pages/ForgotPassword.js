@@ -37,7 +37,10 @@ export default function ForgotPassword() {
   const [resentEmail, setResentEmail] = useState(false);
 
   useEffect(() => {
-    if (verifyForgetPassEmailState.lastAttemptDateTime) {
+    if (
+      verifyForgetPassEmailState &&
+      verifyForgetPassEmailState.lastAttemptDateTime
+    ) {
       const currentTime = Date.parse(getCurrentTimeInPST());
       const lastAttemptTime = Date.parse(
         verifyForgetPassEmailState.lastAttemptDateTime

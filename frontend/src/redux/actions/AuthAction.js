@@ -3,6 +3,7 @@ import {
   SET_USER_LOGGED_IN,
   SET_VERIFY_EMAIL_ATTEMPTS,
   SET_FORGET_PASS_EMAIL_ATTEMPTS,
+  CLEAR_SESSION,
   CLEAR_USER,
 } from "../Types";
 
@@ -35,6 +36,12 @@ export const setForgetPassEmailAttempts =
       payload: { attempts, lastAttemptDateTime },
     });
   };
+
+export const clearSession = () => (dispatch) => {
+  dispatch({
+    type: CLEAR_SESSION,
+  });
+};
 
 export const clearUser = () => (dispatch) => {
   dispatch({

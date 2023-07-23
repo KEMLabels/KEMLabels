@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
 import axios from "../api/axios";
-import { setUserLoggedIn } from "../redux/actions/AuthAction";
+import { clearSession } from "../redux/actions/AuthAction";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 
@@ -73,11 +73,19 @@ export default function HamburgerMenu({ sessionStatus = false }) {
           </Link>
           {!sessionStatus && (
             <>
-              <NavLink className="navLink" to="/signin" activeclassname="active">
+              <NavLink
+                className="navLink"
+                to="/signin"
+                activeclassname="active"
+              >
                 <FaSignInAlt />
                 <span>Sign In</span>
               </NavLink>
-              <NavLink className="navLink" to="/signup" activeclassname="active">
+              <NavLink
+                className="navLink"
+                to="/signup"
+                activeclassname="active"
+              >
                 <FaUserPlus />
                 <span>Get Started</span>
               </NavLink>
@@ -89,7 +97,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
               onClick={async (e) => {
                 e.preventDefault();
                 await axios.get("/logout", { withCredentials: true });
-                dispatch(setUserLoggedIn(false));
+                dispatch(clearSession());
                 window.location.href = "/";
               }}
             >

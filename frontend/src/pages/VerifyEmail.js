@@ -17,7 +17,7 @@ function VerifyEmail() {
   const verifyEmailState = useSelector((state) => state.auth.verifyEmail);
 
   useEffect(() => {
-    if (verifyEmailState.lastAttemptDateTime) {
+    if (verifyEmailState && verifyEmailState.lastAttemptDateTime) {
       const currentTime = Date.parse(getCurrentTimeInPST());
       const lastAttemptTime = Date.parse(verifyEmailState.lastAttemptDateTime);
       const timeDifferenceInMinutes = Math.floor(
