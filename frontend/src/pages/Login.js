@@ -33,28 +33,35 @@ export default function Login() {
             window.location.href = res.data.redirect;
           }
         })
-        .catch((err) => console.log(err));
+        .catch((e) => {
+          console.log("Error: ", e);
+          setErrMsg(`${e.name}: ${e.message}`);
+        });
     } else {
       setIsLoading(false);
     }
   }, [isLoggedIn]);
 
-  const submit = async (e) => {
+  const submit = (e) => {
     e.preventDefault();
     if (email === "" || password === "") {
       setErrMsg("All fields are required.");
       return;
     }
-    const res = await axios.post(
-      "/Signin",
-      { email, password },
-      { withCredentials: true }
-    );
-    if (res.data.errMsg) setErrMsg(res.data.errMsg);
-    else {
-      dispatch(setUserLoggedIn(true));
-      dispatch(setUserEmail(email));
-    }
+    axios
+      .post("/Signin", { email, password }, { withCredentials: true })
+      .then((res) => {
+        console.log(res);
+        if (res.data.errMsg) setErrMsg(res.data.errMsg);
+        else {
+          dispatch(setUserLoggedIn(true));
+          dispatch(setUserEmail(email));
+        }
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg(`${e.name}: ${e.message}`);
+      });
   };
 
   if (isLoading) return;

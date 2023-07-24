@@ -4,10 +4,13 @@ import axios from "../api/axios";
 import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
+import AlertMessage from "../components/AlertMessage";
 
 export default function VerifyEmailConfirmation() {
-  const [validURL, setvalidURL] = useState(false);
   const param = useParams();
+
+  const [validURL, setvalidURL] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
 
   useEffect(() => {
     const url = `http://localhost:8081/users/${param.id}/verify/${param.token}`;
@@ -17,7 +20,11 @@ export default function VerifyEmailConfirmation() {
         console.log(res);
         setvalidURL(true);
       })
-      .catch((err) => setvalidURL(false));
+      .catch((e) => {
+        setvalidURL(false);
+        console.log("Error: ", e);
+        setErrMsg(`${e.name}: ${e.message}`);
+      });
   }, [param]);
 
   return (
@@ -69,6 +76,7 @@ export default function VerifyEmailConfirmation() {
               </>
             )}
           </div>
+          {errMsg && <AlertMessage msg={errMsg} type="error" />}
           <Button
             btnType="button"
             text="Return to home"

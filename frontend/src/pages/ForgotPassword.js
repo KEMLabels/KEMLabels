@@ -101,28 +101,31 @@ export default function ForgotPassword() {
     return true;
   }
 
-  const sendVerificationCode = async (e) => {
+  const sendVerificationCode = (e) => {
     e.preventDefault();
     if (email === "") {
       setErrMsg("All fields are required.");
       return;
     }
-    const res = await axios.post(
-      "/emailExists",
-      { email },
-      { withCredentials: true }
-    );
-    console.log(res.data);
-    if (res.data.errMsg) setErrMsg(res.data.errMsg);
-    else {
-      sendInitialRequest();
-      document.getElementById("resetPasswordForm").reset();
-      setResetPasswordStep("verifyOTP");
-      setInfoMsg("Email has been sent. Please check your inbox.");
-    }
+    axios
+      .post("/emailExists", { email }, { withCredentials: true })
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.errMsg) setErrMsg(res.data.errMsg);
+        else {
+          sendInitialRequest();
+          document.getElementById("resetPasswordForm").reset();
+          setResetPasswordStep("verifyOTP");
+          setInfoMsg("Email has been sent. Please check your inbox.");
+        }
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg(`${e.name}: ${e.message}`);
+      });
   };
 
-  async function sendInitialRequest() {
+  function sendInitialRequest() {
     setResentEmail(true);
     if (verifyForgetPassEmailState.attempts === 10) {
       setErrMsg(
@@ -138,16 +141,19 @@ export default function ForgotPassword() {
       setTimeout(() => {
         setResentEmail(false);
       }, 15000);
-      const res = await axios.post(
-        "/forgotpassword",
-        { email },
-        { withCredentials: true }
-      );
-      console.log(res.data);
+      axios
+        .post("/forgotpassword", { email }, { withCredentials: true })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((e) => {
+          console.log("Error: ", e);
+          setErrMsg(`${e.name}: ${e.message}`);
+        });
     }
   }
 
-  async function sendResetRequest() {
+  function sendResetRequest() {
     setResentEmail(true);
     if (verifyForgetPassEmailState.attempts === 10) {
       setErrMsg(
@@ -163,57 +169,65 @@ export default function ForgotPassword() {
       setTimeout(() => {
         setResentEmail(false);
       }, 15000);
-      const res = await axios.post(
-        "/generateNewOTP",
-        { email },
-        { withCredentials: true }
-      );
-      console.log(res.data);
+      axios
+        .post("/generateNewOTP", { email }, { withCredentials: true })
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((e) => {
+          console.log("Error: ", e);
+          setErrMsg(`${e.name}: ${e.message}`);
+        });
     }
   }
 
-  const validateOTP = async (e) => {
+  const validateOTP = (e) => {
     e.preventDefault();
-    const res = await axios.post(
-      "/checkOTP",
-      { enteredOTP, email },
-      { withCredentials: true }
-    );
-
-    console.log(res);
     setInfoMsg("");
-
-    if (res.data.errMsg) {
-      setErrMsg(res.data.errMsg);
-    } else {
-      document.getElementById("resetPasswordForm").reset();
-      setResetPasswordStep("changePassword");
-      setErrMsg("");
-      setSuccessMsg("Verification successful.");
-      setTimeout(() => {
-        setSuccessMsg("");
-      }, 5000);
-    }
+    axios
+      .post("/checkOTP", { enteredOTP, email }, { withCredentials: true })
+      .then((res) => {
+        console.log(res);
+        if (res.data.errMsg) {
+          setErrMsg(res.data.errMsg);
+        } else {
+          document.getElementById("resetPasswordForm").reset();
+          setResetPasswordStep("changePassword");
+          setErrMsg("");
+          setSuccessMsg("Verification successful.");
+          setTimeout(() => {
+            setSuccessMsg("");
+          }, 5000);
+        }
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg(`${e.name}: ${e.message}`);
+      });
   };
 
-  const changeUserPassword = async (e) => {
+  const changeUserPassword = (e) => {
     e.preventDefault();
     if (!validatePasswordOnSubmit(password)) return;
-    const res = await axios.post(
-      "/updateUserPass",
-      { email, password },
-      { withCredentials: true }
-    );
-    if (res.data.errMsg) setErrMsg(res.data.errMsg);
-    else {
-      setSuccessMsg(
-        "Password updated successfully! Redirecting you to the login page..."
-      );
-      setTimeout(() => {
-        setSuccessMsg("");
-        window.location.href = res.data.redirect;
-      }, 3000);
-    }
+    axios
+      .post("/updateUserPass", { email, password }, { withCredentials: true })
+      .then((res) => {
+        console.log(res);
+        if (res.data.errMsg) setErrMsg(res.data.errMsg);
+        else {
+          setSuccessMsg(
+            "Password updated successfully! Redirecting you to the login page..."
+          );
+          setTimeout(() => {
+            setSuccessMsg("");
+            window.location.href = res.data.redirect;
+          }, 3000);
+        }
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg(`${e.name}: ${e.message}`);
+      });
   };
 
   function renderHeading() {

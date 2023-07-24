@@ -29,13 +29,19 @@ function VerifyEmail() {
       }
     }
     if (isLoggedIn) {
-      axios.get("/isUserVerified", { withCredentials: true }).then((res) => {
-        if (res.data.errMsg) {
-          if (res.data.errMsg.startsWith("Please check your inbox")) {
-            setInfoMsg(res.data.errMsg);
-          } else setErrMsg("An error occured. Please try again later.");
-        } else window.location.href = res.data.redirect;
-      });
+      axios
+        .get("/isUserVerified", { withCredentials: true })
+        .then((res) => {
+          if (res.data.errMsg) {
+            if (res.data.errMsg.startsWith("Please check your inbox")) {
+              setInfoMsg(res.data.errMsg);
+            } else setErrMsg("An error occured. Please try again later.");
+          } else window.location.href = res.data.redirect;
+        })
+        .catch((e) => {
+          console.log("Error: ", e);
+          setErrMsg(`${e.name}: ${e.message}`);
+        });
     } else window.location.href = "/";
   }, [isLoggedIn, verifyEmailState, dispatch]);
 
@@ -73,7 +79,10 @@ function VerifyEmail() {
         .then((res) => {
           console.log(res);
         })
-        .catch((err) => console.log(err));
+        .catch((e) => {
+          console.log("Error: ", e);
+          setErrMsg(`${e.name}: ${e.message}`);
+        });
       setTimeout(() => {
         setResentEmail(false);
         setErrMsg("");

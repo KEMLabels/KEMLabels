@@ -89,19 +89,23 @@ export default function Signup() {
     return true;
   }
 
-  const submit = async (e) => {
+  const submit = (e) => {
     e.preventDefault();
     if (!validateFields()) return;
-    const res = await axios.post(
-      "/Signup",
-      { userName, email, password },
-      { withCredentials: true }
-    );
-    if (res.data.errMsg) setErrMsg(res.data.errMsg);
-    else {
-      dispatch(setUserEmail(email));
-      dispatch(setUserLoggedIn(true));
-    }
+    axios
+      .post("/Signup", { userName, email, password }, { withCredentials: true })
+      .then((res) => {
+        console.log(res);
+        if (res.data.errMsg) setErrMsg(res.data.errMsg);
+        else {
+          dispatch(setUserEmail(email));
+          dispatch(setUserLoggedIn(true));
+        }
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg(`${e.name}: ${e.message}`);
+      });
   };
 
   if (isLoading) return;
