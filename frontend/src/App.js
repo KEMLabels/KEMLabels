@@ -5,6 +5,7 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyEmailConfirmation from "./pages/VerifyEmailConfirmation";
 import VerifyEmail from "./pages/VerifyEmail";
+import Error from "./pages/Error";
 
 export default function App() {
   return (
@@ -19,8 +20,7 @@ export default function App() {
           element={<VerifyEmailConfirmation />}
         ></Route>
         <Route path="/verifyemail" element={<VerifyEmail />}></Route>
-        <Route path="*" element={<h1>404: Not Found</h1>}></Route>
-        {/* TODO: Add error page */}
+        <Route path="*" element={<Error />}></Route>
       </Routes>
     </BrowserRouter>
   );

@@ -7,7 +7,7 @@ import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 import { setVerifyEmailAttempts } from "../redux/actions/AuthAction";
 
-function VerifyEmail() {
+export default function VerifyEmail() {
   const dispatch = useDispatch();
   const email = useSelector((state) => state.auth.email);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -146,5 +146,3 @@ function VerifyEmail() {
     </PageLayout>
   );
 }
-
-export default VerifyEmail;

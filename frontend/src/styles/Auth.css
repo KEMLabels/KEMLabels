@@ -32,6 +32,18 @@
   opacity: 0.5;
 }
 
+.errorContainer {
+  text-align: center;
+}
+
+.errorContainer h1 {
+  font-size: 3rem;
+}
+
+.errorContainer p {
+  font-size: 1.2rem;
+}
+
 .authFormContainer {
   display: flex;
   flex-direction: column;
@@ -143,6 +155,10 @@
 
   .authHeader h1 {
     font-size: 2rem;
+  }
+
+  .errorContainer p {
+    font-size: 1rem;
   }
 
   .authFormContainer a.linkAlt {
