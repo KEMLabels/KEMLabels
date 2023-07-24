@@ -15,7 +15,7 @@ export default function Signup() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
@@ -29,7 +29,6 @@ export default function Signup() {
 
   useEffect(() => {
     if (isLoggedIn) window.location.href = "/verifyemail";
-    else setIsLoading(false);
   }, [isLoggedIn]);
 
   // Validate password field during input change
@@ -91,7 +90,13 @@ export default function Signup() {
 
   const submit = (e) => {
     e.preventDefault();
-    if (!validateFields()) return;
+    setLoading(true);
+
+    if (!validateFields()) {
+      setLoading(false);
+      return;
+    }
+
     axios
       .post("/Signup", { userName, email, password }, { withCredentials: true })
       .then((res) => {
@@ -105,10 +110,12 @@ export default function Signup() {
       .catch((e) => {
         console.log("Error: ", e);
         setErrMsg(`${e.name}: ${e.message}`);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
-  if (isLoading) return;
   return (
     <PageLayout title="Sign Up" hideNavAndFooter>
       <div className="authContainer">
@@ -178,6 +185,7 @@ export default function Signup() {
             <Button
               btnType="submit"
               onClickEvent={submit}
+              loading={loading}
               text="Create account"
             />
           </form>

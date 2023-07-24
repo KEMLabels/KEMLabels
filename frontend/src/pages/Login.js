@@ -15,7 +15,7 @@ export default function Login() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,14 +37,14 @@ export default function Login() {
           console.log("Error: ", e);
           setErrMsg(`${e.name}: ${e.message}`);
         });
-    } else {
-      setIsLoading(false);
     }
   }, [isLoggedIn]);
 
   const submit = (e) => {
     e.preventDefault();
+    setLoading(true);
     if (email === "" || password === "") {
+      setLoading(false);
       setErrMsg("All fields are required.");
       return;
     }
@@ -61,10 +61,12 @@ export default function Login() {
       .catch((e) => {
         console.log("Error: ", e);
         setErrMsg(`${e.name}: ${e.message}`);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
-  if (isLoading) return;
   return (
     <PageLayout title="Login" hideNavAndFooter>
       <div className="authContainer">
@@ -104,7 +106,12 @@ export default function Login() {
             <Link to="/forgotpassword" className="linkAlt">
               Forgot password?
             </Link>
-            <Button btnType="submit" onClickEvent={submit} text="Sign in" />
+            <Button
+              btnType="submit"
+              loading={loading}
+              onClickEvent={submit}
+              text="Sign in"
+            />
           </form>
           <div style={{ width: "100%", textAlign: "center" }}>
             <span style={{ opacity: 0.5 }}>Don't have an account? </span>

@@ -9,6 +9,7 @@ import AlertMessage from "../components/AlertMessage";
 export default function VerifyEmailConfirmation() {
   const param = useParams();
 
+  const [loading, setLoading] = useState(false);
   const [validURL, setvalidURL] = useState(false);
   const [errMsg, setErrMsg] = useState("");
 
@@ -80,7 +81,13 @@ export default function VerifyEmailConfirmation() {
           <Button
             btnType="button"
             text="Return to home"
-            onClickEvent={() => (window.location.href = "/")}
+            loading={loading}
+            onClickEvent={() => {
+              setLoading(true);
+              setTimeout(() => {
+                window.location.href = "/";
+              }, 100);
+            }}
             customStyle={{ width: "100%" }}
           />
         </div>

@@ -9,12 +9,14 @@ import { setVerifyEmailAttempts } from "../redux/actions/AuthAction";
 
 function VerifyEmail() {
   const dispatch = useDispatch();
-  const [infoMsg, setInfoMsg] = useState("");
-  const [errMsg, setErrMsg] = useState("");
-  const [resentEmail, setResentEmail] = useState(false);
   const email = useSelector((state) => state.auth.email);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const verifyEmailState = useSelector((state) => state.auth.verifyEmail);
+
+  const [loading, setLoading] = useState(false);
+  const [infoMsg, setInfoMsg] = useState("");
+  const [errMsg, setErrMsg] = useState("");
+  const [resentEmail, setResentEmail] = useState(false);
 
   useEffect(() => {
     if (verifyEmailState && verifyEmailState.lastAttemptDateTime) {
@@ -59,11 +61,14 @@ function VerifyEmail() {
     return formatter.format(new Date());
   }
 
-  const submit = async (e) => {
+  const submit = (e) => {
     e.preventDefault();
+    setLoading(true);
     setErrMsg("Please wait to re-send another email");
     setResentEmail(true);
+
     if (verifyEmailState.attempts === 10) {
+      setLoading(false);
       setErrMsg(
         "You have exceeded the maximum number of attempts. Please try again later."
       );
@@ -82,6 +87,9 @@ function VerifyEmail() {
         .catch((e) => {
           console.log("Error: ", e);
           setErrMsg(`${e.name}: ${e.message}`);
+        })
+        .finally(() => {
+          setLoading(false);
         });
       setTimeout(() => {
         setResentEmail(false);
@@ -122,6 +130,7 @@ function VerifyEmail() {
             btnType="button"
             text="Resend email"
             onClickEvent={submit}
+            loading={loading}
             customStyle={{ width: "100%" }}
             disabled={resentEmail}
           />

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import axios from "../api/axios";
@@ -37,6 +37,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
   useScrollToLocation();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const [loading, setLoading] = useState(false);
 
   return (
     <nav className={`navbar ${hideNavAndFooter ? "navHidden" : ""}`}>
@@ -66,10 +67,18 @@ export default function Navbar({ hideNavAndFooter = false }) {
               </NavLink>
               <Button
                 onClickEvent={() => {
-                  window.location.href = "/signup";
+                  setLoading(true);
+                  setTimeout(() => {
+                    window.location.href = "/signup";
+                  }, 100);
                 }}
                 text={"Get Started"}
-                customStyle={{ padding: "6px 12px", marginLeft: "-1rem" }}
+                loading={loading}
+                customStyle={{
+                  padding: "6px 12px",
+                  marginLeft: "-1rem",
+                  minWidth: "7.2rem",
+                }}
               />
             </>
           )}

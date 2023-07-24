@@ -20,6 +20,7 @@ export default function ForgotPassword() {
   );
 
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
@@ -35,6 +36,7 @@ export default function ForgotPassword() {
     specialChar: true,
   });
   const [resentEmail, setResentEmail] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     if (
@@ -103,7 +105,10 @@ export default function ForgotPassword() {
 
   const sendVerificationCode = (e) => {
     e.preventDefault();
+    setLoading(true);
+
     if (email === "") {
+      setLoading(false);
       setErrMsg("All fields are required.");
       return;
     }
@@ -122,6 +127,9 @@ export default function ForgotPassword() {
       .catch((e) => {
         console.log("Error: ", e);
         setErrMsg(`${e.name}: ${e.message}`);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -153,9 +161,12 @@ export default function ForgotPassword() {
     }
   }
 
-  function sendResetRequest() {
+  function sendResetRequest(e) {
+    e.preventDefault();
+    setLoading(true);
     setResentEmail(true);
     if (verifyForgetPassEmailState.attempts === 10) {
+      setLoading(false);
       setErrMsg(
         "You have exceeded the maximum number of attempts. Please try again later."
       );
@@ -177,13 +188,18 @@ export default function ForgotPassword() {
         .catch((e) => {
           console.log("Error: ", e);
           setErrMsg(`${e.name}: ${e.message}`);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   }
 
   const validateOTP = (e) => {
     e.preventDefault();
+    setLoading(true);
     setInfoMsg("");
+
     axios
       .post("/checkOTP", { enteredOTP, email }, { withCredentials: true })
       .then((res) => {
@@ -203,18 +219,29 @@ export default function ForgotPassword() {
       .catch((e) => {
         console.log("Error: ", e);
         setErrMsg(`${e.name}: ${e.message}`);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
   const changeUserPassword = (e) => {
     e.preventDefault();
-    if (!validatePasswordOnSubmit(password)) return;
+    setLoading(true);
+    setSuccessMsg("");
+
+    if (!validatePasswordOnSubmit(password)) {
+      setLoading(false);
+      return;
+    }
+
     axios
       .post("/updateUserPass", { email, password }, { withCredentials: true })
       .then((res) => {
         console.log(res);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
+          setRedirecting(true);
           setSuccessMsg(
             "Password updated successfully! Redirecting you to the login page..."
           );
@@ -227,6 +254,13 @@ export default function ForgotPassword() {
       .catch((e) => {
         console.log("Error: ", e);
         setErrMsg(`${e.name}: ${e.message}`);
+      })
+      .finally(() => {
+        if (redirecting) {
+          setTimeout(() => {
+            setLoading(false);
+          }, 3000);
+        } else setLoading(false);
       });
   };
 
@@ -260,6 +294,7 @@ export default function ForgotPassword() {
                 onClickEvent={sendResetRequest}
                 text="Resend email"
                 disabled={resentEmail}
+                loading={loading}
                 customStyle={{
                   fontSize: "1rem",
                   fontWeight: "400",
@@ -313,6 +348,7 @@ export default function ForgotPassword() {
             <Button
               btnType="submit"
               onClickEvent={sendVerificationCode}
+              loading={loading}
               text="Send verification code"
               customStyle={{ marginTop: "1rem" }}
             />
@@ -342,6 +378,7 @@ export default function ForgotPassword() {
             <Button
               btnType="submit"
               onClickEvent={validateOTP}
+              loading={loading}
               text="Enter code"
               customStyle={{ marginTop: "1rem" }}
             />
@@ -384,6 +421,7 @@ export default function ForgotPassword() {
             <Button
               btnType="submit"
               onClickEvent={changeUserPassword}
+              loading={loading}
               text="Update password"
             />
           </>
