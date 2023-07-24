@@ -14,6 +14,7 @@ const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 app.enable('trust proxy');
 
+//Connect to Mongo
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true });
@@ -24,6 +25,7 @@ const connectDB = async () => {
     }
 }
 
+//Import schema modules
 const User = require('./model/users.js');
 const tempTokens = require('./model/tempToken.js');
 const tempOTPS = require('./model/tempOTPs.js');
@@ -34,24 +36,22 @@ const store = new MongoDBStore({
     collection: 'sessions',
 });
 
+//Start app
 app.use('/', express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "http://localhost:3000/");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
-
 const whitelist = ['http://localhost:8081', 'http://localhost:3000']
 app.use(cors({
     origin: whitelist,
     methods: ['POST', 'GET', 'PATCH', 'OPTIONS'],
     credentials: true
 }));
-
 app.use(session({
     name: 'sessionID',
     secret: 'strongass',
@@ -66,6 +66,7 @@ app.use(session({
     store: store,
 }));
 
+//Set up transporter for nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -74,11 +75,13 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+//Erroe handler function
 async function handleErr(err, req, res, next) {
     console.log(err.message)
     return res.json({ errMsg: err.message })
 }
 
+//Signing in
 app.post('/signin', async (req, res) => {
     const { email, password } = req.body
 
@@ -107,6 +110,7 @@ async function auth(req, res, user, enteredPassword) {
     }
 }
 
+//Middleware to request user information
 app.get('/getSessionInfo', (req, res) => {
     res.json({
         isLoggedIn: req.session.isLoggedIn
@@ -127,6 +131,7 @@ app.get('/logout', (req, res) => {
     return res.json({ redirect: '/' })
 })
 
+//Signing up
 app.post("/signup", async (req, res) => {
     const { userName, email, password } = req.body
 
@@ -165,6 +170,7 @@ app.post("/signup", async (req, res) => {
     res.json({ redirect: '/verifyemail' });
 })
 
+//Email verification
 app.get("/generateToken", async (req, res) => {
     const findToken = await tempTokens.findOne({ userid: req.session.user._id.toString() });
     if (findToken) {
@@ -257,6 +263,7 @@ app.get('/checkVerification', async (req, res) => {
     res.json({ redirect: '/' });
 })
 
+//Forgot password
 app.post("/emailExists", async (req, res) => {
     const { email } = req.body
 
@@ -346,6 +353,7 @@ app.post("/checkOTP", async (req, res) => {
     res.status(200).json("success");
 })
 
+//Reset password
 app.post("/updateUserPass", async (req, res) => {
     const { email, password } = req.body
 
@@ -386,6 +394,7 @@ function sendChangePasswordConfirmation(emailAddress) {
     });
 }
 
+//404 NOT FOUND
 app.get('*', (req, res) => {
     throw new Error('PAGE NOT FOUND');
 })
