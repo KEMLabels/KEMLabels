@@ -47,7 +47,7 @@ export default function Signup() {
   function validateFields() {
     // regex
     const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
-    const emailRegex = /^([a-z0-9_.-]+)@([\da-z.-]+)\.([a-z.]{2,6})$/g;
+    const emailRegex = /^([a-z0-9_.+-]+)@([\da-z.-]+)\.([a-z.]{2,6})$/g;
     const passwordRegex =
       /^(?=.*[0-9])(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
