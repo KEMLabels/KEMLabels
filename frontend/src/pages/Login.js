@@ -124,7 +124,7 @@ export default function Login() {
           <img
             src="/media/login.svg"
             width="100%"
-            alt="Illustration of a delivery man."
+            alt="Illustration of a man logging in to an app."
           />
         </div>
       </div>

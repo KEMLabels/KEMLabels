@@ -197,11 +197,10 @@ export default function Signup() {
           </div>
         </div>
         <div className="authColumn">
-          {/* TODO: Replace graphic */}
           <img
-            src="/media/hero.svg"
+            src="/media/signup.jpg"
             width="100%"
-            alt="Illustration of a delivery man."
+            alt="Illustration of a man signing up by unlocking lock with a key."
           />
         </div>
       </div>
