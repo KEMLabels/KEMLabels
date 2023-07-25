@@ -121,9 +121,8 @@ export default function Login() {
           </div>
         </div>
         <div className="authColumn">
-          {/* TODO: Replace graphic */}
           <img
-            src="/media/hero.svg"
+            src="/media/login.svg"
             width="100%"
             alt="Illustration of a delivery man."
           />
