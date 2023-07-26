@@ -7,6 +7,8 @@
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.14.0",
     "@mui/styled-engine-sc": "^5.12.0",
+    "@stripe/react-stripe-js": "^2.1.1",
+    "@stripe/stripe-js": "^1.54.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -22,9 +24,11 @@
     "react-verification-input": "^3.3.1",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.4.2",
+    "stripe": "^12.14.0",
     "styled-components": "^5.3.11",
     "web-vitals": "^2.1.4"
   },
+  "proxy": "http://localhost:8081/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

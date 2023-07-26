@@ -7,6 +7,7 @@ import VerifyEmailConfirmation from "./pages/VerifyEmailConfirmation";
 import VerifyEmail from "./pages/VerifyEmail";
 import Error from "./pages/Error";
 import LoadCredits from "./pages/LoadCredits";
+import CreditCard from "./pages/CreditCard";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         ></Route>
         <Route path="/verifyemail" element={<VerifyEmail />}></Route>
         <Route path="/loadcredits" element={<LoadCredits />}></Route>
+        <Route path="/pay/creditcard" element={<CreditCard />}></Route>
         <Route path="*" element={<Error />}></Route>
       </Routes>
     </BrowserRouter>
