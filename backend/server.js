@@ -13,7 +13,11 @@ require('express-async-errors');
 const mongoose = require('mongoose');
 mongoose.set('strictQuery', false);
 app.enable('trust proxy');
-const stripe = require("stripe")('sk_test_Hrs6SAopgFPF0bZXSN3f6ELN');
+
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+
+const stripe = require("stripe")(stripeSecretKey);
 
 //Connect to Mongo
 const connectDB = async () => {
@@ -76,31 +80,36 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const calculateOrderAmount = (items) => {
-    // Replace this constant with a calculation of the order's amount
-    // Calculate the order total on the server to prevent
-    // people from directly manipulating the amount on the client
-    return 1400;
+//STRIPE API
+
+app.get("/getStripePublicKey", (req, res) => {
+    const key = stripePublicKey;
+    res.json(key);
+})
+
+const calculateOrderAmount = (amount) => {
+    const totalVal = amount * 100;
+    return Number(totalVal);
 };
 
 app.post("/create-payment-intent", async (req, res) => {
-    const { items } = req.body;
-  
+    const { amount } = req.body;
+
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: calculateOrderAmount(items),
-      currency: "usd",
-      automatic_payment_methods: {
-        enabled: true,
-      },
+        amount: calculateOrderAmount(amount),
+        currency: "usd",
+        automatic_payment_methods: {
+            enabled: true,
+        },
     });
-  
-    res.send({
-      clientSecret: paymentIntent.client_secret,
-    });
-  });
 
-//Erroe handler function
+    res.send({
+        clientSecret: paymentIntent.client_secret,
+    });
+});
+
+//Error handler function
 async function handleErr(err, req, res, next) {
     console.log(err.message)
     return res.json({ errMsg: err.message })
@@ -135,22 +144,7 @@ async function auth(req, res, user, enteredPassword) {
     }
 }
 
-//Middleware to request user information
-app.get('/getSessionInfo', (req, res) => {
-    res.json({
-        isLoggedIn: req.session.isLoggedIn
-    })
-})
-
-app.get('/getUserData', (req, res) => {
-    if (!req.session.user) {
-        return null;
-    }
-    res.json({
-        userData: req.session.user
-    })
-})
-
+//Logout
 app.get('/logout', (req, res) => {
     req.session.destroy();
     return res.json({ redirect: '/' })
@@ -360,8 +354,8 @@ app.post("/checkOTP", async (req, res) => {
     const { enteredOTP } = req.body
     const { email } = req.body
     console.log('entered code: ' + enteredOTP);
-    const tempCode = await tempOTPS.findOne({email: email});
-    if(!tempCode) throw new Error("Invalid Code");
+    const tempCode = await tempOTPS.findOne({ email: email });
+    if (!tempCode) throw new Error("Invalid Code");
     console.log('correct code: ' + tempCode.passcode);
     if (Number(enteredOTP) !== Number(tempCode.passcode)) {
         throw new Error('Incorrect code. Please try again.');

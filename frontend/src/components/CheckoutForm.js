@@ -56,11 +56,12 @@ export default function CheckoutForm() {
 
     setIsLoading(true);
 
+    //create a thank you page or something!!!!!!!!
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: "http://localhost:3000",
+        return_url: "/",
       },
     });
 
@@ -83,11 +84,12 @@ export default function CheckoutForm() {
   }
 
   return (
+    //figure out Link for faster checkout
     <form id="payment-form" onSubmit={handleSubmit}>
-      {/* <LinkAuthenticationElement
+      <LinkAuthenticationElement
         id="link-authentication-element"
-        onChange={(e) => setEmail(e.target.value)}
-      /> */}
+        onChange={(e) => setEmail(e.value.email)}
+      />
       <PaymentElement id="payment-element" options={paymentElementOptions} />
       <button disabled={isLoading || !stripe || !elements} id="submit">
         <span id="button-text">

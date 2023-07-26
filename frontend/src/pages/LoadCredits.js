@@ -5,27 +5,10 @@ import { InputField } from "../components/Field";
 import Button from "../components/Button";
 
 export default function LoadCredits() {
-  // const dispatch = useDispatch();
-  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  // const [errMsg, setErrMsg] = useState("");
 
-  // useEffect(() => {
-  //     if (isLoggedIn) {
-  //       axios
-  //         .get("/getSessionInfo", {
-  //           withCredentials: true,
-  //         })
-  //         .then((res) => {
-  //           if (res.data) {
-  //             window.location.href = "/";
-  //           }
-  //         })
-  //         .catch((e) => {
-  //           console.log("Error: ", e);
-  //           setErrMsg(`${e.name}: ${e.message}`);
-  //         });
-  //     }
-  //   }, [isLoggedIn]);
+  //make sure user is logged in
+  //store amount and send to credit card or coinbase
+
   return (
     <form action="POST">
       <p>Wishing to deposit how much?</p>
