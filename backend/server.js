@@ -8,6 +8,7 @@ const dotenv = require("dotenv")
 const cookieParser = require('cookie-parser');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const bodyParser = require('body-parser');
 dotenv.config();
 require('express-async-errors');
 const mongoose = require('mongoose');
@@ -51,7 +52,7 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
-const whitelist = ['http://localhost:8081', 'http://localhost:3000']
+const whitelist = 'http://localhost:3000'
 app.use(cors({
     origin: whitelist,
     methods: ['POST', 'GET', 'PATCH', 'OPTIONS'],
@@ -108,6 +109,34 @@ app.post("/create-payment-intent", async (req, res) => {
         clientSecret: paymentIntent.client_secret,
     });
 });
+
+// app.post("/webhook", (req, res) => {
+//     const event = req.body;
+
+//     // Verify the event came from Stripe (optional but recommended)
+//     const signature = req.headers["stripe-signature"];
+//     try {
+//         // Replace YOUR_STRIPE_WEBHOOK_SECRET with your actual webhook secret key
+//         const verifiedEvent = stripe.webhooks.constructEvent(
+//             req.rawBody,
+//             signature,
+//             "YOUR_STRIPE_WEBHOOK_SECRET"
+//         );
+//         handleWebhookEvent(verifiedEvent);
+//         res.sendStatus(200);
+//     } catch (error) {
+//         console.error("Webhook signature verification failed.", error);
+//         res.sendStatus(400);
+//     }
+// });
+
+// const handleWebhookEvent = (event) => {
+//     // Check if the event is a successful payment event
+//     if (event.type === "payment_intent.succeeded") {
+//       const paymentIntent = event.data.object;
+//       console.log("Payment succeeded!", paymentIntent);
+//     }
+//   };
 
 //Error handler function
 async function handleErr(err, req, res, next) {
