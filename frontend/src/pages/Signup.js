@@ -9,7 +9,7 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
-import { setUserEmail, setUserLoggedIn } from "../redux/actions/AuthAction";
+import { setUserEmail, setUserLoggedIn } from "../redux/actions/UserAction";
 
 export default function Signup() {
   const dispatch = useDispatch();
@@ -103,6 +103,9 @@ export default function Signup() {
         console.log(res);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
+          // Set username
+          // Set credit amount
+          // Set joined date
           dispatch(setUserEmail(email));
           dispatch(setUserLoggedIn(true));
         }

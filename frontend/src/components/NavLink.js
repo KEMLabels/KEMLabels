@@ -14,7 +14,7 @@ import {
   FaUserPlus,
 } from "react-icons/fa";
 import axios from "../api/axios";
-import { clearSession } from "../redux/actions/AuthAction";
+import { clearSession } from "../redux/actions/UserAction";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 

@@ -11,7 +11,7 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
-import { setForgetPassEmailAttempts } from "../redux/actions/AuthAction";
+import { setForgetPassEmailAttempts } from "../redux/actions/UserAction";
 
 export default function ForgotPassword() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);

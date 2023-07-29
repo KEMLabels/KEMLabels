@@ -20,7 +20,7 @@ export const authInitialState = {
   },
 };
 
-export default function AuthReducer(state = authInitialState, action) {
+export default function UserReducer(state = authInitialState, action) {
   switch (action.type) {
     case SET_USER_EMAIL:
       return { ...state, email: action.payload };

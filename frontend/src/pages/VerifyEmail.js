@@ -5,7 +5,7 @@ import axios from "../api/axios";
 import AlertMessage from "../components/AlertMessage";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
-import { setVerifyEmailAttempts } from "../redux/actions/AuthAction";
+import { setVerifyEmailAttempts } from "../redux/actions/UserAction";
 
 export default function VerifyEmail() {
   const dispatch = useDispatch();
