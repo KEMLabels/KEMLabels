@@ -11,13 +11,13 @@ export default function PageLayout({
   hideNavAndFooter = false,
 }) {
   if (title && typeof document !== "undefined") {
-    document.title = isLandingPage ? "LabelMaster" : `${title} | LabelMaster`;
+    document.title = isLandingPage ? "KEMLabels" : `${title} | KEMLabels`;
   }
   return (
     <>
       <Helmet>
         <title>
-          {isLandingPage ? "LabelMaster" : `${title} | LabelMaster`}
+          {isLandingPage ? "KEMLabels" : `${title} | KEMLabels`}
         </title>
         {description && <meta name="description" content={description} />}
       </Helmet>

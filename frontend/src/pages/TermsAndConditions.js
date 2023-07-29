@@ -7,7 +7,7 @@ function TermsAndConditions() {
         <div style={{padding:'0 5em'}}>
             <h1>Effective Date: July 29, 2023</h1>
 
-            <p>Welcome to LabelMaster! By using our website, mobile applications, and services, you agree to these Terms and Conditions. Please review them before using our services.</p>
+            <p>Welcome to KEMLabels! By using our website, mobile applications, and services, you agree to these Terms and Conditions. Please review them before using our services.</p>
 
             <h1>Use of Services:</h1>
             <ol>
@@ -18,7 +18,7 @@ function TermsAndConditions() {
 
             <h1>Content:</h1>
             <ol>
-                <li>Your Content: By submitting content, you grant LabelMaster permission to use it for our services.</li>
+                <li>Your Content: By submitting content, you grant KEMLabels permission to use it for our services.</li>
                 <li>Prohibited Content: Do not submit content that violates laws or others' rights.</li>
             </ol>
 
@@ -27,15 +27,15 @@ function TermsAndConditions() {
 
             <h1>Liability:</h1>
 
-            <p>We strive to provide accurate and reliable services, but we cannot guarantee everything. LabelMaster is not liable for any damages resulting from using our services.</p>
+            <p>We strive to provide accurate and reliable services, but we cannot guarantee everything. KEMLabels is not liable for any damages resulting from using our services.</p>
 
             <h1>Indemnification:</h1>
-            <p>You agree to hold LabelMaster harmless from any claims or losses due to your use of our services.</p>
+            <p>You agree to hold KEMLabels harmless from any claims or losses due to your use of our services.</p>
 
             <h1>Governing Law:</h1>
             <p>These Terms are governed by the laws of Canada.</p>
             <br></br>
-            <p>By using LabelMaster services, you accept these Terms and Conditions. If you have any questions, contact us at [contact email/phone number].</p>
+            <p>By using KEMLabels services, you accept these Terms and Conditions. If you have any questions, contact us at [contact email/phone number].</p>
         </div>
         </PageLayout>
     )

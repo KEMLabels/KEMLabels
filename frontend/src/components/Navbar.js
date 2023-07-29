@@ -99,7 +99,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
         <div style={{ display: "flex", alignItems: "center" }}>
           <Link to="/" className="logo">
             {/* TODO: Change this to logo img later */}
-            <h1>LabelMaster</h1>
+            <h1>KEMLabels</h1>
           </Link>
         </div>
         <div className="navLinksContainer">

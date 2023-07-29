@@ -40,7 +40,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
         >
           <Link to="/" className="logo">
             {/* TODO: Change this to logo img later */}
-            <h1>LabelMaster</h1>
+            <h1>KEMLabels</h1>
           </Link>
 
           <button
@@ -96,9 +96,9 @@ export default function HamburgerMenu({ sessionStatus = false }) {
               <FaPhoneAlt size={16} />
               <span>6041231234</span>
             </a>
-            <a href="mailto:labelmaster@gmail.com">
+            <a href="mailto:kemlabels@gmail.com">
               <FaEnvelope size={16} />
-              <span>labelmaster@gmail.com</span>
+              <span>kemlabels@gmail.com</span>
             </a>
           </div>
         </div>

@@ -16,7 +16,7 @@ export default function Button({
   return (
     <button
       type={btnType !== "button" ? btnType : "button"}
-      className={`labelMasterBtn ${className} ${
+      className={`kemLabelsBtn ${className} ${
         fill === "solid" ? "solid" : "outline"
       }`}
       style={{ ...customStyle }}
