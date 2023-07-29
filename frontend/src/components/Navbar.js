@@ -15,7 +15,8 @@ const useScrollToLocation = () => {
   const hashRef = useRef(hash);
 
   useEffect(() => {
-    if (pathname === "/" && !hash) window.scrollTo({ top: 0, behavior: "smooth" });
+    if (pathname === "/" && !hash)
+      window.scrollTo({ top: 0, behavior: "smooth" });
     if (hash) {
       // We want to reset if the hash has changed
       if (hashRef.current !== hash) {
@@ -35,14 +36,20 @@ const useScrollToLocation = () => {
 };
 
 // Checks if user clicks outside of dropdown menu
-function useOutsideAlerter(ref, hideAccountDropdown, toggleDropdownMenu) {
+function useOutsideAlerter(
+  dropdownMenuRef,
+  accountIconContainerRef,
+  hideAccountDropdown,
+  toggleDropdownMenu
+) {
   useEffect(() => {
     function handleClickOutside(e) {
       if (
         !hideAccountDropdown &&
-        ref.current &&
-        !ref.current.contains(e.target) &&
-        e.target.getAttribute("name") !== "accountNavLink"
+        dropdownMenuRef.current &&
+        !dropdownMenuRef.current.contains(e.target) &&
+        accountIconContainerRef.current &&
+        !accountIconContainerRef.current.contains(e.target)
       ) {
         toggleDropdownMenu();
       }
@@ -52,12 +59,18 @@ function useOutsideAlerter(ref, hideAccountDropdown, toggleDropdownMenu) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [ref, hideAccountDropdown, toggleDropdownMenu]);
+  }, [
+    dropdownMenuRef,
+    accountIconContainerRef,
+    hideAccountDropdown,
+    toggleDropdownMenu,
+  ]);
 }
 
 export default function Navbar({ hideNavAndFooter = false }) {
   useScrollToLocation();
   const dropdownMenuRef = useRef(null);
+  const accountIconContainerRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const username = useSelector((state) => state.auth.username);
   const creditAmount = useSelector((state) => state.auth.creditAmount);
@@ -68,11 +81,16 @@ export default function Navbar({ hideNavAndFooter = false }) {
   const [animateDropdown, setAnimateDropdown] = useState(false);
 
   const toggleDropdownMenu = () => {
-    setHideAccountDropdown(!hideAccountDropdown);
+    setHideAccountDropdown((prevState) => !prevState);
     setAnimateDropdown(!animateDropdown);
   };
 
-  useOutsideAlerter(dropdownMenuRef, hideAccountDropdown, toggleDropdownMenu);
+  useOutsideAlerter(
+    dropdownMenuRef,
+    accountIconContainerRef,
+    hideAccountDropdown,
+    toggleDropdownMenu
+  );
 
   return (
     <nav className={`navbar ${hideNavAndFooter ? "navHidden" : ""}`}>
@@ -121,19 +139,15 @@ export default function Navbar({ hideNavAndFooter = false }) {
             <>
               <div
                 className="accountIconContainer"
-                onClick={toggleDropdownMenu}
+                ref={accountIconContainerRef}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDropdownMenu();
+                }}
               >
-                <PiUserCircleFill
-                  className="accountIcon"
-                  name="accountNavLink"
-                />
-                <p className="navLink" name="accountNavLink">
-                  {username}
-                </p>
-                <HiOutlineChevronDown
-                  className="dropdownIcon"
-                  name="accountNavLink"
-                />
+                <PiUserCircleFill className="accountIcon" />
+                <p className="navLink">{username}</p>
+                <HiOutlineChevronDown className="dropdownIcon" />
               </div>
               <AccountDropdownMenu
                 dropdownMenuRef={dropdownMenuRef}
