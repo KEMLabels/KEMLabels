@@ -15,7 +15,7 @@ const useScrollToLocation = () => {
   const hashRef = useRef(hash);
 
   useEffect(() => {
-    if (pathname === "/") window.scrollTo({ top: 0, behavior: "smooth" });
+    if (pathname === "/" && !hash) window.scrollTo({ top: 0, behavior: "smooth" });
     if (hash) {
       // We want to reset if the hash has changed
       if (hashRef.current !== hash) {
@@ -119,16 +119,15 @@ export default function Navbar({ hideNavAndFooter = false }) {
           )}
           {isLoggedIn && (
             <>
-              <div className="accountIconContainer">
+              <div
+                className="accountIconContainer"
+                onClick={toggleDropdownMenu}
+              >
                 <PiUserCircleFill
                   className="accountIcon"
                   name="accountNavLink"
                 />
-                <p
-                  className="navLink"
-                  name="accountNavLink"
-                  onClick={toggleDropdownMenu}
-                >
+                <p className="navLink" name="accountNavLink">
                   {username}
                 </p>
                 <HiOutlineChevronDown
