@@ -64,8 +64,9 @@ export default function Navbar({ hideNavAndFooter = false }) {
   const [loading, setLoading] = useState(false);
   const [hideAccountDropdown, setHideAccountDropdown] = useState(true);
   const [animateDropdown, setAnimateDropdown] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [joinedDate, setJoinedDate] = useState("");
+  const username = useSelector((state) => state.auth.username);
+  const creditAmount = useSelector((state) => state.auth.creditAmount);
+  const joinedDate = useSelector((state) => state.auth.joinedDate);
 
   const toggleDropdownMenu = () => {
     setHideAccountDropdown(!hideAccountDropdown);
@@ -73,22 +74,6 @@ export default function Navbar({ hideNavAndFooter = false }) {
   };
 
   useOutsideAlerter(dropdownMenuRef, hideAccountDropdown, toggleDropdownMenu);
-
-  useEffect(() => {
-    axios
-      .get("/getUserInfo", {
-        withCredentials: true,
-      })
-      .then((res) => {
-        if (res) {
-          setUserName(res.data.userName);
-          setJoinedDate(new Date(res.data.createdAt).toDateString());
-        }
-      })
-      .catch((e) => {
-        console.log("Error: ", e);
-      });
-  });
 
   return (
     <nav className={`navbar ${hideNavAndFooter ? "navHidden" : ""}`}>
@@ -146,7 +131,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
                   name="accountNavLink"
                   onClick={toggleDropdownMenu}
                 >
-                  {userName}
+                  {username}
                 </p>
                 <HiOutlineChevronDown
                   className="dropdownIcon"
@@ -158,6 +143,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
                 hideAccountDropdown={hideAccountDropdown}
                 animateDropdown={animateDropdown}
                 joinedDate={joinedDate}
+                creditAmount={creditAmount}
               />
             </>
           )}

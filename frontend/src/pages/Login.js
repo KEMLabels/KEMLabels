@@ -64,9 +64,9 @@ export default function Login() {
         console.log(res);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
-          // dispatch(setUserName(res.data.username));
-          // dispatch(setUserCreditAmount(res.data.creditAmount));
-          // dispatch(setUserJoinedDate(res.data.joinedDate));
+          dispatch(setUserName(res.data.userInfo.userName));
+          dispatch(setUserCreditAmount(res.data.userInfo.credits));
+          dispatch(setUserJoinedDate(res.data.userInfo.joinedDate));
           dispatch(setUserEmail(inputEmail));
           dispatch(setUserLoggedIn(true));
         }

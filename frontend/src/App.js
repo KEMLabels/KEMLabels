@@ -8,6 +8,8 @@ import VerifyEmail from "./pages/VerifyEmail";
 import Error from "./pages/Error";
 import LoadCredits from "./pages/LoadCredits";
 import CreditCard from "./pages/CreditCard";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
         <Route path="/" element={<Home />}></Route>
         <Route path="/signin" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
+        <Route path="/privacypolicy" element={<PrivacyPolicy />}></Route>
+        <Route path="/termsandconditions" element={<TermsAndConditions />}></Route>
         <Route path="/forgotpassword" element={<ForgotPassword />}></Route>
         <Route
           path="/users/:id/verify/:token"
