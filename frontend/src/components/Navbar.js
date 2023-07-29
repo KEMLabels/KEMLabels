@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { PiUserCircleFill } from "react-icons/pi";
 import { HiOutlineChevronDown } from "react-icons/hi";
-import axios from "../api/axios";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
@@ -60,13 +59,13 @@ export default function Navbar({ hideNavAndFooter = false }) {
   useScrollToLocation();
   const dropdownMenuRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const username = useSelector((state) => state.auth.username);
+  const creditAmount = useSelector((state) => state.auth.creditAmount);
+  const joinedDate = useSelector((state) => state.auth.joinedDate);
 
   const [loading, setLoading] = useState(false);
   const [hideAccountDropdown, setHideAccountDropdown] = useState(true);
   const [animateDropdown, setAnimateDropdown] = useState(false);
-  const username = useSelector((state) => state.auth.username);
-  const creditAmount = useSelector((state) => state.auth.creditAmount);
-  const joinedDate = useSelector((state) => state.auth.joinedDate);
 
   const toggleDropdownMenu = () => {
     setHideAccountDropdown(!hideAccountDropdown);
@@ -125,7 +124,6 @@ export default function Navbar({ hideNavAndFooter = false }) {
                   className="accountIcon"
                   name="accountNavLink"
                 />
-                {/* TODO: Get username from MongoDB */}
                 <p
                   className="navLink"
                   name="accountNavLink"

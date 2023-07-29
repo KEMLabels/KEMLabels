@@ -10,7 +10,7 @@ export default function AccountDropdownMenu({
   joinedDate,
   creditAmount,
 }) {
-  const dateString = new Date(joinedDate).toDateString().split(' ');
+  const dateString = new Date(joinedDate).toDateString().split(" ");
   const month = dateString[1];
   const day = dateString[2];
   const year = dateString[3];

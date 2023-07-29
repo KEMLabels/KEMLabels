@@ -19,7 +19,10 @@ export default function App() {
         <Route path="/signin" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/privacypolicy" element={<PrivacyPolicy />}></Route>
-        <Route path="/termsandconditions" element={<TermsAndConditions />}></Route>
+        <Route
+          path="/termsandconditions"
+          element={<TermsAndConditions />}
+        ></Route>
         <Route path="/forgotpassword" element={<ForgotPassword />}></Route>
         <Route
           path="/users/:id/verify/:token"
