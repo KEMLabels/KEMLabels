@@ -18,13 +18,13 @@ export default function AccountDropdownLink({ type, link, text }) {
   function renderIcon() {
     switch (type) {
       case "account":
-        return <FaUserEdit className="dropdownLinkIcon" />;
+        return <FaUserEdit />;
       case "load":
-        return <FaMoneyCheckAlt className="dropdownLinkIcon" />;
+        return <FaMoneyCheckAlt />;
       case "history":
-        return <FaHistory className="dropdownLinkIcon" />;
+        return <FaHistory />;
       case "logout":
-        return <FaSignOutAlt className="dropdownLinkIcon" />;
+        return <FaSignOutAlt />;
       default:
         return null;
     }
@@ -46,7 +46,7 @@ export default function AccountDropdownLink({ type, link, text }) {
         {renderIcon()}
         <p className="dropdownNavLink">{text}</p>
       </div>
-      <FaChevronRight className="dropdownLinkIcon" />
+      <FaChevronRight />
     </div>
   );
 }
