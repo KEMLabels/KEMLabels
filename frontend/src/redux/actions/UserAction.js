@@ -1,5 +1,8 @@
 import {
   SET_USER_EMAIL,
+  SET_USER_USERNAME,
+  SET_USER_CREDIT_AMOUNT,
+  SET_USER_JOINED_DATE,
   SET_USER_LOGGED_IN,
   SET_VERIFY_EMAIL_ATTEMPTS,
   SET_FORGET_PASS_EMAIL_ATTEMPTS,
@@ -11,6 +14,27 @@ export const setUserEmail = (email) => (dispatch) => {
   dispatch({
     type: SET_USER_EMAIL,
     payload: email,
+  });
+};
+
+export const setUserName = (username) => (dispatch) => {
+  dispatch({
+    type: SET_USER_USERNAME,
+    payload: username,
+  });
+};
+
+export const setUserCreditAmount = (creditAmount) => (dispatch) => {
+  dispatch({
+    type: SET_USER_CREDIT_AMOUNT,
+    payload: creditAmount,
+  });
+};
+
+export const setUserJoinedDate = (joiendDate) => (dispatch) => {
+  dispatch({
+    type: SET_USER_JOINED_DATE,
+    payload: joiendDate,
   });
 };
 
