@@ -9,7 +9,12 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
-import { setUserEmail, setUserLoggedIn } from "../redux/actions/UserAction";
+import {
+  setUserEmail,
+  setUserJoinedDate,
+  setUserLoggedIn,
+  setUserName,
+} from "../redux/actions/UserAction";
 
 export default function Signup() {
   const dispatch = useDispatch();
@@ -17,9 +22,9 @@ export default function Signup() {
 
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
-  const [userName, setUserName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [inputUserName, setInputUserName] = useState("");
+  const [inputEmail, setInputEmail] = useState("");
+  const [inputPassword, setInputPassword] = useState("");
   const [passwordValid, setPasswordValid] = useState({
     length: true,
     uppercase: true,
@@ -50,16 +55,16 @@ export default function Signup() {
     const passwordRegex =
       /^(?=.*[0-9])(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
-    if (userName === "" || email === "" || password === "") {
+    if (inputUserName === "" || inputEmail === "" || inputPassword === "") {
       setErrMsg("All fields are required.");
       return false;
     }
 
     // username validation
-    if (userName.length < 3 || userName.length > 50) {
+    if (inputUserName.length < 3 || inputUserName.length > 50) {
       setErrMsg("Username must be between 3 and 50 characters.");
       return false;
-    } else if (!usernameRegex.test(userName)) {
+    } else if (!usernameRegex.test(inputUserName)) {
       setErrMsg(
         "Invalid username. Only alphabets, numbers, dash, underscores, and periods are allowed."
       );
@@ -67,19 +72,19 @@ export default function Signup() {
     }
 
     // email validation
-    if (email.length < 3 || email.length > 100) {
+    if (inputEmail.length < 3 || inputEmail.length > 100) {
       setErrMsg("Email must be between 3 and 100 characters.");
       return false;
-    } else if (!emailRegex.test(email)) {
+    } else if (!emailRegex.test(inputEmail)) {
       setErrMsg("Invalid email.");
       return false;
     }
 
     // password validation
-    if (password.length < 8 || password.length > 50) {
+    if (inputPassword.length < 8 || inputPassword.length > 50) {
       setErrMsg("Password must be between 8 and 50 characters.");
       return false;
-    } else if (!passwordRegex.test(password)) {
+    } else if (!passwordRegex.test(inputPassword)) {
       setErrMsg(
         "Password must contain at least one uppercase letter, one number, and one special character."
       );
@@ -98,15 +103,18 @@ export default function Signup() {
     }
 
     axios
-      .post("/Signup", { userName, email, password }, { withCredentials: true })
+      .post(
+        "/Signup",
+        { userName: inputUserName, email: inputEmail, password: inputPassword },
+        { withCredentials: true }
+      )
       .then((res) => {
         console.log(res);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
-          // Set username
-          // Set credit amount
-          // Set joined date
-          dispatch(setUserEmail(email));
+          dispatch(setUserName(inputUserName));
+          // dispatch(setUserJoinedDate(new Date().toDateString()));
+          dispatch(setUserEmail(inputEmail));
           dispatch(setUserLoggedIn(true));
         }
       })
@@ -137,7 +145,7 @@ export default function Signup() {
           <form action="POST" className="authFormContainer">
             <InputField
               onChangeEvent={(e) => {
-                setUserName(e.target.value);
+                setInputUserName(e.target.value);
                 setErrMsg("");
               }}
               placeholder="Username"
@@ -147,7 +155,7 @@ export default function Signup() {
             <InputField
               fieldType="email"
               onChangeEvent={(e) => {
-                setEmail(e.target.value);
+                setInputEmail(e.target.value);
                 setErrMsg("");
               }}
               placeholder="Email"
@@ -156,7 +164,7 @@ export default function Signup() {
             />
             <PasswordField
               onChangeEvent={(e) => {
-                setPassword(e.target.value);
+                setInputPassword(e.target.value);
                 validatePasswordOnTyping(e.target.value);
                 setErrMsg("");
               }}

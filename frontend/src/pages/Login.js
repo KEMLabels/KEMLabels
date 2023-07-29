@@ -9,7 +9,13 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
-import { setUserEmail, setUserLoggedIn } from "../redux/actions/UserAction";
+import {
+  setUserCreditAmount,
+  setUserEmail,
+  setUserJoinedDate,
+  setUserLoggedIn,
+  setUserName,
+} from "../redux/actions/UserAction";
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -17,8 +23,8 @@ export default function Login() {
 
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [inputEmail, setInputEmail] = useState("");
+  const [inputPassword, setInputPassword] = useState("");
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -43,21 +49,25 @@ export default function Login() {
   const submit = (e) => {
     e.preventDefault();
     setLoading(true);
-    if (email === "" || password === "") {
+    if (inputEmail === "" || inputPassword === "") {
       setLoading(false);
       setErrMsg("All fields are required.");
       return;
     }
     axios
-      .post("/Signin", { email, password }, { withCredentials: true })
+      .post(
+        "/Signin",
+        { email: inputEmail, password: inputPassword },
+        { withCredentials: true }
+      )
       .then((res) => {
         console.log(res);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
-          // Set username
-          // Set credit amount
-          // Set joined date
-          dispatch(setUserEmail(email));
+          // dispatch(setUserName(res.data.username));
+          // dispatch(setUserCreditAmount(res.data.creditAmount));
+          // dispatch(setUserJoinedDate(res.data.joinedDate));
+          dispatch(setUserEmail(inputEmail));
           dispatch(setUserLoggedIn(true));
         }
       })
@@ -90,7 +100,7 @@ export default function Login() {
             <InputField
               fieldType="email"
               onChangeEvent={(e) => {
-                setEmail(e.target.value);
+                setInputEmail(e.target.value);
                 setErrMsg("");
               }}
               placeholder="Email"
@@ -99,7 +109,7 @@ export default function Login() {
             />
             <PasswordField
               onChangeEvent={(e) => {
-                setPassword(e.target.value);
+                setInputPassword(e.target.value);
                 setErrMsg("");
               }}
               placeholder="Password"
