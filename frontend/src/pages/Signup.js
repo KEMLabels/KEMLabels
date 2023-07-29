@@ -93,6 +93,20 @@ export default function Signup() {
     return true;
   }
 
+  function getCurrenDateInPST() {
+    const formatter = new Intl.DateTimeFormat("en", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: "America/Vancouver",
+    });
+    return formatter.format(new Date());
+  }
+
   const submit = (e) => {
     e.preventDefault();
     setLoading(true);
@@ -113,7 +127,9 @@ export default function Signup() {
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           dispatch(setUserName(inputUserName));
-          // dispatch(setUserJoinedDate(new Date().toDateString()));
+          dispatch(
+            setUserJoinedDate(new Date(getCurrenDateInPST()).toISOString())
+          );
           dispatch(setUserEmail(inputEmail));
           dispatch(setUserLoggedIn(true));
         }
