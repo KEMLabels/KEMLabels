@@ -82,7 +82,11 @@
 
 .passwordRequirements ul li {
   color: black;
-  transition: all 0.3s ease-in-out;
+  -webkit-transition: all ease-in-out 0.3s;
+  -moz-transition: all ease-in-out 0.3s;
+  -ms-transition: all ease-in-out 0.3s;
+  -o-transition: all ease-in-out 0.3s;
+  transition: all ease-in-out 0.3s;
 }
 
 .passwordRequirements ul li.invalidPassword {

@@ -72,11 +72,19 @@
   border: solid 1px #efefef;
   border-radius: 0.75rem;
   box-shadow: 0px 0px 16px rgba(180, 180, 180, 0.1);
-  transition: all 0.1s ease-in-out;
+  -webkit-transition: all ease-in-out 0.1s;
+  -moz-transition: all ease-in-out 0.1s;
+  -ms-transition: all ease-in-out 0.1s;
+  -o-transition: all ease-in-out 0.1s;
+  transition: all ease-in-out 0.1s;
 }
 
 .cardsContainer .card:hover {
   border-bottom: solid 3px var(--primaryColor);
+  -webkit-transform: scale(1.05);
+  -moz-transform: scale(1.05);
+  -ms-transform: scale(1.05);
+  -o-transform: scale(1.05);
   transform: scale(1.05);
 }
 
@@ -125,7 +133,11 @@
   border: none;
   cursor: pointer;
   border-bottom: solid 1px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease-in-out;
+  -webkit-transition: all ease-in-out 0.3s;
+  -moz-transition: all ease-in-out 0.3s;
+  -ms-transition: all ease-in-out 0.3s;
+  -o-transition: all ease-in-out 0.3s;
+  transition: all ease-in-out 0.3s;
 }
 
 .accordionHeading:hover {
