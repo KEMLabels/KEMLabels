@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { PiUserCircleFill } from "react-icons/pi";
+import { HiOutlineChevronDown } from "react-icons/hi";
 import axios from "../api/axios";
-import { clearSession } from "../redux/actions/AuthAction";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 import HamburgerMenu from "./HamburgerMenu";
 import Button from "./Button";
+import AccountDropdownMenu from "./AccountDropdownMenu";
 
 const useScrollToLocation = () => {
   const scrolledRef = useRef(false);
   const { hash, pathname } = useLocation();
   const hashRef = useRef(hash);
-  // const [userName, setUserName] = useState("");
-  // const [joinedDate, setJoinedDate] = useState("");
 
   useEffect(() => {
     if (pathname === "/") window.scrollTo({ top: 0, behavior: "smooth" });
@@ -32,27 +32,63 @@ const useScrollToLocation = () => {
         scrolledRef.current = true;
       }
     }
-    // axios
-    // .get("/getUserInfo", {
-    //   withCredentials: true,
-    // })
-    // .then((res) => {
-    //   if (res) {
-    //     setUserName(res.data.userName);
-    //     setJoinedDate(new Date(res.data.createdAt).toDateString())
-    //   }
-    // })
-    // .catch((e) => {
-    //   console.log("Error: ", e);
-    // });
   });
 };
 
+// Checks if user clicks outside of dropdown menu
+function useOutsideAlerter(ref, hideAccountDropdown, toggleDropdownMenu) {
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (
+        !hideAccountDropdown &&
+        ref.current &&
+        !ref.current.contains(e.target) &&
+        e.target.getAttribute("name") !== "accountNavLink"
+      ) {
+        toggleDropdownMenu();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref, hideAccountDropdown, toggleDropdownMenu]);
+}
+
 export default function Navbar({ hideNavAndFooter = false }) {
   useScrollToLocation();
-  const dispatch = useDispatch();
+  const dropdownMenuRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
   const [loading, setLoading] = useState(false);
+  const [hideAccountDropdown, setHideAccountDropdown] = useState(true);
+  const [animateDropdown, setAnimateDropdown] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [joinedDate, setJoinedDate] = useState("");
+
+  const toggleDropdownMenu = () => {
+    setHideAccountDropdown(!hideAccountDropdown);
+    setAnimateDropdown(!animateDropdown);
+  };
+
+  useOutsideAlerter(dropdownMenuRef, hideAccountDropdown, toggleDropdownMenu);
+
+  useEffect(() => {
+    axios
+      .get("/getUserInfo", {
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (res) {
+          setUserName(res.data.userName);
+          setJoinedDate(new Date(res.data.createdAt).toDateString());
+        }
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+      });
+  });
 
   return (
     <nav className={`navbar ${hideNavAndFooter ? "navHidden" : ""}`}>
@@ -98,17 +134,32 @@ export default function Navbar({ hideNavAndFooter = false }) {
             </>
           )}
           {isLoggedIn && (
-            <Link
-              className="navLink"
-              onClick={async (e) => {
-                e.preventDefault();
-                await axios.get("/logout", { withCredentials: true });
-                dispatch(clearSession());
-                window.location.href = "/";
-              }}
-            >
-              Logout
-            </Link>
+            <>
+              <div className="accountIconContainer">
+                <PiUserCircleFill
+                  className="accountIcon"
+                  name="accountNavLink"
+                />
+                {/* TODO: Get username from MongoDB */}
+                <p
+                  className="navLink"
+                  name="accountNavLink"
+                  onClick={toggleDropdownMenu}
+                >
+                  {userName}
+                </p>
+                <HiOutlineChevronDown
+                  className="dropdownIcon"
+                  name="accountNavLink"
+                />
+              </div>
+              <AccountDropdownMenu
+                dropdownMenuRef={dropdownMenuRef}
+                hideAccountDropdown={hideAccountDropdown}
+                animateDropdown={animateDropdown}
+                joinedDate={joinedDate}
+              />
+            </>
           )}
         </div>
         <div className="navCorner" />
