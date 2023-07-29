@@ -1,24 +1,12 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { Link, NavLink } from "react-router-dom";
-import {
-  FaBars,
-  FaQuestionCircle,
-  FaSignInAlt,
-  FaPhoneAlt,
-  FaEnvelope,
-  FaSignOutAlt,
-  FaLayerGroup,
-  FaUserPlus,
-} from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { FaBars, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
-import axios from "../api/axios";
-import { clearSession } from "../redux/actions/AuthAction";
+import NavLink from "./NavLink";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
 
 export default function HamburgerMenu({ sessionStatus = false }) {
-  const dispatch = useDispatch();
   const [showHamburgerMenu, setShowHamburgerMenu] = useState(false);
 
   // Hides menu when user clicks outside of menu
@@ -63,47 +51,41 @@ export default function HamburgerMenu({ sessionStatus = false }) {
           </button>
         </div>
         <div className="mobNavLinksContainer">
-          <Link className="navLink" to="/#howitworks">
-            <FaLayerGroup />
-            <span>How It Works</span>
-          </Link>
-          <Link className="navLink" to="/#faq">
-            <FaQuestionCircle />
-            <span>FAQ</span>
-          </Link>
-          {!sessionStatus && (
+          <NavLink type="howitworks" text="How It Works" link="/#howitworks" />
+          <NavLink type="faq" text="FAQ" link="/#faq" />
+          {!sessionStatus ? (
             <>
+              <NavLink type="signin" text="Sign In" link="/signin" isNavlink />
               <NavLink
-                className="navLink"
-                to="/signin"
-                activeclassname="active"
-              >
-                <FaSignInAlt />
-                <span>Sign In</span>
-              </NavLink>
-              <NavLink
-                className="navLink"
-                to="/signup"
-                activeclassname="active"
-              >
-                <FaUserPlus />
-                <span>Get Started</span>
-              </NavLink>
+                type="signup"
+                text="Get Started"
+                link="/signup"
+                isNavlink
+              />
             </>
-          )}
-          {sessionStatus && (
-            <Link
-              className="navLink"
-              onClick={async (e) => {
-                e.preventDefault();
-                await axios.get("/logout", { withCredentials: true });
-                dispatch(clearSession());
-                window.location.href = "/";
-              }}
-            >
-              <FaSignOutAlt />
-              <span>Logout</span>
-            </Link>
+          ) : (
+            <>
+              <hr />
+              <NavLink
+                type="account"
+                text="Account Settings"
+                link="/accountsettings"
+                isNavlink
+              />
+              <NavLink
+                type="load"
+                text="Load Credits"
+                link="/loadcredits"
+                isNavlink
+              />
+              <NavLink
+                type="history"
+                text="Credit History"
+                link="/credithistory"
+                isNavlink
+              />
+              <NavLink type="logout" text="Logout" link="/" linkOnClick />
+            </>
           )}
         </div>
         <div className="mobContact">
