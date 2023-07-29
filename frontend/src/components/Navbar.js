@@ -12,6 +12,8 @@ const useScrollToLocation = () => {
   const scrolledRef = useRef(false);
   const { hash, pathname } = useLocation();
   const hashRef = useRef(hash);
+  // const [userName, setUserName] = useState("");
+  // const [joinedDate, setJoinedDate] = useState("");
 
   useEffect(() => {
     if (pathname === "/") window.scrollTo({ top: 0, behavior: "smooth" });
@@ -30,6 +32,19 @@ const useScrollToLocation = () => {
         scrolledRef.current = true;
       }
     }
+    // axios
+    // .get("/getUserInfo", {
+    //   withCredentials: true,
+    // })
+    // .then((res) => {
+    //   if (res) {
+    //     setUserName(res.data.userName);
+    //     setJoinedDate(new Date(res.data.createdAt).toDateString())
+    //   }
+    // })
+    // .catch((e) => {
+    //   console.log("Error: ", e);
+    // });
   });
 };
 

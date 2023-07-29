@@ -144,6 +144,15 @@ async function handleErr(err, req, res, next) {
     return res.json({ errMsg: err.message })
 }
 
+//Get user data for navbar
+app.get('/getUserInfo', async (req, res) => {
+    let userId = req.session.user._id;
+    const user = await User.findById({_id: userId});
+    if(user) {
+        res.json(user);
+    }
+})
+
 //Signing in
 app.post('/signin', async (req, res) => {
     const { email, password } = req.body
