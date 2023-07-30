@@ -2,7 +2,7 @@ import React from "react";
 import PageLayout from "../components/PageLayout";
 import "../styles/Global.css";
 
-function TermsAndConditions() {
+export default function TermsAndConditions() {
   return (
     <PageLayout title="Terms and Conditions">
       <div className="globalContainer">
@@ -89,5 +89,3 @@ function TermsAndConditions() {
     </PageLayout>
   );
 }
-
-export default TermsAndConditions;
