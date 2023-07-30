@@ -215,6 +215,17 @@ export default function Signup() {
               loading={loading}
               text="Create account"
             />
+            <p className="disclaimer">
+              By signing up to create an account I accept KEMLabel's{" "}
+              <Link className="link" target="_blank" to="/termsandconditions">
+                Terms and Conditions
+              </Link>{" "}
+              and{" "}
+              <Link className="link" target="_blank" to="/privacypolicy">
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </form>
           <div style={{ width: "100%", textAlign: "center" }}>
             <span style={{ opacity: 0.5 }}>Already have an account? </span>

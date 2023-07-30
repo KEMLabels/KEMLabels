@@ -125,6 +125,17 @@ export default function Login() {
               onClickEvent={submit}
               text="Sign in"
             />
+            <p className="disclaimer">
+              By continuing, you agree to KEMLabel's{" "}
+              <Link className="link" target="_blank" to="/termsandconditions">
+                Terms and Conditions
+              </Link>{" "}
+              and{" "}
+              <Link className="link" target="_blank" to="/privacypolicy">
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </form>
           <div style={{ width: "100%", textAlign: "center" }}>
             <span style={{ opacity: 0.5 }}>Don't have an account? </span>
