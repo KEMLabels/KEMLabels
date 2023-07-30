@@ -137,6 +137,8 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  max-width: 1200px;
+  margin: auto;
   padding: 5rem 7rem;
   text-align: left;
 }
