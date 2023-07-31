@@ -288,7 +288,7 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
         <p>Thank you for signing up with us!</p>
         <p>Please use the following link to confirm your email address: <a href="${url}" target="_blank">${url}</a></p>
         <p>If you did not sign up for KEMLabels, you can safely ignore this email.</p>
-        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>(604) 123 1234</strong>.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
         <p>Thank you,<br/>KEMLabels Team!</p>
         </div>`,
     }
@@ -407,7 +407,7 @@ function sendOTPEmail(OTPPasscode, emailAddress) {
     const sendOneTimePasscodeEmail = {
         from: process.env.MAIL_USER,
         to: emailAddress,
-        subject: 'Your KEMLabels Verification Code',
+        subject: 'KEMLabels Verification Code',
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
@@ -420,7 +420,7 @@ function sendOTPEmail(OTPPasscode, emailAddress) {
         <p>To confirm your email address, please enter the 4 digit code below.</p>
         <div style="margin: 2rem; text-align: center;"><h1 style="font-size: ;letter-spacing: 5px">${OTPPasscode}</h1></div>
         <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
-        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>(604) 123 1234</strong>.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
         <p>Thank you,<br/>KEMLabels Team!</p>
         </div>`,
     }
@@ -482,10 +482,20 @@ function sendChangePasswordConfirmation(emailAddress) {
     const changePassConfirmation = {
         from: process.env.MAIL_USER,
         to: emailAddress,
-        subject: 'Your One Time Passcode',
-        html: `<div style="display:flex;width:100%;background:#09C5A3;"><img src="cid:logo" style="width:15%;margin:auto;padding:1.5rem 1rem 1rem;object-fit:contain;object-position:center center;"></div>
-        <div style="display:flex;width:100%;background:#09C5A3;margin-bottom:2rem;"><h1 style="text-align:center;color:#FFF;text-transform:capitalize;font-size:2rem;font-weight:700;padding-top:1rem;padding-bottom:1rem;width: 100%;">You have a new patient waiting for you!</h1></div>
-        <p style="font-size:14px;color:#000;">Your password has been changed. </p><p style="font-size:14px;color:#000;">Cheers</p>`,
+        subject: 'Password Has Been Changed - Ensure Your Account\'s Safety',
+        attachments: [{
+            filename: 'Logo.png',
+            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            cid: 'logo' 
+        }],
+        html: `
+        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
+        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
+        <h1 style="margin-bottom: 2rem;">Did you change your password?</h1>
+        <p>We noticed the password for your KEMLabels' account was recently changed. If this was you, rest assured that your new password is now in effect. No further action is required and you can safely ignore this email.</p>
+        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team!</p>
+        </div>`,
     }
     transporter.sendMail(changePassConfirmation, function (err, info) {
         if (err) console.log(err)
