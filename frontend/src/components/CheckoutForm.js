@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   PaymentElement,
-  LinkAuthenticationElement,
   useStripe,
   useElements
 } from "@stripe/react-stripe-js";
@@ -56,14 +55,14 @@ export default function CheckoutForm() {
 
     setIsLoading(true);
 
-    //create a thank you page or something!!!!!!!!
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: "http://localhost:3000/success/",
+        return_url: "http://localhost:3000/webhook/",
+        receipt_email: email,
       },
-    })
+    });
 
     // This point will only be reached if there is an immediate error when
     // confirming the payment. Otherwise, your customer will be redirected to
@@ -84,11 +83,13 @@ export default function CheckoutForm() {
   }
 
   return (
-    //figure out Link for faster checkout
     <form id="payment-form" onSubmit={handleSubmit}>
-      <LinkAuthenticationElement
-        id="link-authentication-element"
-        onChange={(e) => setEmail(e.value.email)}
+      <input
+        id="email"
+        type="text"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Enter email address"
       />
       <PaymentElement id="payment-element" options={paymentElementOptions} />
       <button disabled={isLoading || !stripe || !elements} id="submit">

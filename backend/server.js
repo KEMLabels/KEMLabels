@@ -8,7 +8,6 @@ const dotenv = require("dotenv")
 const cookieParser = require('cookie-parser');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const bodyParser = require('body-parser');
 dotenv.config();
 require('express-async-errors');
 const mongoose = require('mongoose');
@@ -44,7 +43,16 @@ const store = new MongoDBStore({
 
 //Start app
 app.use('/', express.static(__dirname + '/public'));
-app.use(express.json());
+function customJsonParser(req, res, next) {
+    if (req.path === '/webhook' && req.method === 'POST') {
+        // If the request is for "/webhook" and it's a POST request, skip the JSON parsing
+        next();
+    } else {
+        // For all other requests, use express.json()
+        express.json()(req, res, next);
+    }
+}
+app.use(customJsonParser);
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(function (req, res, next) {
@@ -95,13 +103,17 @@ const calculateOrderAmount = (amount) => {
 
 app.post("/create-payment-intent", async (req, res) => {
     const { amount } = req.body;
+    const { email } = req.body;;
 
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
         amount: calculateOrderAmount(amount),
         currency: "usd",
         automatic_payment_methods: {
-            enabled: true,
+            enabled: false,
+        },
+        metadata: {
+            email: email,
         },
     });
 
@@ -110,33 +122,42 @@ app.post("/create-payment-intent", async (req, res) => {
     });
 });
 
-// app.post("/webhook", (req, res) => {
-//     const event = req.body;
+//Stripe API Webhook implementation
+const endpointSecret = "whsec_1eb5aad30bbe004eb79af52738cedd36f095c45574998a8f8fcf8176f44101e9";
 
-//     // Verify the event came from Stripe (optional but recommended)
-//     const signature = req.headers["stripe-signature"];
-//     try {
-//         // Replace YOUR_STRIPE_WEBHOOK_SECRET with your actual webhook secret key
-//         const verifiedEvent = stripe.webhooks.constructEvent(
-//             req.rawBody,
-//             signature,
-//             "YOUR_STRIPE_WEBHOOK_SECRET"
-//         );
-//         handleWebhookEvent(verifiedEvent);
-//         res.sendStatus(200);
-//     } catch (error) {
-//         console.error("Webhook signature verification failed.", error);
-//         res.sendStatus(400);
-//     }
-// });
+app.post('/webhook', express.raw({ type: "application/json" }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
 
-// const handleWebhookEvent = (event) => {
-//     // Check if the event is a successful payment event
-//     if (event.type === "payment_intent.succeeded") {
-//       const paymentIntent = event.data.object;
-//       console.log("Payment succeeded!", paymentIntent);
-//     }
-//   };
+    let event;
+
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } catch (err) {
+        console.log("Failed to verify webook.");
+        return;
+    }
+
+    if (event.type === "payment_intent.succeeded") {
+        const paymentIntent = event.data.object;
+        console.log("Payment succeeded!", paymentIntent);
+        let user = await User.findOne({ email: paymentIntent.metadata.email })
+        if (!user)
+            throw new Error('Does not exist.');
+        let userExistingCredits = user.credits;
+        User.updateOne({
+            "_id": user._id.toString()
+        }, {
+            // set amount
+            "credits": userExistingCredits + 40
+        })
+            .then((obj) => {
+                console.log("User credits updated");
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+});
 
 //Error handler function
 async function handleErr(err, req, res, next) {
