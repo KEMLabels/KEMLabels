@@ -94,7 +94,8 @@ export default function Signup() {
   }
 
   function getCurrenDateInPST() {
-    const formatter = new Intl.DateTimeFormat("en", {
+    const date = new Date();
+    date.toLocaleString("en", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -104,7 +105,7 @@ export default function Signup() {
       hour12: false,
       timeZone: "America/Vancouver",
     });
-    return formatter.format(new Date());
+    return date.toISOString();
   }
 
   const submit = (e) => {
@@ -128,7 +129,7 @@ export default function Signup() {
         else {
           dispatch(setUserName(inputUserName));
           dispatch(
-            setUserJoinedDate(new Date(getCurrenDateInPST()).toISOString())
+            setUserJoinedDate(getCurrenDateInPST())
           );
           dispatch(setUserEmail(inputEmail));
           dispatch(setUserLoggedIn(true));
