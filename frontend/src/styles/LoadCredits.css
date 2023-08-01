@@ -1,0 +1,60 @@
+.paymentOptionCardGroup {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.paymentOptionCardGroup .paymentOptionCard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 2rem;
+  border: solid 2px #cdcdcd;
+  gap: 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  -webkit-transition: all ease-in-out 0.1s;
+  -moz-transition: all ease-in-out 0.1s;
+  -ms-transition: all ease-in-out 0.1s;
+  -o-transition: all ease-in-out 0.1s;
+  transition: all ease-in-out 0.1s;
+}
+
+.paymentOptionCardGroup .paymentOptionCard:hover {
+  border-color: var(--primaryColor);
+}
+
+.paymentOptionCardGroup .paymentOptionCard:hover p,
+.paymentOptionCardGroup .paymentOptionCard:hover svg {
+  color: var(--primaryColor);
+  -webkit-transition: all ease-in-out 0.1s;
+  -moz-transition: all ease-in-out 0.1s;
+  -ms-transition: all ease-in-out 0.1s;
+  -o-transition: all ease-in-out 0.1s;
+  transition: all ease-in-out 0.1s;
+}
+
+.paymentOptionCardGroup .paymentOptionCard p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #6a6a6a;
+}
+
+.paymentOptionCardGroup .paymentOptionCard svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #6a6a6a;
+  margin-top: 1px;
+}
+
+@media screen and (max-width: 768px) {
+  .paymentOptionCardGroup .paymentOptionCard {
+    padding: 1rem 1.5rem;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .paymentOptionCardGroup {
+    flex-direction: column;
+  }
+}
