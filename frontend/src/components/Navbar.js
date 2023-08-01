@@ -155,6 +155,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
                 animateDropdown={animateDropdown}
                 joinedDate={joinedDate}
                 creditAmount={creditAmount}
+                username={username}
               />
             </>
           )}

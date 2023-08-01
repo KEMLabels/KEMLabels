@@ -98,7 +98,7 @@
   font-size: 1.2rem;
   margin: auto -2rem 0;
   padding: 1rem 2rem 0;
-  border-top: solid 1px #EFEFEF;
+  border-top: solid 1px #efefef;
 }
 
 .mobContact .contactInfo {
@@ -274,13 +274,23 @@
   justify-content: space-between;
 }
 
-.dropdownContent .dropdownProfileDetails .profileDetailsRow .profileDetailsLabel {
+.dropdownContent .dropdownProfileDetails .profileDetailsRow.username {
+  display: none;
+}
+
+.dropdownContent
+  .dropdownProfileDetails
+  .profileDetailsRow
+  .profileDetailsLabel {
   font-size: 1rem;
   font-weight: 300;
   color: #454545;
 }
 
-.dropdownContent .dropdownProfileDetails .profileDetailsRow .profileDetailsValue {
+.dropdownContent
+  .dropdownProfileDetails
+  .profileDetailsRow
+  .profileDetailsValue {
   font-size: 1rem;
   font-weight: 400;
   color: black;
@@ -320,7 +330,6 @@
   margin-top: -2px;
 }
 
-
 .dropdownContent .dropdownLink:hover {
   background: var(--primaryColor);
 }
@@ -331,7 +340,16 @@
 }
 
 .dropdownContent .dropdownLink:hover * {
-  color: white!important;
+  color: white !important;
+}
+
+@media screen and (max-width: 900px) {
+  .navContainer {
+    padding: 20px 30px;
+  }
+  .navLinksContainer {
+    gap: 2rem;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -345,6 +363,18 @@
 
   .navLinksContainer {
     gap: 2rem;
+  }
+
+  .accountIconContainer {
+    gap: 0.5rem;
+  }
+
+  .accountIconContainer .navLink {
+    display: none;
+  }
+
+  .dropdownContent .dropdownProfileDetails .profileDetailsRow.username {
+    display: flex;
   }
 
   .dropdownContent {
@@ -404,7 +434,7 @@
   .navContainer {
     padding: 20px;
     border-radius: 0;
-    border-bottom: solid 1px #E5E5E5;
+    border-bottom: solid 1px #e5e5e5;
     box-shadow: none;
   }
 

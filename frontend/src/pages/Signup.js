@@ -61,8 +61,8 @@ export default function Signup() {
     }
 
     // username validation
-    if (inputUserName.length < 3 || inputUserName.length > 50) {
-      setErrMsg("Username must be between 3 and 50 characters.");
+    if (inputUserName.length < 3 || inputUserName.length > 15) {
+      setErrMsg("Username must be between 3 and 15 characters.");
       return false;
     } else if (!usernameRegex.test(inputUserName)) {
       setErrMsg(
@@ -128,9 +128,7 @@ export default function Signup() {
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           dispatch(setUserName(inputUserName));
-          dispatch(
-            setUserJoinedDate(getCurrenDateInPST())
-          );
+          dispatch(setUserJoinedDate(getCurrenDateInPST()));
           dispatch(setUserEmail(inputEmail));
           dispatch(setUserLoggedIn(true));
         }
@@ -167,7 +165,7 @@ export default function Signup() {
               }}
               placeholder="Username"
               minLength={3}
-              maxLength={50}
+              maxLength={15}
             />
             <InputField
               fieldType="email"

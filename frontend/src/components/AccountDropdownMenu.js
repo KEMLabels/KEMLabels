@@ -9,6 +9,7 @@ export default function AccountDropdownMenu({
   animateDropdown,
   joinedDate,
   creditAmount,
+  username,
 }) {
   const dateString = new Date(joinedDate).toDateString().split(" ");
   const month = dateString[1];
@@ -23,9 +24,12 @@ export default function AccountDropdownMenu({
       ref={dropdownMenuRef}
     >
       <div className="dropdownProfileDetails">
+        <div className="profileDetailsRow username">
+          <p className="profileDetailsLabel">User:</p>
+          <p className="profileDetailsValue">{`@${username}`}</p>
+        </div>
         <div className="profileDetailsRow">
           <p className="profileDetailsLabel">Credits:</p>
-          {/* TODO: redux */}
           <p className="profileDetailsValue">{`$${creditAmount}.00`}</p>
         </div>
         <div className="profileDetailsRow">
