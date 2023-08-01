@@ -179,6 +179,7 @@ export default function ForgotPassword() {
       );
       setTimeout(() => {
         setResentEmail(false);
+        setLoading(false);
       }, 15000);
       axios
         .post("/generateNewOTP", { email }, { withCredentials: true })
