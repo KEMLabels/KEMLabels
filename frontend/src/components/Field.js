@@ -18,7 +18,6 @@ function InputField({
 }) {
   return (
     <div className={`fieldContainer ${className}`}>
-      {/* <label htmlFor={id} className="fieldLabel">{label}</label> */}
       <input
         id={id}
         className={`fieldInput ${className} ${disabled ? "disabled" : ""}`}
@@ -30,12 +29,49 @@ function InputField({
         placeholder={placeholder}
         disabled={disabled}
         minLength={minLength || null}
-        maxLength={maxLength || null} 
-        // required
+        maxLength={maxLength || null}
         onChange={(e) => {
           if (onChangeEvent) onChangeEvent(e);
         }}
       />
+    </div>
+  );
+}
+
+function AmountField({
+  id,
+  className = "",
+  name = "",
+  fieldType = "number",
+  title = "",
+  initialValue = "",
+  placeholder = "",
+  minLength,
+  maxLength,
+  onChangeEvent,
+  customStyle,
+  disabled = false,
+}) {
+  return (
+    <div className={`fieldContainer ${className}`}>
+      <span className="currencySymbol">$</span>
+      <input
+        id={id}
+        className={`fieldInput ${className} ${disabled ? "disabled" : ""}`}
+        type={fieldType}
+        name={name}
+        title={title}
+        style={{ ...customStyle, marginLeft: "-1.5rem", marginRight: "-2.5rem", padding: "15px 3.5rem 15px 2.5rem" }}
+        defaultValue={initialValue}
+        placeholder={placeholder}
+        disabled={disabled}
+        minLength={minLength || null}
+        maxLength={maxLength || null}
+        onChange={(e) => {
+          if (onChangeEvent) onChangeEvent(e);
+        }}
+      />
+      <span className="currencyFormat">USD</span>
     </div>
   );
 }
@@ -55,7 +91,6 @@ function PasswordField({
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div className={`fieldContainer ${className}`}>
-      {/* <label htmlFor={id} className="fieldLabel">{label}</label> */}
       <input
         id={id}
         className={`fieldInput ${className} ${disabled ? "disabled" : ""}`}
@@ -67,7 +102,7 @@ function PasswordField({
         placeholder={placeholder}
         disabled={disabled}
         minLength={minLength || null}
-        maxLength={maxLength || null} 
+        maxLength={maxLength || null}
         onChange={(e) => {
           if (onChangeEvent) onChangeEvent(e);
         }}
@@ -85,4 +120,4 @@ function PasswordField({
   );
 }
 
-export { InputField, PasswordField };
+export { InputField, PasswordField, AmountField };
