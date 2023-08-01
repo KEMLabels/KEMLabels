@@ -280,7 +280,7 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
-            cid: 'logo' 
+            cid: 'logo'
         }],
         html: `
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
@@ -302,7 +302,12 @@ app.get('/users/:id/verify/:token', async (req, res) => {
         const user = await User.findOne({ _id: req.params.id });
         if (!user) throw new Error('Invalid Link');
         const token = await tempTokens.findOne({ token: req.params.token });
-        if (!token) throw new Error('Invalid Link');
+        if (!token) {
+            const previoustoken = await tempTokens.findOne({ userid: req.params.id })
+            if (previoustoken) {
+                if (previoustoken.token !== req.params.token) throw new Error('Expired Link');
+            } else throw new Error('Invalid Link');
+        } 
 
         User.updateOne({
             "_id": user._id.toString()
@@ -411,7 +416,7 @@ function sendOTPEmail(OTPPasscode, emailAddress) {
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
-            cid: 'logo' 
+            cid: 'logo'
         }],
         html: `
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
@@ -486,7 +491,7 @@ function sendChangePasswordConfirmation(emailAddress) {
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
-            cid: 'logo' 
+            cid: 'logo'
         }],
         html: `
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
