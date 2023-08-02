@@ -300,13 +300,13 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
 app.get('/users/:id/verify/:token', async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.id });
-        if (!user) throw new Error('Invalid Link');
+        if (!user) throw new Error('Link Invalid');
         const token = await tempTokens.findOne({ token: req.params.token });
         if (!token) {
             const previoustoken = await tempTokens.findOne({ userid: req.params.id })
             if (previoustoken) {
-                if (previoustoken.token !== req.params.token) throw new Error('Expired Link');
-            } else throw new Error('Invalid Link');
+                if (previoustoken.token !== req.params.token) throw new Error('Link Expired');
+            } else throw new Error('Link Invalid');
         } 
 
         User.updateOne({
@@ -333,6 +333,10 @@ app.get('/users/:id/verify/:token', async (req, res) => {
         return res.json({ redirect: '/' });
     } catch (err) {
         console.log(err);
+        if (err.message === 'Link Invalid' || err.message === 'Link Expired') {
+            return res.status(400).json({ msg: err.message });
+        }
+        return res.status(400).json({ msg: err.message });
     }
 })
 

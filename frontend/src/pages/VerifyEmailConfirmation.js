@@ -13,6 +13,7 @@ export default function VerifyEmailConfirmation() {
   const [loading, setLoading] = useState(false);
   const [validURL, setvalidURL] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const [linkErrMsg, setLinkErrMsg] = useState("");
 
   useEffect(() => {
     const url = `http://localhost:8081/users/${param.id}/verify/${param.token}`;
@@ -23,17 +24,67 @@ export default function VerifyEmailConfirmation() {
         setvalidURL(true);
       })
       .catch((e) => {
+        console.log(`${e?.name}: ${e?.message}`);
         setvalidURL(false);
-        console.log("Error: ", e);
-        setErrMsg(`${e.name}: ${e.message}`);
+        if (
+          e?.response?.data?.msg === "Link Invalid" ||
+          e?.response?.data?.msg === "Link Expired"
+        ) {
+          setLinkErrMsg(e.response.data.msg);
+        } else setErrMsg("An unexpected error occured."); // Axios default error
       });
     setTimeout(() => {
       setIsFetching(false);
     }, 500);
   }, [param]);
 
+  function renderErrorHeading() {
+    switch (linkErrMsg) {
+      case "Link Invalid":
+        return (
+          <>
+            <h1 style={{ textAlign: "center" }}>Your email link is invalid!</h1>{" "}
+            <p style={{ opacity: "0.7", textAlign: "center" }}>
+              We're sorry, but your email link doesn't seem right. Please{" "}
+              <Link to="/verifyemail" className="link">
+                request a new link here.
+              </Link>
+            </p>
+          </>
+        );
+      case "Link Expired":
+        return (
+          <>
+            <h1 style={{ textAlign: "center" }}>
+              Your email link has expired!
+            </h1>{" "}
+            <p style={{ opacity: "0.7", textAlign: "center" }}>
+              We're sorry, but your email link has expired. Please{" "}
+              <Link to="/verifyemail" className="link">
+                request a new link here.
+              </Link>
+            </p>
+          </>
+        );
+      default:
+        return (
+          <>
+            <h1 style={{ textAlign: "center" }}>
+              Uh oh! Something went wrong.
+            </h1>{" "}
+            <p style={{ opacity: "0.7", textAlign: "center" }}>
+              We're sorry but something went wrong on our server. Please try{" "}
+              <Link to="/verifyemail" className="link">
+                requesting a new link here.
+              </Link>
+            </p>
+          </>
+        );
+    }
+  }
+
   return (
-    <PageLayout title={validURL ? "Email Verified" : "Email Link Expired"}>
+    <PageLayout title={validURL ? "Email Verified" : `Email ${linkErrMsg}`}>
       <div
         className="authContainer"
         style={{
@@ -69,17 +120,7 @@ export default function VerifyEmailConfirmation() {
                   </p>
                 </>
               ) : (
-                <>
-                  <h1 style={{ textAlign: "center" }}>
-                    Your email link has expired!
-                  </h1>{" "}
-                  <p style={{ opacity: "0.7", textAlign: "center" }}>
-                    We're sorry, but your email link has expired. Please{" "}
-                    <Link to="/verifyemail" className="link">
-                      request a new link here.
-                    </Link>
-                  </p>
-                </>
+                renderErrorHeading()
               )}
             </div>
             {errMsg && <AlertMessage msg={errMsg} type="error" />}
