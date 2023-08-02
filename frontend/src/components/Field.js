@@ -38,6 +38,46 @@ function InputField({
   );
 }
 
+function StripeInputField({
+  id,
+  className = "",
+  name = "",
+  fieldType = "text",
+  title = "",
+  initialValue = "",
+  label = "",
+  placeholder = "",
+  minLength,
+  maxLength,
+  onChangeEvent,
+  customStyle,
+  disabled = false,
+}) {
+  return (
+    <div className={`stripeFieldContainer ${className}`}>
+      <label className="stripeFieldLabel">{label}</label>
+      <input
+        id={id}
+        className={`stripeFieldInput ${className} ${
+          disabled ? "disabled" : ""
+        }`}
+        type={fieldType}
+        name={name}
+        title={title}
+        style={{ ...customStyle }}
+        defaultValue={initialValue}
+        placeholder={placeholder}
+        disabled={disabled}
+        minLength={minLength || null}
+        maxLength={maxLength || null}
+        onChange={(e) => {
+          if (onChangeEvent) onChangeEvent(e);
+        }}
+      />
+    </div>
+  );
+}
+
 function AmountField({
   id,
   className = "",
@@ -61,7 +101,12 @@ function AmountField({
         type={fieldType}
         name={name}
         title={title}
-        style={{ ...customStyle, marginLeft: "-1.5rem", marginRight: "-2.5rem", padding: "15px 3.5rem 15px 2.5rem" }}
+        style={{
+          ...customStyle,
+          marginLeft: "-1.5rem",
+          marginRight: "-2.5rem",
+          padding: "15px 3.5rem 15px 2.5rem",
+        }}
         defaultValue={initialValue}
         placeholder={placeholder}
         disabled={disabled}
@@ -120,4 +165,4 @@ function PasswordField({
   );
 }
 
-export { InputField, PasswordField, AmountField };
+export { InputField, PasswordField, AmountField, StripeInputField };
