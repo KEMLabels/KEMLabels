@@ -126,7 +126,13 @@ export default function ForgotPassword() {
       })
       .catch((e) => {
         console.log("Error: ", e);
-        setErrMsg(`${e.name}: ${e.message}`);
+        if (
+          e?.response?.data?.msg ===
+          "This email is not associated with an account."
+        ) {
+          setErrMsg(e.response.data.msg);
+        } else
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       })
       .finally(() => {
         setLoading(false);
@@ -156,7 +162,7 @@ export default function ForgotPassword() {
         })
         .catch((e) => {
           console.log("Error: ", e);
-          setErrMsg(`${e.name}: ${e.message}`);
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         });
     }
   }
@@ -188,7 +194,7 @@ export default function ForgotPassword() {
         })
         .catch((e) => {
           console.log("Error: ", e);
-          setErrMsg(`${e.name}: ${e.message}`);
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         })
         .finally(() => {
           setLoading(false);
@@ -205,21 +211,24 @@ export default function ForgotPassword() {
       .post("/checkOTP", { enteredOTP, email }, { withCredentials: true })
       .then((res) => {
         console.log(res);
-        if (res.data.errMsg) {
-          setErrMsg(res.data.errMsg);
-        } else {
-          document.getElementById("resetPasswordForm").reset();
-          setResetPasswordStep("changePassword");
-          setErrMsg("");
-          setSuccessMsg("Verification successful.");
-          setTimeout(() => {
-            setSuccessMsg("");
-          }, 5000);
-        }
+        document.getElementById("resetPasswordForm").reset();
+        setResetPasswordStep("changePassword");
+        setErrMsg("");
+        setSuccessMsg("Verification successful.");
+        setTimeout(() => {
+          setSuccessMsg("");
+        }, 5000);
       })
       .catch((e) => {
         console.log("Error: ", e);
-        setErrMsg(`${e.name}: ${e.message}`);
+        if (
+          e?.response?.data?.msg ===
+          "Hmm... your code was incorrect. Please try again."
+        ) {
+          setErrMsg(e.response.data.msg);
+        } else {
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        }
       })
       .finally(() => {
         setLoading(false);
@@ -254,7 +263,7 @@ export default function ForgotPassword() {
       })
       .catch((e) => {
         console.log("Error: ", e);
-        setErrMsg(`${e.name}: ${e.message}`);
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       })
       .finally(() => {
         if (redirecting) {

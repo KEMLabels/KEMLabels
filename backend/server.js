@@ -471,7 +471,7 @@ app.post("/checkOTP", async (req, res) => {
         if (!tempCode) throw new Error("Invalid Code");
         console.log('correct code: ' + tempCode.passcode);
         if (Number(enteredOTP) !== Number(tempCode.passcode)) {
-            throw new Error('Incorrect code. Please try again.');
+            throw new Error('Hmm... your code was incorrect. Please try again.');
         } else {
             tempOTPS.deleteOne({
                 passcode: enteredOTP

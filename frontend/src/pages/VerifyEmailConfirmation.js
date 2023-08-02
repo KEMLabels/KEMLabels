@@ -24,14 +24,16 @@ export default function VerifyEmailConfirmation() {
         setvalidURL(true);
       })
       .catch((e) => {
-        console.log(`${e?.name}: ${e?.message}`);
+        console.log("Error: ", e);
         setvalidURL(false);
         if (
           e?.response?.data?.msg === "Link Invalid" ||
           e?.response?.data?.msg === "Link Expired"
         ) {
           setLinkErrMsg(e.response.data.msg);
-        } else setErrMsg("An unexpected error occured."); // Axios default error
+        } else {
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        }
       });
     setTimeout(() => {
       setIsFetching(false);

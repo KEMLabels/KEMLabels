@@ -34,15 +34,23 @@ export default function VerifyEmail() {
       axios
         .get("/isUserVerified", { withCredentials: true })
         .then((res) => {
-          if (res.data.errMsg) {
-            if (res.data.errMsg.startsWith("Please check your inbox")) {
-              setInfoMsg(res.data.errMsg);
-            } else setErrMsg("An error occured. Please try again later.");
-          } else window.location.href = res.data.redirect;
+          if (res.status === 200) window.location.href = res.data.redirect;
+          else {
+            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          }
         })
         .catch((e) => {
           console.log("Error: ", e);
-          setErrMsg(`${e.name}: ${e.message}`);
+          if (
+            e?.response?.data?.msg ===
+            "Please check your inbox for a verification link to verify your account."
+          ) {
+            setErrMsg("");
+            setInfoMsg(e.response.data.msg);
+          } else {
+            setInfoMsg("");
+            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          }
         });
     } else window.location.href = "/";
   }, [isLoggedIn, verifyEmailState, dispatch]);
@@ -86,7 +94,7 @@ export default function VerifyEmail() {
         })
         .catch((e) => {
           console.log("Error: ", e);
-          setErrMsg(`${e.name}: ${e.message}`);
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         })
         .finally(() => {
           setLoading(false);

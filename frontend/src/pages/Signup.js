@@ -135,7 +135,14 @@ export default function Signup() {
       })
       .catch((e) => {
         console.log("Error: ", e);
-        setErrMsg(`${e.name}: ${e.message}`);
+        if (
+          e?.response?.data?.msg ===
+          "This username is already associated with an account."
+        ) {
+          setErrMsg(e.response.data.msg);
+        } else {
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        }
       })
       .finally(() => {
         setLoading(false);

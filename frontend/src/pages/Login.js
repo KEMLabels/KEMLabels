@@ -41,7 +41,11 @@ export default function Login() {
         })
         .catch((e) => {
           console.log("Error: ", e);
-          setErrMsg(`${e.name}: ${e.message}`);
+          if (e?.response?.data?.msg === "User is not verified") {
+            window.location.href = "/verifyemail";
+          } else {
+            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          }
         });
     }
   }, [isLoggedIn]);
@@ -73,7 +77,10 @@ export default function Login() {
       })
       .catch((e) => {
         console.log("Error: ", e);
-        setErrMsg(`${e.name}: ${e.message}`);
+        if (e?.response?.data?.msg === "Incorrect email or password.") {
+          setErrMsg(e.response.data.msg);
+        } else
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       })
       .finally(() => {
         setLoading(false);
