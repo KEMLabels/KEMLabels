@@ -102,24 +102,29 @@ const calculateOrderAmount = (amount) => {
 };
 
 app.post("/create-payment-intent", async (req, res) => {
-    const { amount } = req.body;
-    const { email } = req.body;;
+    try {
+        const { amount } = req.body;
+        const { email } = req.body;;
 
-    // Create a PaymentIntent with the order amount and currency
-    const paymentIntent = await stripe.paymentIntents.create({
-        amount: calculateOrderAmount(amount),
-        currency: "usd",
-        automatic_payment_methods: {
-            enabled: false,
-        },
-        metadata: {
-            email: email,
-        },
-    });
+        // Create a PaymentIntent with the order amount and currency
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: calculateOrderAmount(amount),
+            currency: "usd",
+            automatic_payment_methods: {
+                enabled: false,
+            },
+            metadata: {
+                email: email,
+            },
+        });
 
-    res.send({
-        clientSecret: paymentIntent.client_secret,
-    });
+        res.send({
+            clientSecret: paymentIntent.client_secret,
+        });
+    } catch (err) {
+        console.log(err);
+        res.send({ err });
+    }
 });
 
 //Stripe API Webhook implementation
@@ -173,31 +178,29 @@ app.post('/signin', async (req, res) => {
         email: email,
         password: password
     }
-
     var emailAddress = data.email.toLowerCase();
-
-    let user = await User.findOne({ email: emailAddress })
-    if (!user)
-        throw new Error('Incorrect email or password.');
-    else
-        return auth(req, res, user, data.password);
-})
-
-async function auth(req, res, user, enteredPassword) {
-    const comparePass = await bcrypt.compare(enteredPassword, user.password);
-    if (!comparePass) {
-        throw new Error('Incorrect email or password.');
-    } else {
-        req.session.user = user;
-        req.session.isLoggedIn = true;
-        const userInfo = {
-            credits: user.credits,
-            userName: user.userName,
-            joinedDate: user.createdAt,
+    try {
+        let user = await User.findOne({ email: emailAddress })
+        if (!user)
+            throw new Error('Incorrect email or password.');
+        const comparePass = await bcrypt.compare(password, user.password);
+        if (!comparePass) {
+            throw new Error('Incorrect email or password.');
+        } else {
+            req.session.user = user;
+            req.session.isLoggedIn = true;
+            const userInfo = {
+                credits: user.credits,
+                userName: user.userName,
+                joinedDate: user.createdAt,
+            }
+            res.json({ redirect: '/', userInfo });
         }
-        res.json({ redirect: '/', userInfo });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
     }
-}
+})
 
 //Logout
 app.get('/logout', (req, res) => {
@@ -207,41 +210,46 @@ app.get('/logout', (req, res) => {
 
 //Signing up
 app.post("/signup", async (req, res) => {
-    const { userName, email, password } = req.body
+    try {
+        const { userName, email, password } = req.body
 
-    const data = {
-        userName: userName,
-        email: email,
-        password: password
+        const data = {
+            userName: userName,
+            email: email,
+            password: password
+        }
+
+        const userNameExists = await User.findOne({ userName: data.userName })
+        if (userNameExists) throw new Error('This username is already associated with an account.');
+        const emailExists = await User.findOne({ email: data.email })
+        if (emailExists) throw new Error('This email is already associated with an account.');
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(data.password, salt);
+
+        const new_user = new User({
+            userName: data.userName,
+            email: data.email,
+            password: hashedPassword,
+        });
+        new_user.save()
+
+        const token = crypto.randomBytes(32).toString("hex");
+        const create_token = new tempTokens({
+            token: token,
+            userid: new_user._id
+        })
+        create_token.save()
+        const url = `http://localhost:3000/users/${new_user._id}/verify/${token}`;
+        await sendSignUpConfirmationEmail(data.email, url);
+
+        req.session.user = new_user;
+        req.session.isLoggedIn = true;
+        res.json({ redirect: '/verifyemail' });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
     }
-
-    const userNameExists = await User.findOne({ userName: data.userName })
-    if (userNameExists) throw new Error('This username is already associated with an account.');
-    const emailExists = await User.findOne({ email: data.email })
-    if (emailExists) throw new Error('This email is already associated with an account.');
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(data.password, salt);
-
-    const new_user = new User({
-        userName: data.userName,
-        email: data.email,
-        password: hashedPassword,
-    });
-    new_user.save()
-
-    const token = crypto.randomBytes(32).toString("hex");
-    const create_token = new tempTokens({
-        token: token,
-        userid: new_user._id
-    })
-    create_token.save()
-    const url = `http://localhost:3000/users/${new_user._id}/verify/${token}`;
-    await sendSignUpConfirmationEmail(data.email, url);
-
-    req.session.user = new_user;
-    req.session.isLoggedIn = true;
-    res.json({ redirect: '/verifyemail' });
 })
 
 //Email verification
@@ -307,7 +315,7 @@ app.get('/users/:id/verify/:token', async (req, res) => {
             if (previoustoken) {
                 if (previoustoken.token !== req.params.token) throw new Error('Link Expired');
             } else throw new Error('Link Invalid');
-        } 
+        }
 
         User.updateOne({
             "_id": user._id.toString()
@@ -341,33 +349,49 @@ app.get('/users/:id/verify/:token', async (req, res) => {
 })
 
 app.get('/isUserVerified', async (req, res) => {
-    const user = await User.findOne({ _id: req.session.user._id });
-    if (!user) throw new Error('An error occured.');
-    const verified = user.verified;
+    try {
+        const user = await User.findOne({ _id: req.session.user._id });
+        if (!user) throw new Error('An error occured.');
+        const verified = user.verified;
 
-    if (!verified) throw new Error('Please check your inbox for a verification link to verify your account.');
-    else res.json({ redirect: '/' });
+        if (!verified) throw new Error('Please check your inbox for a verification link to verify your account.');
+        else res.json({ redirect: '/' });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
+    }
+
 })
 
 app.get('/checkVerification', async (req, res) => {
-    const user = await User.findOne({ _id: req.session.user._id });
-    if (!user) throw new Error('An error occured.');
-    const verified = user.verified;
-    if (!verified) throw new Error('User is not verified');
-    res.json({ redirect: '/' });
+    try {
+        const user = await User.findOne({ _id: req.session.user._id });
+        if (!user) throw new Error('An error occured.');
+        const verified = user.verified;
+        if (!verified) throw new Error('User is not verified');
+        res.json({ redirect: '/' });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
+    }
 })
 
 //Forgot password
 app.post("/emailExists", async (req, res) => {
-    const { email } = req.body
+    try {
+        const { email } = req.body
 
-    const data = {
-        email: email
+        const data = {
+            email: email
+        }
+
+        const emailExists = await User.findOne({ email: data.email })
+        if (!emailExists) throw new Error('This email is not associated with an account.');
+        else res.json({ emailExists });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
     }
-
-    const emailExists = await User.findOne({ email: data.email })
-    if (!emailExists) throw new Error('This email is not associated with an account.');
-    else res.json({ emailExists });
 })
 
 app.post("/forgotpassword", async (req, res) => {
@@ -439,52 +463,63 @@ function sendOTPEmail(OTPPasscode, emailAddress) {
 }
 
 app.post("/checkOTP", async (req, res) => {
-    const { enteredOTP } = req.body
-    const { email } = req.body
-    console.log('entered code: ' + enteredOTP);
-    const tempCode = await tempOTPS.findOne({ email: email });
-    if (!tempCode) throw new Error("Invalid Code");
-    console.log('correct code: ' + tempCode.passcode);
-    if (Number(enteredOTP) !== Number(tempCode.passcode)) {
-        throw new Error('Incorrect code. Please try again.');
-    } else {
-        tempOTPS.deleteOne({
-            passcode: enteredOTP
-        })
-            .then(function () {
-                console.log('successfuly deleted');
-            }).catch(function (error) {
-                console.log(error); // Failure
-            });
+    try {
+        const { enteredOTP } = req.body
+        const { email } = req.body
+        console.log('entered code: ' + enteredOTP);
+        const tempCode = await tempOTPS.findOne({ email: email });
+        if (!tempCode) throw new Error("Invalid Code");
+        console.log('correct code: ' + tempCode.passcode);
+        if (Number(enteredOTP) !== Number(tempCode.passcode)) {
+            throw new Error('Incorrect code. Please try again.');
+        } else {
+            tempOTPS.deleteOne({
+                passcode: enteredOTP
+            })
+                .then(function () {
+                    console.log('successfuly deleted');
+                }).catch(function (error) {
+                    console.log(error); // Failure
+                });
+        }
+        res.status(200).json("success");
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
     }
-    res.status(200).json("success");
+
 })
 
 //Reset password
 app.post("/updateUserPass", async (req, res) => {
-    const { email, password } = req.body
+    try {
+        const { email, password } = req.body
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-    const userData = await User.findOne({ email: email })
+        const userData = await User.findOne({ email: email })
+        if (!userData) throw new Error("Unexpected error occured");
 
-    User.updateOne({
-        "_id": userData._id.toString()
-    }, {
-        "password": hashedPassword
-    })
-        .then((obj) => {
-            console.log("Updated Password");
+        User.updateOne({
+            "_id": userData._id.toString()
+        }, {
+            "password": hashedPassword
         })
-        .catch((err) => {
-            console.log(err);
-        })
+            .then((obj) => {
+                console.log("Updated Password");
+            })
+            .catch((err) => {
+                console.log(err);
+            })
 
-    sendChangePasswordConfirmation(email);
+        sendChangePasswordConfirmation(email);
 
-    res.json({ redirect: '/signin' });
-
+        res.json({ redirect: '/signin' });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
+    }
 })
 
 function sendChangePasswordConfirmation(emailAddress) {
