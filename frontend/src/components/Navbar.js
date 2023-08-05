@@ -32,7 +32,7 @@ const useScrollToLocation = () => {
         scrolledRef.current = true;
       }
     }
-  });
+  }, [hash, pathname]);
 };
 
 // Checks if user clicks outside of dropdown menu
@@ -68,7 +68,6 @@ function useOutsideAlerter(
 }
 
 export default function Navbar({ hideNavAndFooter = false }) {
-  useScrollToLocation();
   const dropdownMenuRef = useRef(null);
   const accountIconContainerRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -79,6 +78,8 @@ export default function Navbar({ hideNavAndFooter = false }) {
   const [loading, setLoading] = useState(false);
   const [hideAccountDropdown, setHideAccountDropdown] = useState(true);
   const [animateDropdown, setAnimateDropdown] = useState(false);
+
+  useScrollToLocation();
 
   const toggleDropdownMenu = () => {
     setHideAccountDropdown((prevState) => !prevState);
