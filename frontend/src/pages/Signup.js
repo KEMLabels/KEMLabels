@@ -198,20 +198,20 @@ export default function Signup() {
               <p>Password must include:</p>
               <ul>
                 <li className={passwordValid.length ? "" : "invalidPassword"}>
-                  At least 8 characters
+                  8 - 50 characters
                 </li>
                 <li
                   className={passwordValid.uppercase ? "" : "invalidPassword"}
                 >
-                  At least 1 uppercase letter
+                  1 uppercase letter
                 </li>
                 <li className={passwordValid.number ? "" : "invalidPassword"}>
-                  At least 1 number
+                  1 number
                 </li>
                 <li
                   className={passwordValid.specialChar ? "" : "invalidPassword"}
                 >
-                  At least 1 special character
+                  1 special character
                 </li>
               </ul>
             </div>
