@@ -124,13 +124,15 @@ function StripeAmountField({
           step={0.1}
           onBlur={() => {
             let inputValue = currentValue;
-            if (!inputValue.includes(".")) {
-              inputValue = parseFloat(inputValue).toFixed(2);
-            } else {
-              // If there's a decimal point, check the number of decimal places
-              const [integerPart, decimalPart] = inputValue.split(".");
-              if (decimalPart.length < 2) {
-                inputValue = `${integerPart}.${decimalPart.padEnd(2, "0")}`;
+            if (inputValue) {
+              if (!inputValue.includes(".")) {
+                inputValue = parseFloat(inputValue).toFixed(2);
+              } else {
+                // If there's a decimal point, check the number of decimal places
+                const [integerPart, decimalPart] = inputValue.split(".");
+                if (decimalPart.length < 2) {
+                  inputValue = `${integerPart}.${decimalPart.padEnd(2, "0")}`;
+                }
               }
             }
             onChangeEvent({ target: { value: inputValue } });
@@ -138,22 +140,24 @@ function StripeAmountField({
           onChange={(e) => {
             if (onChangeEvent) {
               let inputValue = e.target.value.replace(/[^0-9.]/g, "");
-              let [integerPart, decimalPart] = inputValue.split(".");
+              if (inputValue) {
+                let [integerPart, decimalPart] = inputValue.split(".");
 
-              // Limit to 6 digits before decimal
-              if (integerPart && integerPart.length > 6) {
-                integerPart = integerPart.slice(0, 6);
+                // Limit to 6 digits before decimal
+                if (integerPart && integerPart.length > 6) {
+                  integerPart = integerPart.slice(0, 6);
+                }
+
+                // Limit to 2 decimal places
+                if (decimalPart && decimalPart.length > 2) {
+                  decimalPart = decimalPart.slice(0, 2);
+                }
+
+                // Combine integer and decimal parts
+                inputValue = decimalPart
+                  ? `${integerPart}.${decimalPart}`
+                  : integerPart;
               }
-
-              // Limit to 2 decimal places
-              if (decimalPart && decimalPart.length > 2) {
-                decimalPart = decimalPart.slice(0, 2);
-              }
-
-              // Combine integer and decimal parts
-              inputValue = decimalPart
-                ? `${integerPart}.${decimalPart}`
-                : integerPart;
               onChangeEvent({ target: { value: inputValue } });
             }
           }}
