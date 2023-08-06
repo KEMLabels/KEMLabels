@@ -23,6 +23,8 @@ export default function CheckoutForm({ useremail, errorMsg }) {
 
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [returnHomeBtnLoading, setReturnHomeBtnLoading] = useState(false);
+  const [loadAgainBtnLoading, setLoadAgainBtnLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -194,7 +196,6 @@ export default function CheckoutForm({ useremail, errorMsg }) {
           />
           <Button
             btnType="submit"
-            id="submit"
             text="Submit"
             loading={isLoading}
             disabled={isLoading || !stripe || !elements}
@@ -207,7 +208,37 @@ export default function CheckoutForm({ useremail, errorMsg }) {
           />
         </>
       ) : (
-        <p>Your current total of credits: ${Number(creditAmount).toFixed(2)}</p>
+        <>
+          <p className="totalCredsUpdate">
+            Your updated total credits is now{" "}
+            <strong>${Number(creditAmount).toFixed(2)}</strong>
+          </p>
+          <div className="loadSuccessBtnGroup">
+            <Button
+              text="Return home"
+              fill="outline"
+              loading={returnHomeBtnLoading}
+              customStyle={{ width: "100%" }}
+              onClickEvent={() => {
+                setReturnHomeBtnLoading(true);
+                setTimeout(() => {
+                  window.location.href = "/";
+                }, 100);
+              }}
+            />
+            <Button
+              text="Load again"
+              loading={loadAgainBtnLoading}
+              customStyle={{ width: "100%" }}
+              onClickEvent={() => {
+                setLoadAgainBtnLoading(true);
+                setTimeout(() => {
+                  window.location.href = "/loadcredits";
+                }, 100);
+              }}
+            />
+          </div>
+        </>
       )}
     </form>
   );

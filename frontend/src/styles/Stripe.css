@@ -140,6 +140,22 @@
   border-left-width: 0;
 }
 
+.stripePaymentForm .totalCredsUpdate {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 300;
+  margin: 2.5rem 0 4rem;
+}
+
+.stripePaymentForm .totalCredsUpdate strong {
+  color: var(--primaryColor);
+}
+
+.stripePaymentForm .loadSuccessBtnGroup {
+  display: flex;
+  gap: 1.5rem;
+}
+
 @media screen and (max-width: 768px) {
   .stripePaymentForm .stripeFieldGroup {
     flex-direction: column;
@@ -156,5 +172,10 @@
     box-shadow: none;
     padding: 0;
     min-width: initial;
+  }
+
+  .stripePaymentForm .loadSuccessBtnGroup {
+    flex-direction: column-reverse;
+    flex-wrap: wrap;
   }
 }
