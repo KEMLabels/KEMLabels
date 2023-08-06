@@ -15,6 +15,16 @@ import {
   setUserLoggedIn,
   setUserName,
 } from "../redux/actions/UserAction";
+import {
+  lengthRangeCheck,
+  validateEmailOnSubmit,
+  validatePasswordNumber,
+  validatePasswordOnSubmit,
+  validatePasswordSpecialChar,
+  validatePasswordUppercase,
+  validateUsernameOnSubmit,
+} from "../utils/Validation";
+import { getCurrDateTimeInISO } from "../utils/Helpers";
 
 export default function Signup() {
   const dispatch = useDispatch();
@@ -39,73 +49,31 @@ export default function Signup() {
   // Validate password field during input change
   function validatePasswordOnTyping(password) {
     const passwordValid = {
-      length: password.length >= 8,
-      uppercase: /[A-Z]/.test(password),
-      number: /[0-9]/.test(password),
-      specialChar: /[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~]/.test(password),
+      length: lengthRangeCheck(password, 8, 50),
+      uppercase: validatePasswordUppercase(password),
+      number: validatePasswordNumber(password),
+      specialChar: validatePasswordSpecialChar(password),
     };
     setPasswordValid(passwordValid);
   }
 
   // Validate all fields before submitting
   function validateFields() {
-    // regex
-    const usernameRegex = /^[a-zA-Z0-9_.-]+$/;
-    const emailRegex = /^([a-z0-9_.+-]+)@([\da-z.-]+)\.([a-z.]{2,6})$/g;
-    const passwordRegex =
-      /^(?=.*[0-9])(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~])(?=.*[A-Z])(?=.*[a-z]).*$/;
-
+    // empty field validation
     if (inputUserName === "" || inputEmail === "" || inputPassword === "") {
       setErrMsg("All fields are required.");
       return false;
     }
 
-    // username validation
-    if (inputUserName.length < 3 || inputUserName.length > 15) {
-      setErrMsg("Username must be between 3 and 15 characters.");
-      return false;
-    } else if (!usernameRegex.test(inputUserName)) {
-      setErrMsg(
-        "Invalid username. Only alphabets, numbers, dash, underscores, and periods are allowed."
-      );
-      return false;
-    }
-
-    // email validation
-    if (inputEmail.length < 3 || inputEmail.length > 100) {
-      setErrMsg("Email must be between 3 and 100 characters.");
-      return false;
-    } else if (!emailRegex.test(inputEmail)) {
-      setErrMsg("Invalid email.");
-      return false;
-    }
-
-    // password validation
-    if (inputPassword.length < 8 || inputPassword.length > 50) {
-      setErrMsg("Password must be between 8 and 50 characters.");
-      return false;
-    } else if (!passwordRegex.test(inputPassword)) {
-      setErrMsg(
-        "Password must contain at least one uppercase letter, one number, and one special character."
-      );
+    // username, email, password validation
+    if (
+      !validateUsernameOnSubmit(inputUserName, setErrMsg) ||
+      !validateEmailOnSubmit(inputEmail, setErrMsg) ||
+      !validatePasswordOnSubmit(inputPassword, setErrMsg)
+    ) {
       return false;
     }
     return true;
-  }
-
-  function getCurrenDateInPST() {
-    const date = new Date();
-    date.toLocaleString("en", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-      timeZone: "America/Vancouver",
-    });
-    return date.toISOString();
   }
 
   const submit = (e) => {
@@ -128,7 +96,7 @@ export default function Signup() {
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           dispatch(setUserName(inputUserName));
-          dispatch(setUserJoinedDate(getCurrenDateInPST()));
+          dispatch(setUserJoinedDate(getCurrDateTimeInISO()));
           dispatch(setUserEmail(inputEmail));
           dispatch(setUserLoggedIn(true));
         }
@@ -137,7 +105,9 @@ export default function Signup() {
         console.log("Error: ", e);
         if (
           e?.response?.data?.msg ===
-          "This username is already associated with an account."
+            "This username is already associated with an account." ||
+          e?.response?.data?.msg ===
+            "This email is already associated with an account."
         ) {
           setErrMsg(e.response.data.msg);
         } else {

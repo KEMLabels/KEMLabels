@@ -6,6 +6,7 @@ import AlertMessage from "../components/AlertMessage";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 import { setVerifyEmailAttempts } from "../redux/actions/UserAction";
+import { getCurrDateTime } from "../utils/Helpers";
 
 export default function VerifyEmail() {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ export default function VerifyEmail() {
 
   useEffect(() => {
     if (verifyEmailState && verifyEmailState.lastAttemptDateTime) {
-      const currentTime = Date.parse(getCurrentTimeInPST());
+      const currentTime = Date.parse(getCurrDateTime());
       const lastAttemptTime = Date.parse(verifyEmailState.lastAttemptDateTime);
       const timeDifferenceInMinutes = Math.floor(
         Math.abs(currentTime - lastAttemptTime) / 1000 / 60
@@ -55,20 +56,6 @@ export default function VerifyEmail() {
     } else window.location.href = "/";
   }, [isLoggedIn, verifyEmailState, dispatch]);
 
-  function getCurrentTimeInPST() {
-    const formatter = new Intl.DateTimeFormat("en", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-      timeZone: "America/Vancouver",
-    });
-    return formatter.format(new Date());
-  }
-
   const submit = (e) => {
     e.preventDefault();
     setLoading(true);
@@ -84,7 +71,7 @@ export default function VerifyEmail() {
       dispatch(
         setVerifyEmailAttempts(
           verifyEmailState.attempts + 1,
-          getCurrentTimeInPST()
+          getCurrDateTime()
         )
       );
       axios

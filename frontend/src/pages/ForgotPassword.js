@@ -12,6 +12,14 @@ import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
 import { setForgetPassEmailAttempts } from "../redux/actions/UserAction";
+import {
+  lengthRangeCheck,
+  validatePasswordNumber,
+  validatePasswordOnSubmit,
+  validatePasswordSpecialChar,
+  validatePasswordUppercase,
+} from "../utils/Validation";
+import { getCurrDateTime } from "../utils/Helpers";
 
 export default function ForgotPassword() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -43,7 +51,7 @@ export default function ForgotPassword() {
       verifyForgetPassEmailState &&
       verifyForgetPassEmailState.lastAttemptDateTime
     ) {
-      const currentTime = Date.parse(getCurrentTimeInPST());
+      const currentTime = Date.parse(getCurrDateTime());
       const lastAttemptTime = Date.parse(
         verifyForgetPassEmailState.lastAttemptDateTime
       );
@@ -62,45 +70,15 @@ export default function ForgotPassword() {
     }
   }, [isLoggedIn, verifyForgetPassEmailState, dispatch]);
 
-  function getCurrentTimeInPST() {
-    const formatter = new Intl.DateTimeFormat("en", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-      timeZone: "America/Vancouver",
-    });
-    return formatter.format(new Date());
-  }
-
   // Validate password field during input change
   function validatePasswordOnTyping(password) {
     const passwordValid = {
-      length: password.length >= 8,
-      uppercase: /[A-Z]/.test(password),
-      number: /[0-9]/.test(password),
-      specialChar: /[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~]/.test(password),
+      length: lengthRangeCheck(password, 8, 50),
+      uppercase: validatePasswordUppercase(password),
+      number: validatePasswordNumber(password),
+      specialChar: validatePasswordSpecialChar(password),
     };
     setPasswordValid(passwordValid);
-  }
-
-  // Validate password on submit
-  function validatePasswordOnSubmit(password) {
-    const passwordRegex =
-      /^(?=.*[0-9])(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~])(?=.*[A-Z])(?=.*[a-z]).*$/;
-    if (password.length < 8 || password.length > 50) {
-      setErrMsg("Password must be between 8 and 50 characters.");
-      return false;
-    } else if (!passwordRegex.test(password)) {
-      setErrMsg(
-        "Password must contain at least one uppercase letter, one number, and one special character."
-      );
-      return false;
-    }
-    return true;
   }
 
   const sendVerificationCode = (e) => {
@@ -149,7 +127,7 @@ export default function ForgotPassword() {
       dispatch(
         setForgetPassEmailAttempts(
           verifyForgetPassEmailState.attempts + 1,
-          getCurrentTimeInPST()
+          getCurrDateTime()
         )
       );
       setTimeout(() => {
@@ -171,6 +149,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     setLoading(true);
     setResentEmail(true);
+
     if (verifyForgetPassEmailState.attempts === 10) {
       setLoading(false);
       setErrMsg(
@@ -180,7 +159,7 @@ export default function ForgotPassword() {
       dispatch(
         setForgetPassEmailAttempts(
           verifyForgetPassEmailState.attempts + 1,
-          getCurrentTimeInPST()
+          getCurrDateTime()
         )
       );
       setTimeout(() => {
@@ -240,9 +219,9 @@ export default function ForgotPassword() {
     setLoading(true);
     setSuccessMsg("");
 
-    if (!validatePasswordOnSubmit(password)) {
+    if (!validatePasswordOnSubmit(password, setErrMsg)) {
       setLoading(false);
-      return;
+      return false;
     }
 
     axios
