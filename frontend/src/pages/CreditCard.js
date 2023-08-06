@@ -11,6 +11,7 @@ import PageLayout from "../components/PageLayout";
 export default function CreditCard() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const email = useSelector((state) => state.auth.email);
+  const creditAmount = useSelector((state) => state.auth.creditAmount);
 
   const [clientSecret, setClientSecret] = useState("");
   const [stripeKey, setStripeKey] = useState("");
@@ -36,12 +37,14 @@ export default function CreditCard() {
     fetch("/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      //MAKE SURE TO SEND IN VALUE FROM REDUX FOR AMOUNT THIS IS HARD CODED!!!!!!
-      body: JSON.stringify({ amount: "500", email: email }),
+      body: JSON.stringify({
+        email: email,
+        amount: creditAmount.toString() === "0" ? 1 : Number(creditAmount),
+      }),
     })
       .then((res) => res.json())
       .then((data) => setClientSecret(data.clientSecret));
-  }, [isLoggedIn, email]);
+  }, [isLoggedIn, email, creditAmount]);
 
   // Only load stripePromise if stripeKey is obtained
   const stripePromise =

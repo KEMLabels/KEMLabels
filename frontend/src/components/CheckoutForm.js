@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   PaymentElement,
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { setUserCreditAmount } from "../redux/actions/UserAction";
 import { StripeAmountField, StripeInputField } from "./Field";
 import AlertMessage from "./AlertMessage";
 import Button from "./Button";
@@ -11,6 +13,7 @@ import Button from "./Button";
 export default function CheckoutForm({ useremail, errorMsg }) {
   const stripe = useStripe();
   const elements = useElements();
+  const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
@@ -70,10 +73,13 @@ export default function CheckoutForm({ useremail, errorMsg }) {
     setIsLoading(true);
 
     if (!loadAmount || loadAmount === 0) {
+      dispatch(setUserCreditAmount(0));
       setErrMsg("Please enter a valid amount.");
       setLoadAmountFieldInvalid(true);
       setIsLoading(false);
       return;
+    } else {
+      dispatch(setUserCreditAmount(loadAmount));
     }
 
     const { error } = await stripe.confirmPayment({
