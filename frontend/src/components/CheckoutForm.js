@@ -13,7 +13,12 @@ import { StripeAmountField, StripeInputField } from "./Field";
 import AlertMessage from "./AlertMessage";
 import Button from "./Button";
 
-export default function CheckoutForm({ useremail, errorMsg }) {
+export default function CheckoutForm({
+  useremail,
+  errorMsg,
+  loadCreditSuccess,
+  setLoadCreditSuccess,
+}) {
   const stripe = useStripe();
   const elements = useElements();
   const dispatch = useDispatch();
@@ -28,9 +33,9 @@ export default function CheckoutForm({ useremail, errorMsg }) {
   const [errMsg, setErrMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  const [loadCreditSuccess, setLoadCreditSuccess] = useState(false);
   const [loadAmount, setLoadAmount] = useState("");
   const [loadAmountFieldInvalid, setLoadAmountFieldInvalid] = useState(false);
+
   const paymentElementRef = useRef(null);
 
   useEffect(() => {
@@ -91,7 +96,15 @@ export default function CheckoutForm({ useremail, errorMsg }) {
         console.log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       });
-  }, [stripe, elements, errorMsg, creditAmount, dispatch, loadedAmount]);
+  }, [
+    stripe,
+    elements,
+    errorMsg,
+    creditAmount,
+    loadedAmount,
+    dispatch,
+    setLoadCreditSuccess,
+  ]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -211,7 +224,7 @@ export default function CheckoutForm({ useremail, errorMsg }) {
         <>
           <p className="totalCredsUpdate">
             Your updated total credits is now{" "}
-            <strong>${Number(creditAmount).toFixed(2)}</strong>
+            <strong>${Number(creditAmount).toFixed(2)}.</strong>
           </p>
           <div className="loadSuccessBtnGroup">
             <Button

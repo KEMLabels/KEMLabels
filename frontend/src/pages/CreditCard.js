@@ -17,6 +17,7 @@ export default function CreditCard() {
   const [stripeKey, setStripeKey] = useState("");
   const [hasStripeKey, SetHasStripeKey] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const [loadCreditSuccess, setLoadCreditSuccess] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) window.location.href = "/";
@@ -73,12 +74,29 @@ export default function CreditCard() {
           style={{ width: "100%", maxWidth: "700px" }}
         >
           <div className="authHeader" style={{ textAlign: "center" }}>
-            <h1>You're almost done!</h1>
-            <p>Please enter your card information below.</p>
+            {!loadCreditSuccess ? (
+              <>
+                <h1>You're almost done!</h1>
+                <p>Please enter your card information below.</p>
+              </>
+            ) : (
+              <>
+                <h1>Credits loaded successfully!</h1>
+                <p>
+                  Thank you for your payment, we have sent an automated payment
+                  receipt to your registered email.
+                </p>
+              </>
+            )}
           </div>
           {clientSecret && hasStripeKey && stripeKey && (
             <Elements options={options} stripe={stripePromise}>
-              <CheckoutForm errorMsg={errMsg} useremail={email} />
+              <CheckoutForm
+                errorMsg={errMsg}
+                useremail={email}
+                setLoadCreditSuccess={setLoadCreditSuccess}
+                loadCreditSuccess={loadCreditSuccess}
+              />
             </Elements>
           )}
         </div>
