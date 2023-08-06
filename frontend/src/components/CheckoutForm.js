@@ -68,7 +68,7 @@ export default function CheckoutForm({ useremail, errorMsg }) {
     }
 
     setIsLoading(true);
-    
+
     if (!loadAmount || loadAmount === 0) {
       setErrMsg("Please enter a valid amount.");
       setLoadAmountFieldInvalid(true);
@@ -80,7 +80,7 @@ export default function CheckoutForm({ useremail, errorMsg }) {
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: "http://localhost:3000/webhook/",
+        return_url: "http://localhost:3000/webhook/", // TODO: Change this to the domain
         receipt_email: useremail,
       },
     });
@@ -108,10 +108,7 @@ export default function CheckoutForm({ useremail, errorMsg }) {
   };
 
   return (
-    <form
-      className="stripePaymentForm"
-      id="payment-form"
-    >
+    <form className="stripePaymentForm" id="payment-form">
       {errMsg && <AlertMessage msg={errMsg} type="error" />}
       {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
       {successMsg && <AlertMessage msg={successMsg} type="success" />}
