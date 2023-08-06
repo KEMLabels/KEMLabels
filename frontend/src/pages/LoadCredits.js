@@ -1,16 +1,19 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PageLayout from "../components/PageLayout";
 import "../styles/Global.css";
 import "../styles/LoadCredits.css";
 import { FaBitcoin, FaRegCreditCard } from "react-icons/fa";
+import { setUserLoadAmount } from "../redux/actions/UserAction";
 
 export default function LoadCredits() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!isLoggedIn) window.location.href = "/";
-  }, [isLoggedIn]);
+    dispatch(setUserLoadAmount(0));
+  }, [isLoggedIn, dispatch]);
 
   return (
     <PageLayout title="Load Credits">

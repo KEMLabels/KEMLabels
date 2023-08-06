@@ -13,6 +13,7 @@ import {
   setUserCreditAmount,
   setUserEmail,
   setUserJoinedDate,
+  setUserLoadAmount,
   setUserLoggedIn,
   setUserName,
 } from "../redux/actions/UserAction";
@@ -70,6 +71,7 @@ export default function Login() {
         else {
           dispatch(setUserName(res.data.userInfo.userName));
           dispatch(setUserCreditAmount(res.data.userInfo.credits));
+          dispatch(setUserLoadAmount(0));
           dispatch(setUserJoinedDate(res.data.userInfo.joinedDate));
           dispatch(setUserEmail(inputEmail));
           dispatch(setUserLoggedIn(true));

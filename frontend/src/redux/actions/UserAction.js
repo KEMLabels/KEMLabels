@@ -2,6 +2,7 @@ import {
   SET_USER_EMAIL,
   SET_USER_USERNAME,
   SET_USER_CREDIT_AMOUNT,
+  SET_USER_LOAD_AMOUNT,
   SET_USER_JOINED_DATE,
   SET_USER_LOGGED_IN,
   SET_VERIFY_EMAIL_ATTEMPTS,
@@ -28,6 +29,13 @@ export const setUserCreditAmount = (creditAmount) => (dispatch) => {
   dispatch({
     type: SET_USER_CREDIT_AMOUNT,
     payload: creditAmount,
+  });
+};
+
+export const setUserLoadAmount = (loadAmount) => (dispatch) => {
+  dispatch({
+    type: SET_USER_LOAD_AMOUNT,
+    payload: loadAmount,
   });
 };
 
