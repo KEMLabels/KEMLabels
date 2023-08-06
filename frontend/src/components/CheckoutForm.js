@@ -4,7 +4,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { StripeInputField } from "./Field";
+import { StripeAmountField, StripeInputField } from "./Field";
 import AlertMessage from "./AlertMessage";
 import Button from "./Button";
 
@@ -16,12 +16,15 @@ export default function CheckoutForm({ useremail, errorMsg }) {
   const [errMsg, setErrMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [loadAmount, setLoadAmount] = useState("");
+  const [loadAmountFieldInvalid, setLoadAmountFieldInvalid] = useState(false);
   const paymentElementRef = useRef(null);
 
   useEffect(() => {
     if (errorMsg) setErrMsg(errorMsg);
 
-    if (!stripe) {
+    if (!stripe || !elements) {
+      setIsLoading(true);
       return;
     }
 
@@ -29,9 +32,7 @@ export default function CheckoutForm({ useremail, errorMsg }) {
       "payment_intent_client_secret"
     );
 
-    if (!clientSecret) {
-      return;
-    }
+    if (!clientSecret) return;
 
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
       switch (paymentIntent.status) {
@@ -49,7 +50,13 @@ export default function CheckoutForm({ useremail, errorMsg }) {
           break;
       }
     });
-  }, [stripe, errorMsg]);
+  }, [stripe, elements, errorMsg]);
+
+  useEffect(() => {
+    if (stripe && elements) {
+      setIsLoading(false);
+    }
+  }, [stripe, elements]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,6 +68,13 @@ export default function CheckoutForm({ useremail, errorMsg }) {
     }
 
     setIsLoading(true);
+    
+    if (!loadAmount || loadAmount === 0) {
+      setErrMsg("Please enter a valid amount.");
+      setLoadAmountFieldInvalid(true);
+      setIsLoading(false);
+      return;
+    }
 
     const { error } = await stripe.confirmPayment({
       elements,
@@ -97,25 +111,47 @@ export default function CheckoutForm({ useremail, errorMsg }) {
     <form
       className="stripePaymentForm"
       id="payment-form"
-      onSubmit={handleSubmit}
     >
       {errMsg && <AlertMessage msg={errMsg} type="error" />}
       {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
       {successMsg && <AlertMessage msg={successMsg} type="success" />}
 
-      <StripeInputField
-        fieldType="email"
-        label="Email"
-        disabled
-        initialValue={useremail}
-        placeholder="Email"
-        minLength={3}
-        maxLength={100}
-      />
+      {!isLoading && (
+        <div className="stripeFieldGroup">
+          <StripeInputField
+            containerClassName="emailField"
+            fieldType="email"
+            label="Email"
+            disabled
+            initialValue={useremail}
+            placeholder="Email"
+            minLength={3}
+            maxLength={100}
+          />
+          <StripeAmountField
+            containerClassName="loadAmountField"
+            fieldType="number"
+            label="Load amount"
+            placeholder="0"
+            currentValue={loadAmount}
+            prefix="$"
+            postfix="USD"
+            onChangeEvent={(e) => {
+              handleInputChange();
+              setLoadAmountFieldInvalid(false);
+              setLoadAmount(e.target.value);
+            }}
+            customStyle={
+              loadAmountFieldInvalid ? { border: "2px solid #df1b41" } : {}
+            }
+            customContainerStyle={{ width: "35%" }}
+          />
+        </div>
+      )}
       <PaymentElement
         id="payment-element"
         options={paymentElementOptions}
-        ref={paymentElementRef}
+        refs={paymentElementRef}
         onChange={handleInputChange}
       />
       <Button
@@ -124,6 +160,7 @@ export default function CheckoutForm({ useremail, errorMsg }) {
         text="Pay now"
         loading={isLoading}
         disabled={isLoading || !stripe || !elements}
+        onClickEvent={handleSubmit}
         customStyle={{
           padding: "8px 12px",
           borderRadius: "4px",

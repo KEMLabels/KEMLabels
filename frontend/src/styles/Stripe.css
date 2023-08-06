@@ -12,7 +12,12 @@
   margin-bottom: 24px;
 }
 
-.stripePaymentForm .stripeFieldContainer {
+.stripePaymentForm .stripeFieldGroup {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.stripePaymentForm .stripeFieldGroup .stripeFieldContainer {
   position: relative;
   margin-bottom: 0.75rem;
   vertical-align: top;
@@ -23,7 +28,15 @@
   color: #30313d;
 }
 
-.stripePaymentForm .stripeFieldContainer .stripeFieldLabel {
+.stripePaymentForm .stripeFieldGroup .stripeFieldContainer.emailField {
+  width: 65%;
+}
+
+.stripePaymentForm .stripeFieldGroup .stripeFieldContainer.loadAmountField {
+  width: 35%;
+}
+
+.stripePaymentForm .stripeFieldGroup .stripeFieldContainer .stripeFieldLabel {
   display: block;
   font-size: 0.93rem;
   margin-bottom: 0.25rem;
@@ -39,7 +52,7 @@
     opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.stripePaymentForm .stripeFieldContainer .stripeFieldInput {
+.stripePaymentForm .stripeFieldGroup .stripeFieldContainer .stripeFieldInput {
   font-family: Helvetica, sans-serif;
   font-weight: 300;
   display: block;
@@ -65,23 +78,80 @@
   font-size: inherit;
   font-weight: inherit;
   line-height: inherit;
+  z-index: 2;
 }
 
-.stripePaymentForm .stripeFieldContainer .stripeFieldInput.disabled {
+.stripePaymentForm
+  .stripeFieldGroup
+  .stripeFieldContainer
+  .stripeFieldInput.disabled {
   background-color: #f2f2f2;
   color: #757680;
   border-color: #e6e6e6;
   box-shadow: none;
 }
 
-.stripePaymentForm .stripeFieldContainer .stripeFieldInput:focus {
+.stripePaymentForm
+  .stripeFieldGroup
+  .stripeFieldContainer
+  .stripeFieldInput:focus {
   outline: 0;
   border-color: hsla(210, 96%, 45%, 50%);
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 6px rgba(0, 0, 0, 0.02),
     0 0 0 3px hsla(210, 96%, 45%, 25%), 0 1px 1px 0 rgba(0, 0, 0, 0.08);
 }
 
-@media only screen and (max-width: 592px) {
+.stripePaymentForm
+  .stripeFieldGroup
+  .stripeFieldContainer
+  .stripeFieldInput.postfix {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.stripePaymentForm
+  .stripeFieldGroup
+  .stripeFieldContainer
+  .stripeFieldInput.postfix {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.stripePaymentForm .stripeFieldGroup .stripeFieldContainer .stripePrefix,
+.stripePaymentForm .stripeFieldGroup .stripeFieldContainer .stripePostfix {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 0.5rem;
+  color: #757680;
+  background: #f2f2f2;
+  border: solid 1px #e6e6e6;
+}
+
+.stripePaymentForm .stripeFieldGroup .stripeFieldContainer .stripePrefix {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-right-width: 0;
+}
+
+.stripePaymentForm .stripeFieldGroup .stripeFieldContainer .stripePostfix {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-left-width: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .stripePaymentForm .stripeFieldGroup {
+    flex-direction: column;
+    gap: 0;
+  }
+  .stripePaymentForm .stripeFieldGroup .stripeFieldContainer.emailField,
+  .stripePaymentForm .stripeFieldGroup .stripeFieldContainer.loadAmountField {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 592px) {
   .stripePaymentForm {
     box-shadow: none;
     padding: 0;

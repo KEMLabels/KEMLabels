@@ -9,18 +9,22 @@ import CheckoutForm from "../components/CheckoutForm";
 import PageLayout from "../components/PageLayout";
 
 export default function CreditCard() {
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const email = useSelector((state) => state.auth.email);
 
   const [clientSecret, setClientSecret] = useState("");
-  const [stripeKey, setstripeKey] = useState("");
+  const [stripeKey, setStripeKey] = useState("");
+  const [hasStripeKey, SetHasStripeKey] = useState(false);
   const [errMsg, setErrMsg] = useState("");
 
   useEffect(() => {
+    if (!isLoggedIn) window.location.href = "/";
     axios
       .get("/getStripePublicKey")
       .then((res) => {
         if (res) {
-          setstripeKey(res.data);
+          setStripeKey(res.data);
+          SetHasStripeKey(true);
         }
       })
       .catch((e) => {
@@ -37,9 +41,11 @@ export default function CreditCard() {
     })
       .then((res) => res.json())
       .then((data) => setClientSecret(data.clientSecret));
-  }, [email]);
+  }, [isLoggedIn, email]);
 
-  const stripePromise = loadStripe(stripeKey);
+  // Only load stripePromise if stripeKey is obtained
+  const stripePromise =
+    hasStripeKey && stripeKey ? loadStripe(stripeKey) : null;
 
   const appearance = {
     theme: "stripe",
@@ -67,7 +73,7 @@ export default function CreditCard() {
             <h1>You're almost done!</h1>
             <p>Please enter your card information below.</p>
           </div>
-          {clientSecret && (
+          {clientSecret && hasStripeKey && stripeKey && (
             <Elements options={options} stripe={stripePromise}>
               <CheckoutForm errorMsg={errMsg} useremail={email} />
             </Elements>
