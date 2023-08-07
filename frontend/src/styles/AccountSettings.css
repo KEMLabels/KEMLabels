@@ -73,15 +73,12 @@
   .settingsFieldContainer {
   display: flex;
   flex-direction: column;
-  max-width: 500px;
 }
 
 .settingsContainer
   .settingsInnerContainer
   .settingsContent
   .settingsFieldContainer
-  label {
-  font-size: 1rem;
-  font-weight: 400;
-  margin-bottom: 0.5rem;
+  .settingsField {
+  max-width: 500px;
 }

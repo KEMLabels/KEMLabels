@@ -7,9 +7,12 @@ import Button from "../components/Button";
 import { NavLink } from "react-router-dom";
 import { InputField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
-import { validateUsernameOnSubmit } from "../utils/Validation";
+import {
+  validateEmailOnSubmit,
+  validateUsernameOnSubmit,
+} from "../utils/Validation";
 import axios from "../api/axios";
-import { setUserName } from "../redux/actions/UserAction";
+import { clearSession, setUserName } from "../redux/actions/UserAction";
 
 export default function AccountSettings({ currentPage = "username" }) {
   const dispatch = useDispatch();
@@ -23,11 +26,139 @@ export default function AccountSettings({ currentPage = "username" }) {
   const [successMsg, setSuccessMsg] = useState("");
   const [inputUserName, setInputUserName] = useState("");
   const [inputEmail, setInputEmail] = useState("");
+  const [confirmInputEmail, setConfirmInputEmail] = useState("");
+  const [startVerifyEmailTimer, setStartVerifyEmailTimer] = useState("");
+  const [resentEmail, setResentEmail] = useState(false);
   const [inputPassword, setInputPassword] = useState("");
 
   useEffect(() => {
     if (!isLoggedIn) window.location.href = "/";
   }, [isLoggedIn]);
+
+  // TODO: Not working, throwing an unexpected error from backend, maybe cuz its running every 5 seconds?
+  // Check if user's new email is verified every second
+  useEffect(() => {
+    function checkIsUserEmailVerified() {
+      axios
+        .get("/checkVerification", {
+          withCredentials: true,
+        })
+        .then((res) => {
+          if (!res.data.errMsg) {
+            setStartVerifyEmailTimer(false);
+            setSuccessMsg(
+              "Email updated successfully. Redirecting you to login page ..."
+            );
+            setTimeout(async () => {
+              setSuccessMsg("");
+              await axios.get("/logout", { withCredentials: true });
+              dispatch(clearSession());
+              window.location.href = "/login";
+            }, 3000);
+          }
+        })
+        .catch((e) => {
+          console.log("Error: ", e);
+          if (e?.response?.data?.msg !== "User is not verified") {
+            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          }
+        });
+    }
+
+    let intervalId;
+    if (startVerifyEmailTimer) intervalId = setInterval(checkIsUserEmailVerified, 5000);
+    else return () => clearInterval(intervalId);
+  }, [startVerifyEmailTimer, dispatch]);
+
+  // TODO: Add this call in backend to update username
+  // TODO: if the user has already changed their username
+  // in the past 24 hours send an error message, do this in the backend?
+  // TODO: Add the checks in the catch statements for the backend with same error messages
+  function updateUsernameCall(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!validateUsernameOnSubmit(inputUserName, setErrMsg)) {
+      setLoading(false);
+      return;
+    }
+
+    axios
+      .post(
+        "/UpdateUsername",
+        { userName: inputUserName },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res);
+        if (res.data.errMsg) setErrMsg(res.data.errMsg);
+        else {
+          dispatch(setUserName(inputUserName));
+          window.location.href = "/account/change-username";
+          setSuccessMsg("Username updated successfully."); // TODO for Towa: Check if this works
+        }
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        if (
+          e?.response?.data?.msg ===
+            "This username is already associated with an account." ||
+          e?.response?.data?.msg ===
+            "You have already changed your username once in the past 24 hours. Please try again later."
+        ) {
+          setErrMsg(e.response.data.msg);
+        } else {
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
+  // TODO: Update user's NEW email in the /generateToken call with confirmInputEmail
+  // Request a new email verification link
+  function sendEmailVerificationLink(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    if (inputEmail === "" || confirmInputEmail === "") {
+      setErrMsg("All fields are required.");
+      setLoading(false);
+      return;
+    }
+
+    if (!validateEmailOnSubmit(inputEmail, setErrMsg)) {
+      setLoading(false);
+      return;
+    }
+
+    if (inputEmail !== confirmInputEmail) {
+      setErrMsg("Emails don't match. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    setErrMsg("Please wait to re-send another email");
+    setResentEmail(true);
+    setStartVerifyEmailTimer(true);
+
+    axios
+      .get("/generateToken", { withCredentials: true })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      });
+
+    setTimeout(() => {
+      setResentEmail(false);
+      setLoading(false);
+      setErrMsg("");
+    }, 15000);
+  }
 
   function renderHeading() {
     switch (currentPage) {
@@ -65,82 +196,74 @@ export default function AccountSettings({ currentPage = "username" }) {
   function renderField() {
     switch (currentPage) {
       case "email":
-        return null;
+        return (
+          <form action="POST" className="settingsFieldContainer">
+            <InputField
+              fieldType="email"
+              containerClassName="settingsField"
+              onChangeEvent={(e) => {
+                setInputEmail(e.target.value);
+                setErrMsg("");
+                setSuccessMsg("");
+              }}
+              currentValue={inputEmail}
+              placeholder="New email"
+              minLength={3}
+              maxLength={100}
+            />
+            <InputField
+              fieldType="email"
+              containerClassName="settingsField"
+              onChangeEvent={(e) => {
+                setConfirmInputEmail(e.target.value);
+                setErrMsg("");
+                setSuccessMsg("");
+              }}
+              currentValue={confirmInputEmail}
+              placeholder="Confirm new email"
+              minLength={3}
+              maxLength={100}
+            />
+            <Button
+              btnType="submit"
+              disabled={!inputEmail || !confirmInputEmail || resentEmail}
+              loading={loading}
+              text="Send verification link"
+              onClickEvent={sendEmailVerificationLink}
+              customStyle={{ width: "100%", maxWidth: "300px" }}
+            />
+          </form>
+        );
       case "password":
         return null;
       default:
       case "username":
         return (
-          <InputField
-            onChangeEvent={(e) => {
-              setInputUserName(e.target.value);
-              setErrMsg("");
-              setSuccessMsg("");
-            }}
-            placeholder="Username"
-            minLength={3}
-            maxLength={15}
-          />
+          <form action="POST" className="settingsFieldContainer">
+            <InputField
+              onChangeEvent={(e) => {
+                setInputUserName(e.target.value);
+                setErrMsg("");
+                setSuccessMsg("");
+              }}
+              containerClassName="settingsField"
+              currentValue={inputUserName}
+              placeholder="New username"
+              minLength={3}
+              maxLength={15}
+            />
+            <Button
+              btnType="submit"
+              disabled={!inputUserName}
+              loading={loading}
+              text="Save changes"
+              onClickEvent={updateUsernameCall}
+              customStyle={{ width: "100%", maxWidth: "300px" }}
+            />
+          </form>
         );
     }
   }
-
-  // TODO: Add this call in backend to update username
-  // TODO: if the user has already changed their username
-  // in the past 24 hours send an error message, do this in the backend?
-  function updateUsernameCall() {
-    axios
-      .post(
-        "/UpdateUsername",
-        { userName: inputUserName },
-        { withCredentials: true }
-      )
-      .then((res) => {
-        console.log(res);
-        if (res.data.errMsg) setErrMsg(res.data.errMsg);
-        else {
-          dispatch(setUserName(inputUserName));
-          window.location.href = "/account/change-username";
-          setSuccessMsg("Username updated successfully.");
-        }
-      })
-      .catch((e) => {
-        console.log("Error: ", e);
-        if (
-          e?.response?.data?.msg ===
-            "This username is already associated with an account." ||
-          e?.response?.data?.msg ===
-            "You have already changed your username once in the past 24 hours. Please try again later."
-        ) {
-          setErrMsg(e.response.data.msg);
-        } else {
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }
-
-  const saveChanges = (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    if (!validateUsernameOnSubmit(inputUserName, setErrMsg)) {
-      setLoading(false);
-      return;
-    }
-
-    switch (currentPage) {
-      case "email":
-        break;
-      case "password":
-        break;
-      default:
-      case "username":
-        updateUsernameCall();
-    }
-  };
 
   return (
     <PageLayout title="Account Settings">
@@ -153,6 +276,7 @@ export default function AccountSettings({ currentPage = "username" }) {
               to="/account/change-username"
               onClick={() => {
                 setInputEmail("");
+                setConfirmInputEmail("");
                 setInputPassword("");
                 setSuccessMsg("");
                 setErrMsg("");
@@ -178,6 +302,7 @@ export default function AccountSettings({ currentPage = "username" }) {
               onClick={() => {
                 setInputUserName("");
                 setInputEmail("");
+                setConfirmInputEmail("");
                 setSuccessMsg("");
                 setErrMsg("");
               }}
@@ -189,17 +314,7 @@ export default function AccountSettings({ currentPage = "username" }) {
             {renderHeading()}
             {errMsg && <AlertMessage msg={errMsg} type="error" />}
             {successMsg && <AlertMessage msg={successMsg} type="success" />}
-            <form action="POST" className="settingsFieldContainer">
-              {renderField()}
-              <Button
-                btnType="submit"
-                disabled={!inputUserName}
-                loading={loading}
-                text="Save changes"
-                onClickEvent={saveChanges}
-                customStyle={{ width: "100%", maxWidth: "300px" }}
-              />
-            </form>
+            {renderField()}
           </div>
         </div>
       </div>
