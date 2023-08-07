@@ -76,7 +76,7 @@ export default function CreditCard() {
           <div className="authHeader" style={{ textAlign: "center" }}>
             {!loadCreditSuccess ? (
               <>
-                <h1>You're almost done!</h1>
+                <h1>Credit card setup</h1>
                 <p>Please enter your card information below.</p>
               </>
             ) : (
