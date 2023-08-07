@@ -85,18 +85,10 @@ export default function AccountSettings({ currentPage = "username" }) {
     }
   }
 
-  const saveChanges = (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    if (!validateUsernameOnSubmit(inputUserName, setErrMsg)) {
-      setLoading(false);
-      return;
-    }
-
-    // TODO: Add this call in backend to update username
-    // TODO: if the user has already changed their username
-    // in the past 24 hours send an error message, do this in the backend?
+  // TODO: Add this call in backend to update username
+  // TODO: if the user has already changed their username
+  // in the past 24 hours send an error message, do this in the backend?
+  function updateUsernameCall() {
     axios
       .post(
         "/UpdateUsername",
@@ -110,15 +102,15 @@ export default function AccountSettings({ currentPage = "username" }) {
           dispatch(setUserName(inputUserName));
           window.location.href = "/account/change-username";
           setSuccessMsg("Username updated successfully.");
-        };
+        }
       })
       .catch((e) => {
         console.log("Error: ", e);
         if (
           e?.response?.data?.msg ===
-          "This username is already associated with an account." ||
+            "This username is already associated with an account." ||
           e?.response?.data?.msg ===
-          "You have already changed your username once in the past 24 hours. Please try again later."
+            "You have already changed your username once in the past 24 hours. Please try again later."
         ) {
           setErrMsg(e.response.data.msg);
         } else {
@@ -128,6 +120,26 @@ export default function AccountSettings({ currentPage = "username" }) {
       .finally(() => {
         setLoading(false);
       });
+  }
+
+  const saveChanges = (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!validateUsernameOnSubmit(inputUserName, setErrMsg)) {
+      setLoading(false);
+      return;
+    }
+
+    switch (currentPage) {
+      case "email":
+        break;
+      case "password":
+        break;
+      default:
+      case "username":
+        updateUsernameCall();
+    }
   };
 
   return (
