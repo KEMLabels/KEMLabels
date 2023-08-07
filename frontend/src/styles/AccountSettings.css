@@ -18,6 +18,45 @@
   margin-left: auto;
 }
 
+.settingsContainer .settingsDropdown {
+  display: none;
+  margin-bottom: 3rem;
+  width: 100%;
+}
+
+.settingsContainer .settingsDropdownControl {
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: black;
+  padding: 4px 52px 16px 10px;
+  border-color: #efefef;
+  border-width: 0 0 1px 0;
+  border-radius: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.settingsContainer .settingsDropdownControl:hover {
+  box-shadow: none;
+}
+
+.settingsContainer .settingsDropdownMenu {
+  border-color: #f0f0f0;
+  border-radius: 0 0 8px 8px;
+}
+
+.settingsContainer .settingsDropdownMenu .Dropdown-option {
+  font-size: 1rem;
+  font-weight: 300;
+  color: black;
+  background-color: white;
+  padding: 1rem;
+}
+
+.settingsContainer .settingsDropdownMenu .Dropdown-option.is-selected {
+  color: white;
+  background-color: var(--primaryColor);
+}
+
 .settingsContainer .settingsInnerContainer {
   display: flex;
   width: 100%;
@@ -81,4 +120,61 @@
   .settingsFieldContainer
   .settingsField {
   max-width: 500px;
+}
+
+@media screen and (max-width: 1200px) {
+  .settingsContainer {
+    padding: 5rem;
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .settingsContainer h1 {
+    margin-left: 0;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  .settingsContainer .settingsInnerContainer .settingsSidebar {
+    display: none;
+  }
+  .settingsContainer .settingsInnerContainer .settingsContent {
+    width: 100%;
+  }
+  .settingsContainer .settingsDropdown {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .settingsContainer {
+    min-height: auto;
+    padding: 3rem;
+  }
+  .settingsContainer .settingsInnerContainer .settingsContent {
+    padding: 1.5rem 2rem;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .settingsContainer {
+    padding: 3rem 2rem;
+  }
+  .settingsContainer .settingsInnerContainer .settingsContent {
+    padding: 0;
+    border: none;
+  }
+  .settingsContainer .settingsInnerContainer .settingsContent .headings h2 {
+    font-size: 1.3rem;
+  }
+  .settingsContainer .settingsInnerContainer .settingsContent .headings p {
+    font-size: 1rem;
+  }
+  .settingsContainer
+    .settingsInnerContainer
+    .settingsContent
+    .settingsFieldContainer
+    .kemLabelsBtn {
+    max-width: 100% !important;
+  }
 }

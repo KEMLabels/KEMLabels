@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Dropdown from "react-dropdown";
 import "../styles/Global.css";
 import "../styles/AccountSettings.css";
+import "react-dropdown/style.css";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 import { NavLink } from "react-router-dom";
@@ -30,10 +32,27 @@ export default function AccountSettings({ currentPage = "username" }) {
   const [startVerifyEmailTimer, setStartVerifyEmailTimer] = useState("");
   const [resentEmail, setResentEmail] = useState(false);
   const [inputPassword, setInputPassword] = useState("");
+  const dropdownSettingsOptions = useMemo(() => [
+    { label: "Change username", value: "change-username" },
+    { label: "Change email", value: "change-email" },
+    { label: "Change password", value: "change-password" },
+  ], []);
+  const [dropdownSettingsValue, setDropdownSettingsValue] = useState(dropdownSettingsOptions[0]);
+
 
   useEffect(() => {
     if (!isLoggedIn) window.location.href = "/";
-  }, [isLoggedIn]);
+
+    switch (currentPage) {
+      case "email":
+        return setDropdownSettingsValue(dropdownSettingsOptions[1].label);
+      case "password":
+        return setDropdownSettingsValue(dropdownSettingsOptions[2].label);
+      default:
+      case "username":
+        return setDropdownSettingsValue(dropdownSettingsOptions[0].label);
+    }
+  }, [isLoggedIn, currentPage, dropdownSettingsOptions]);
 
   // TODO: Not working, throwing an unexpected error from backend, maybe cuz its running every 5 seconds?
   // Check if user's new email is verified every second
@@ -66,7 +85,8 @@ export default function AccountSettings({ currentPage = "username" }) {
     }
 
     let intervalId;
-    if (startVerifyEmailTimer) intervalId = setInterval(checkIsUserEmailVerified, 5000);
+    if (startVerifyEmailTimer)
+      intervalId = setInterval(checkIsUserEmailVerified, 5000);
     else return () => clearInterval(intervalId);
   }, [startVerifyEmailTimer, dispatch]);
 
@@ -269,6 +289,29 @@ export default function AccountSettings({ currentPage = "username" }) {
     <PageLayout title="Account Settings">
       <div className="settingsContainer">
         <h1>Account settings</h1>
+        <Dropdown
+          className="settingsDropdown"
+          controlClassName="settingsDropdownControl"
+          menuClassName="settingsDropdownMenu"
+          options={dropdownSettingsOptions}
+          onChange={(e) => {
+            console.log(e.label);
+            switch (e.label) {
+              case "Change email":
+                window.location.href = "/account/change-email";
+                break;
+              case "Change password":
+                window.location.href = "/account/change-password";
+                break;
+              default:
+              case "Change username":
+                window.location.href = "/account/change-username";
+                break;
+            }
+          }}
+          value={dropdownSettingsOptions.find((option) => option.label === dropdownSettingsValue)}
+          placeholder="Select an option"
+        />
         <div className="settingsInnerContainer">
           <div className="settingsSidebar">
             <NavLink
