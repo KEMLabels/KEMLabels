@@ -43,7 +43,7 @@ export default function AccountDropdownMenu({
       <AccountDropdownLink
         type="account"
         text="Account settings"
-        link="/accountsettings"
+        link="/account/change-username"
       />
       <AccountDropdownLink
         type="load"

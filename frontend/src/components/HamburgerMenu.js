@@ -69,7 +69,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
               <NavLink
                 type="account"
                 text="Account Settings"
-                link="/accountsettings"
+                link="/account/change-username"
                 isNavlink
               />
               <NavLink

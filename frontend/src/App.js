@@ -10,6 +10,7 @@ import LoadCredits from "./pages/LoadCredits";
 import CreditCard from "./pages/CreditCard";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import AccountSettings from "./pages/AccountSettings";
 
 export default function App() {
   return (
@@ -29,6 +30,18 @@ export default function App() {
           element={<VerifyEmailConfirmation />}
         ></Route>
         <Route path="/verifyemail" element={<VerifyEmail />}></Route>
+        <Route
+          path="/account/change-username"
+          element={<AccountSettings currentPage="username" />}
+        ></Route>
+        <Route
+          path="/account/change-email"
+          element={<AccountSettings currentPage="email" />}
+        ></Route>
+        <Route
+          path="/account/change-password"
+          element={<AccountSettings currentPage="password" />}
+        ></Route>
         <Route path="/loadcredits" element={<LoadCredits />}></Route>
         <Route path="/pay/creditcard" element={<CreditCard />}></Route>
         <Route path="*" element={<Error />}></Route>
