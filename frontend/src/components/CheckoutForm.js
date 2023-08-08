@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   PaymentElement,
@@ -22,6 +23,7 @@ export default function CheckoutForm({
   const stripe = useStripe();
   const elements = useElements();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const creditAmount = useSelector((state) => state.auth.creditAmount);
   const loadedAmount = useSelector((state) => state.auth.loadAmount);
@@ -235,7 +237,7 @@ export default function CheckoutForm({
               onClickEvent={() => {
                 setReturnHomeBtnLoading(true);
                 setTimeout(() => {
-                  window.location.href = "/";
+                  navigate("/");
                 }, 100);
               }}
             />
@@ -246,7 +248,7 @@ export default function CheckoutForm({
               onClickEvent={() => {
                 setLoadAgainBtnLoading(true);
                 setTimeout(() => {
-                  window.location.href = "/loadcredits";
+                  navigate("/loadcredits");
                 }, 100);
               }}
             />

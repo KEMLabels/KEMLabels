@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import axios from "../api/axios";
@@ -28,6 +28,8 @@ import { getCurrDateTimeInISO } from "../utils/Helpers";
 
 export default function Signup() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const [loading, setLoading] = useState(false);
@@ -43,8 +45,8 @@ export default function Signup() {
   });
 
   useEffect(() => {
-    if (isLoggedIn) window.location.href = "/verifyemail";
-  }, [isLoggedIn]);
+    if (isLoggedIn) navigate("/verifyemail");
+  }, [isLoggedIn, navigate]);
 
   // Validate password field during input change
   function validatePasswordOnTyping(password) {

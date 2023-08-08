@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 
 export default function Error() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   return (
@@ -38,7 +40,7 @@ export default function Error() {
             onClickEvent={() => {
               setLoading(true);
               setTimeout(() => {
-                window.location.href = "/";
+                navigate("/");
               }, 100);
             }}
             loading={loading}

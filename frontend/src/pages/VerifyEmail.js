@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "../api/axios";
 import AlertMessage from "../components/AlertMessage";
@@ -10,6 +10,8 @@ import { getCurrDateTime } from "../utils/Helpers";
 
 export default function VerifyEmail() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const email = useSelector((state) => state.auth.email);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const verifyEmailState = useSelector((state) => state.auth.verifyEmail);
@@ -35,7 +37,7 @@ export default function VerifyEmail() {
       axios
         .get("/isUserVerified", { withCredentials: true })
         .then((res) => {
-          if (res.status === 200) window.location.href = res.data.redirect;
+          if (res.status === 200) navigate(res.data.redirect);
           else {
             setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
           }
@@ -53,8 +55,8 @@ export default function VerifyEmail() {
             setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
           }
         });
-    } else window.location.href = "/";
-  }, [isLoggedIn, verifyEmailState, dispatch]);
+    } else navigate("/");
+  }, [isLoggedIn, verifyEmailState, dispatch, navigate]);
 
   const submit = (e) => {
     e.preventDefault();
@@ -69,10 +71,7 @@ export default function VerifyEmail() {
       );
     } else {
       dispatch(
-        setVerifyEmailAttempts(
-          verifyEmailState.attempts + 1,
-          getCurrDateTime()
-        )
+        setVerifyEmailAttempts(verifyEmailState.attempts + 1, getCurrDateTime())
       );
       axios
         .get("/generateToken", { withCredentials: true })

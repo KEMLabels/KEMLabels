@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { useSelector } from "react-redux";
@@ -9,6 +10,8 @@ import CheckoutForm from "../components/CheckoutForm";
 import PageLayout from "../components/PageLayout";
 
 export default function CreditCard() {
+  const navigate = useNavigate();
+
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const email = useSelector((state) => state.auth.email);
   const creditAmount = useSelector((state) => state.auth.creditAmount);
@@ -20,7 +23,7 @@ export default function CreditCard() {
   const [loadCreditSuccess, setLoadCreditSuccess] = useState(false);
 
   useEffect(() => {
-    if (!isLoggedIn) window.location.href = "/";
+    if (!isLoggedIn) navigate("/");
     axios
       .get("/getStripePublicKey")
       .then((res) => {

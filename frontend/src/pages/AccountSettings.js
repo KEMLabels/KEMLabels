@@ -6,7 +6,7 @@ import "../styles/AccountSettings.css";
 import "react-dropdown/style.css";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { InputField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import {
@@ -18,6 +18,7 @@ import { clearSession, setUserName } from "../redux/actions/UserAction";
 
 export default function AccountSettings({ currentPage = "username" }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const username = useSelector((state) => state.auth.username);
@@ -32,16 +33,20 @@ export default function AccountSettings({ currentPage = "username" }) {
   const [startVerifyEmailTimer, setStartVerifyEmailTimer] = useState("");
   const [resentEmail, setResentEmail] = useState(false);
   const [inputPassword, setInputPassword] = useState("");
-  const dropdownSettingsOptions = useMemo(() => [
-    { label: "Change username", value: "change-username" },
-    { label: "Change email", value: "change-email" },
-    { label: "Change password", value: "change-password" },
-  ], []);
-  const [dropdownSettingsValue, setDropdownSettingsValue] = useState(dropdownSettingsOptions[0]);
-
+  const dropdownSettingsOptions = useMemo(
+    () => [
+      { label: "Change username", value: "change-username" },
+      { label: "Change email", value: "change-email" },
+      { label: "Change password", value: "change-password" },
+    ],
+    []
+  );
+  const [dropdownSettingsValue, setDropdownSettingsValue] = useState(
+    dropdownSettingsOptions[0]
+  );
 
   useEffect(() => {
-    if (!isLoggedIn) window.location.href = "/";
+    if (!isLoggedIn) navigate("/");
 
     switch (currentPage) {
       case "email":
@@ -52,7 +57,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       case "username":
         return setDropdownSettingsValue(dropdownSettingsOptions[0].label);
     }
-  }, [isLoggedIn, currentPage, dropdownSettingsOptions]);
+  }, [isLoggedIn, currentPage, dropdownSettingsOptions, navigate]);
 
   // TODO: Not working, throwing an unexpected error from backend, maybe cuz its running every 5 seconds?
   // Check if user's new email is verified every second
@@ -72,7 +77,7 @@ export default function AccountSettings({ currentPage = "username" }) {
               setSuccessMsg("");
               await axios.get("/logout", { withCredentials: true });
               dispatch(clearSession());
-              window.location.href = "/login";
+              navigate("/login");
             }, 3000);
           }
         })
@@ -88,7 +93,7 @@ export default function AccountSettings({ currentPage = "username" }) {
     if (startVerifyEmailTimer)
       intervalId = setInterval(checkIsUserEmailVerified, 5000);
     else return () => clearInterval(intervalId);
-  }, [startVerifyEmailTimer, dispatch]);
+  }, [startVerifyEmailTimer, dispatch, navigate]);
 
   // TODO: Add this call in backend to update username
   // TODO: if the user has already changed their username
@@ -114,7 +119,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           dispatch(setUserName(inputUserName));
-          window.location.href = "/account/change-username";
+          navigate("/account/change-username");
           setSuccessMsg("Username updated successfully."); // TODO for Towa: Check if this works
         }
       })
@@ -295,21 +300,22 @@ export default function AccountSettings({ currentPage = "username" }) {
           menuClassName="settingsDropdownMenu"
           options={dropdownSettingsOptions}
           onChange={(e) => {
-            console.log(e.label);
             switch (e.label) {
               case "Change email":
-                window.location.href = "/account/change-email";
+                navigate("/account/change-email");
                 break;
               case "Change password":
-                window.location.href = "/account/change-password";
+                navigate("/account/change-password");
                 break;
               default:
               case "Change username":
-                window.location.href = "/account/change-username";
+                navigate("/account/change-username");
                 break;
             }
           }}
-          value={dropdownSettingsOptions.find((option) => option.label === dropdownSettingsValue)}
+          value={dropdownSettingsOptions.find(
+            (option) => option.label === dropdownSettingsValue
+          )}
           placeholder="Select an option"
         />
         <div className="settingsInnerContainer">

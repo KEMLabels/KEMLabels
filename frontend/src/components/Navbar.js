@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { PiUserCircleFill } from "react-icons/pi";
 import { HiOutlineChevronDown } from "react-icons/hi";
 import "../styles/Global.css";
@@ -68,6 +68,8 @@ function useOutsideAlerter(
 }
 
 export default function Navbar({ hideNavAndFooter = false }) {
+  const navigate = useNavigate();
+
   const dropdownMenuRef = useRef(null);
   const accountIconContainerRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -123,7 +125,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
                 onClickEvent={() => {
                   setLoading(true);
                   setTimeout(() => {
-                    window.location.href = "/signup";
+                    navigate("/signup");
                   }, 100);
                 }}
                 text={"Get Started"}

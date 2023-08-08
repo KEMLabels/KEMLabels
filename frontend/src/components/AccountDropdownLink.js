@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   FaUserEdit,
   FaChevronRight,
@@ -14,6 +15,7 @@ import "../styles/Navbar.css";
 
 export default function AccountDropdownLink({ type, link, text }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   function renderIcon() {
     switch (type) {
@@ -39,7 +41,7 @@ export default function AccountDropdownLink({ type, link, text }) {
           await axios.get("/logout", { withCredentials: true });
           dispatch(clearSession());
         }
-        window.location.href = `${link}`;
+        navigate(`${link}`);
       }}
     >
       <div>

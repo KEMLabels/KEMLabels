@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { NavLink as NativeNavLink } from "react-router-dom";
 import {
   FaUserEdit,
@@ -26,6 +26,7 @@ export default function NavLink({
   linkOnClick = false,
 }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   function renderIcon() {
     switch (type) {
@@ -67,7 +68,7 @@ export default function NavLink({
             await axios.get("/logout", { withCredentials: true });
             dispatch(clearSession());
           }
-          window.location.href = `${link}`;
+          navigate(`${link}`);
         }
       }}
     >

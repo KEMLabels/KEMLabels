@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import { BiErrorCircle } from "react-icons/bi";
@@ -22,12 +22,14 @@ import {
 import { getCurrDateTime } from "../utils/Helpers";
 
 export default function ForgotPassword() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const verifyForgetPassEmailState = useSelector(
     (state) => state.auth.verifyForgetPassEmail
   );
 
-  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -64,11 +66,11 @@ export default function ForgotPassword() {
       }
     }
     if (isLoggedIn) {
-      window.location.href = "/";
+      navigate("/");
     } else {
       setIsLoading(false);
     }
-  }, [isLoggedIn, verifyForgetPassEmailState, dispatch]);
+  }, [isLoggedIn, verifyForgetPassEmailState, dispatch, navigate]);
 
   // Validate password field during input change
   function validatePasswordOnTyping(password) {
@@ -236,7 +238,7 @@ export default function ForgotPassword() {
           );
           setTimeout(() => {
             setSuccessMsg("");
-            window.location.href = res.data.redirect;
+            navigate(res.data.redirect);
           }, 3000);
         }
       })

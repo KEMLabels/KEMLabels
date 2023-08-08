@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "../api/axios";
 import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
@@ -8,6 +8,7 @@ import AlertMessage from "../components/AlertMessage";
 
 export default function VerifyEmailConfirmation() {
   const param = useParams();
+  const navigate = useNavigate();
 
   const [fetching, setIsFetching] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -132,9 +133,7 @@ export default function VerifyEmailConfirmation() {
               loading={loading}
               onClickEvent={() => {
                 setLoading(true);
-                setTimeout(() => {
-                  window.location.href = "/";
-                }, 100);
+                setTimeout(() => navigate("/"), 100);
               }}
               customStyle={{ width: "100%" }}
             />

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import axios from "../api/axios";
@@ -20,6 +20,8 @@ import {
 
 export default function Login() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const [loading, setLoading] = useState(false);
@@ -34,22 +36,19 @@ export default function Login() {
           withCredentials: true,
         })
         .then((res) => {
-          if (res.data.errMsg) {
-            window.location.href = "/verifyemail";
-          } else {
-            window.location.href = res.data.redirect;
-          }
+          if (res.data.errMsg) navigate("/verifyemail");
+          else navigate(res.data.redirect);
         })
         .catch((e) => {
           console.log("Error: ", e);
           if (e?.response?.data?.msg === "User is not verified") {
-            window.location.href = "/verifyemail";
+            navigate("/verifyemail");
           } else {
             setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
           }
         });
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, navigate]);
 
   const submit = (e) => {
     e.preventDefault();
@@ -66,7 +65,6 @@ export default function Login() {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           dispatch(setUserName(res.data.userInfo.userName));

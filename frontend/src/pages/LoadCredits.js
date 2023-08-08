@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import PageLayout from "../components/PageLayout";
 import "../styles/Global.css";
@@ -7,13 +8,15 @@ import { FaBitcoin, FaRegCreditCard } from "react-icons/fa";
 import { setUserLoadAmount } from "../redux/actions/UserAction";
 
 export default function LoadCredits() {
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   useEffect(() => {
-    if (!isLoggedIn) window.location.href = "/";
+    if (!isLoggedIn) navigate("/");
     dispatch(setUserLoadAmount(0));
-  }, [isLoggedIn, dispatch]);
+  }, [isLoggedIn, dispatch, navigate]);
 
   return (
     <PageLayout title="Load Credits">
@@ -45,7 +48,7 @@ export default function LoadCredits() {
             <div
               className="paymentOptionCard"
               onClick={() => {
-                window.location.href = "/pay/creditcard";
+                navigate("/pay/creditcard");
               }}
             >
               <p>Credit / Debit Card</p>
@@ -54,7 +57,7 @@ export default function LoadCredits() {
             <div
               className="paymentOptionCard"
               onClick={() => {
-                window.location.href = "/pay/crypto";
+                navigate("/pay/crypto");
               }}
             >
               <p>Crypto Currency</p>
