@@ -343,7 +343,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 }
                 loading={loading}
                 text={
-                  !showOTPField ? "Send verification code" : "Confirm new email"
+                  !showOTPField ? "Send verification code" : "Confirm changes"
                 }
                 onClickEvent={
                   !showOTPField ? sendVerificationCode : validateOTP
@@ -375,7 +375,7 @@ export default function AccountSettings({ currentPage = "username" }) {
               btnType="submit"
               disabled={!inputUserName}
               loading={loading}
-              text="Save changes"
+              text="Confirm changes"
               onClickEvent={updateUsernameCall}
               customStyle={{ width: "100%", maxWidth: "300px" }}
             />
