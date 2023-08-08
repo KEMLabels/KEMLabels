@@ -134,11 +134,11 @@ export default function Login() {
             />
             <p className="disclaimer">
               By continuing, you agree to KEMLabel's{" "}
-              <Link className="link" target="_blank" to="/termsandconditions">
+              <Link className="link" to="/termsandconditions">
                 Terms and Conditions
               </Link>{" "}
               and{" "}
-              <Link className="link" target="_blank" to="/privacypolicy">
+              <Link className="link" to="/privacypolicy">
                 Privacy Policy
               </Link>
               .

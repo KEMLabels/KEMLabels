@@ -195,11 +195,11 @@ export default function Signup() {
             />
             <p className="disclaimer">
               By signing up to create an account I accept KEMLabel's{" "}
-              <Link className="link" target="_blank" to="/termsandconditions">
+              <Link className="link" to="/termsandconditions">
                 Terms and Conditions
               </Link>{" "}
               and{" "}
-              <Link className="link" target="_blank" to="/privacypolicy">
+              <Link className="link" to="/privacypolicy">
                 Privacy Policy
               </Link>
               .
