@@ -122,6 +122,24 @@
   max-width: 500px;
 }
 
+.settingsContainer
+  .settingsInnerContainer
+  .settingsContent
+  .settingsFieldContainer
+  .otpContainer {
+  justify-content: flex-start;
+  margin: 1.5rem 0px 3rem;
+}
+
+.settingsContainer
+  .settingsInnerContainer
+  .settingsContent
+  .settingsFieldContainer
+  .btnGroup {
+  display: flex;
+  gap: 1.5rem;
+}
+
 @media screen and (max-width: 1200px) {
   .settingsContainer {
     padding: 5rem;
@@ -163,6 +181,7 @@
   .settingsContainer .settingsInnerContainer .settingsContent {
     padding: 0;
     border: none;
+    box-shadow: none;
   }
   .settingsContainer .settingsInnerContainer .settingsContent .headings h2 {
     font-size: 1.3rem;
@@ -176,5 +195,30 @@
     .settingsFieldContainer
     .kemLabelsBtn {
     max-width: 100% !important;
+  }
+  .settingsContainer
+    .settingsInnerContainer
+    .settingsContent
+    .settingsFieldContainer
+    .otpContainer {
+    justify-content: center;
+  }
+
+  .settingsContainer
+    .settingsInnerContainer
+    .settingsContent
+    .settingsFieldContainer
+    .otpContainer
+    .otpInputContainer {
+    width: 250px;
+    height: 70px;
+  }
+
+  .settingsContainer
+    .settingsInnerContainer
+    .settingsContent
+    .settingsFieldContainer
+    .btnGroup {
+    flex-direction: column;
   }
 }

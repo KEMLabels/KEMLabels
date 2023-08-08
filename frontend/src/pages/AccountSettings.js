@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Dropdown from "react-dropdown";
+import VerificationInput from "react-verification-input";
 import "../styles/Global.css";
+import "../styles/Auth.css";
 import "../styles/AccountSettings.css";
 import "react-dropdown/style.css";
 import PageLayout from "../components/PageLayout";
@@ -26,13 +28,16 @@ export default function AccountSettings({ currentPage = "username" }) {
 
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const [infoMsg, setInfoMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [inputUserName, setInputUserName] = useState("");
   const [inputEmail, setInputEmail] = useState("");
   const [confirmInputEmail, setConfirmInputEmail] = useState("");
-  const [startVerifyEmailTimer, setStartVerifyEmailTimer] = useState("");
-  const [resentEmail, setResentEmail] = useState(false);
+  const [sendVerificationEmail, setVerificationEmail] = useState(false);
+  const [showOTPField, setShowOTPField] = useState(false);
+  const [enteredOTP, setEnteredOTP] = useState("");
   const [inputPassword, setInputPassword] = useState("");
+
   const dropdownSettingsOptions = useMemo(
     () => [
       { label: "Change username", value: "change-username" },
@@ -59,42 +64,7 @@ export default function AccountSettings({ currentPage = "username" }) {
     }
   }, [isLoggedIn, currentPage, dropdownSettingsOptions, navigate]);
 
-  // TODO: Not working, throwing an unexpected error from backend, maybe cuz its running every 5 seconds?
-  // Check if user's new email is verified every second
-  useEffect(() => {
-    function checkIsUserEmailVerified() {
-      axios
-        .get("/checkVerification", {
-          withCredentials: true,
-        })
-        .then((res) => {
-          if (!res.data.errMsg) {
-            setStartVerifyEmailTimer(false);
-            setSuccessMsg(
-              "Email updated successfully. Redirecting you to login page ..."
-            );
-            setTimeout(async () => {
-              setSuccessMsg("");
-              await axios.get("/logout", { withCredentials: true });
-              dispatch(clearSession());
-              navigate("/login");
-            }, 3000);
-          }
-        })
-        .catch((e) => {
-          console.log("Error: ", e);
-          if (e?.response?.data?.msg !== "User is not verified") {
-            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-          }
-        });
-    }
-
-    let intervalId;
-    if (startVerifyEmailTimer)
-      intervalId = setInterval(checkIsUserEmailVerified, 5000);
-    else return () => clearInterval(intervalId);
-  }, [startVerifyEmailTimer, dispatch, navigate]);
-
+  //#region Change username helper functions
   // TODO: Add this call in backend to update username
   // TODO: if the user has already changed their username
   // in the past 24 hours send an error message, do this in the backend?
@@ -140,10 +110,77 @@ export default function AccountSettings({ currentPage = "username" }) {
         setLoading(false);
       });
   }
+  //#endregion
 
-  // TODO: Update user's NEW email in the /generateToken call with confirmInputEmail
-  // Request a new email verification link
-  function sendEmailVerificationLink(e) {
+  //#region Change email helper functions
+  // TODO: Fix this OTP email since its sent to NEW email
+  // Confirm email change via OTP
+  function validateOTP(e) {
+    e.preventDefault();
+    setLoading(true);
+    setInfoMsg("");
+    setErrMsg("");
+
+    axios
+      .post("/checkOTP", { enteredOTP, email }, { withCredentials: true })
+      .then((res) => {
+        console.log(res);
+        setSuccessMsg(
+          "Verification successful and your email has been updated! Redirecting you to the login page..."
+        );
+        setTimeout(() => {
+          setSuccessMsg("");
+          axios.get("/logout", { withCredentials: true });
+          dispatch(clearSession());
+          navigate("/signin");
+        }, 3000);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        if (
+          e?.response?.data?.msg ===
+          "Hmm... your code was incorrect. Please try again."
+        ) {
+          setErrMsg(e.response.data.msg);
+        } else {
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
+  // TODO: Fix axios call here to resend OTP to NEW email
+  function sendResetRequest(e) {
+    e.preventDefault();
+    setInfoMsg(
+      `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
+    );
+    setErrMsg("Please wait to re-send another email.");
+    setVerificationEmail(true);
+
+    axios
+      .post("/generateNewOTP", { email }, { withCredentials: true })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setVerificationEmail(false);
+          setErrMsg("");
+        }, 15000);
+      });
+  }
+
+  // TODO: Update user's NEW email in the /sendEmailChangeConfirmation call
+  // NEW EMAIL: {confirmInputEmail}, OLD EMAIL: {email}
+  // Send OTP to new email and notice to old email
+  function sendVerificationCode(e) {
     e.preventDefault();
     setLoading(true);
 
@@ -164,26 +201,35 @@ export default function AccountSettings({ currentPage = "username" }) {
       return;
     }
 
-    setErrMsg("Please wait to re-send another email");
-    setResentEmail(true);
-    setStartVerifyEmailTimer(true);
+    setInfoMsg(
+      `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
+    );
+    setErrMsg("Please wait to re-send another email.");
+    setVerificationEmail(true);
+    setShowOTPField(true);
 
+    // TODO: Add this call in backend that sends email to new and old email (2 different emails)
     axios
-      .get("/generateToken", { withCredentials: true })
+      .get("/sendEmailChangeConfirmation", { withCredentials: true })
       .then((res) => {
         console.log(res);
       })
       .catch((e) => {
         console.log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      })
+      .finally(() => {
+        setLoading(false);
       });
 
+    setLoading(false); // Remove this later since its in the .finally in Axios call
+
     setTimeout(() => {
-      setResentEmail(false);
-      setLoading(false);
+      setVerificationEmail(false);
       setErrMsg("");
     }, 15000);
   }
+  //#endregion
 
   function renderHeading() {
     switch (currentPage) {
@@ -193,7 +239,8 @@ export default function AccountSettings({ currentPage = "username" }) {
             <h2>Change email</h2>
             <p>
               Your current email is <strong>{email}.</strong> To change your
-              email, please update the field below.
+              email, please update the fields below and follow the instructions
+              when you receive a confirmation email.
             </p>
           </div>
         );
@@ -223,40 +270,87 @@ export default function AccountSettings({ currentPage = "username" }) {
       case "email":
         return (
           <form action="POST" className="settingsFieldContainer">
-            <InputField
-              fieldType="email"
-              containerClassName="settingsField"
-              onChangeEvent={(e) => {
-                setInputEmail(e.target.value);
-                setErrMsg("");
-                setSuccessMsg("");
-              }}
-              currentValue={inputEmail}
-              placeholder="New email"
-              minLength={3}
-              maxLength={100}
-            />
-            <InputField
-              fieldType="email"
-              containerClassName="settingsField"
-              onChangeEvent={(e) => {
-                setConfirmInputEmail(e.target.value);
-                setErrMsg("");
-                setSuccessMsg("");
-              }}
-              currentValue={confirmInputEmail}
-              placeholder="Confirm new email"
-              minLength={3}
-              maxLength={100}
-            />
-            <Button
-              btnType="submit"
-              disabled={!inputEmail || !confirmInputEmail || resentEmail}
-              loading={loading}
-              text="Send verification link"
-              onClickEvent={sendEmailVerificationLink}
-              customStyle={{ width: "100%", maxWidth: "300px" }}
-            />
+            {!showOTPField ? (
+              <>
+                <InputField
+                  fieldType="email"
+                  containerClassName="settingsField"
+                  onChangeEvent={(e) => {
+                    setInputEmail(e.target.value);
+                    setErrMsg("");
+                    setInfoMsg("");
+                    setSuccessMsg("");
+                  }}
+                  currentValue={inputEmail}
+                  placeholder="New email"
+                  minLength={3}
+                  maxLength={100}
+                />
+                <InputField
+                  fieldType="email"
+                  containerClassName="settingsField"
+                  onChangeEvent={(e) => {
+                    setConfirmInputEmail(e.target.value);
+                    setErrMsg("");
+                    setInfoMsg("");
+                    setSuccessMsg("");
+                  }}
+                  currentValue={confirmInputEmail}
+                  placeholder="Confirm new email"
+                  minLength={3}
+                  maxLength={100}
+                />
+              </>
+            ) : (
+              <div className="otpContainer">
+                <VerificationInput
+                  length={4}
+                  autoFocus
+                  placeholder="*"
+                  validChars="0-9"
+                  classNames={{
+                    container: "otpInputContainer",
+                    character: "otpText",
+                    characterInactive: "inactiveText",
+                    characterSelected: "selectedText",
+                  }}
+                  onChange={(value) => {
+                    setEnteredOTP(value);
+                    setErrMsg("");
+                    setInfoMsg("");
+                    setSuccessMsg("");
+                  }}
+                />
+              </div>
+            )}
+            <div className="btnGroup">
+              {showOTPField && (
+                <Button
+                  fill="outline"
+                  disabled={sendVerificationEmail}
+                  loading={sendVerificationEmail}
+                  text="Resend email"
+                  onClickEvent={sendResetRequest}
+                  customStyle={{ width: "100%", maxWidth: "300px" }}
+                />
+              )}
+              <Button
+                btnType="submit"
+                disabled={
+                  !inputEmail ||
+                  !confirmInputEmail ||
+                  (showOTPField && enteredOTP.length !== 4)
+                }
+                loading={loading}
+                text={
+                  !showOTPField ? "Send verification code" : "Confirm new email"
+                }
+                onClickEvent={
+                  !showOTPField ? sendVerificationCode : validateOTP
+                }
+                customStyle={{ width: "100%", maxWidth: "300px" }}
+              />
+            </div>
           </form>
         );
       case "password":
@@ -326,8 +420,10 @@ export default function AccountSettings({ currentPage = "username" }) {
               onClick={() => {
                 setInputEmail("");
                 setConfirmInputEmail("");
+                setShowOTPField(false);
                 setInputPassword("");
                 setSuccessMsg("");
+                setInfoMsg("");
                 setErrMsg("");
               }}
             >
@@ -340,6 +436,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 setInputUserName("");
                 setInputPassword("");
                 setSuccessMsg("");
+                setInfoMsg("");
                 setErrMsg("");
               }}
             >
@@ -352,7 +449,9 @@ export default function AccountSettings({ currentPage = "username" }) {
                 setInputUserName("");
                 setInputEmail("");
                 setConfirmInputEmail("");
+                setShowOTPField(false);
                 setSuccessMsg("");
+                setInfoMsg("");
                 setErrMsg("");
               }}
             >
@@ -362,6 +461,7 @@ export default function AccountSettings({ currentPage = "username" }) {
           <div className="settingsContent">
             {renderHeading()}
             {errMsg && <AlertMessage msg={errMsg} type="error" />}
+            {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
             {successMsg && <AlertMessage msg={successMsg} type="success" />}
             {renderField()}
           </div>
