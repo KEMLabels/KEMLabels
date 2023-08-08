@@ -396,13 +396,32 @@ export default function AccountSettings({ currentPage = "username" }) {
           onChange={(e) => {
             switch (e.label) {
               case "Change email":
+                setInputUserName("");
+                setInputPassword("");
+                setSuccessMsg("");
+                setInfoMsg("");
+                setErrMsg("");
                 navigate("/account/change-email");
                 break;
               case "Change password":
+                setInputUserName("");
+                setInputEmail("");
+                setConfirmInputEmail("");
+                setShowOTPField(false);
+                setSuccessMsg("");
+                setInfoMsg("");
+                setErrMsg("");
                 navigate("/account/change-password");
                 break;
               default:
               case "Change username":
+                setInputEmail("");
+                setConfirmInputEmail("");
+                setShowOTPField(false);
+                setInputPassword("");
+                setSuccessMsg("");
+                setInfoMsg("");
+                setErrMsg("");
                 navigate("/account/change-username");
                 break;
             }
