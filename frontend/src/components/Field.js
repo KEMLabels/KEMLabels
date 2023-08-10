@@ -121,7 +121,7 @@ function StripeAmountField({
           value={currentValue}
           placeholder={placeholder}
           disabled={disabled}
-          step={0.1}
+          step={0.5}
           onBlur={() => {
             let inputValue = currentValue;
             if (inputValue) {

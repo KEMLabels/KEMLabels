@@ -119,9 +119,9 @@ export default function CheckoutForm({
 
     setIsLoading(true);
 
-    if (!loadAmount || loadAmount === 0) {
+    if (!loadAmount || loadAmount < 1) {
       dispatch(setUserLoadAmount(0));
-      setErrMsg("Please enter a valid amount.");
+      setErrMsg("Please enter an amount greater than $1.00");
       setLoadAmountFieldInvalid(true);
       setIsLoading(false);
       return;
