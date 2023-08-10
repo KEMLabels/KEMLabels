@@ -13,6 +13,7 @@ import {
   setUserCreditAmount,
   setUserEmail,
   setUserJoinedDate,
+  setUserLoadAmount,
   setUserLoggedIn,
   setUserName,
 } from "../redux/actions/UserAction";
@@ -99,9 +100,10 @@ export default function Signup() {
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           dispatch(setUserName(inputUserName));
-          dispatch(setUserCreditAmount(0));
-          dispatch(setUserJoinedDate(getCurrDateTimeInISO()));
           dispatch(setUserEmail(inputEmail));
+          dispatch(setUserCreditAmount(0));
+          dispatch(setUserLoadAmount(0));
+          dispatch(setUserJoinedDate(getCurrDateTimeInISO()));
           dispatch(setUserLoggedIn(true));
         }
       })
