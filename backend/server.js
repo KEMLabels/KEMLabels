@@ -18,6 +18,10 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 const stripe = require("stripe")(stripeSecretKey);
+var coinbase = require('coinbase-commerce-node');
+var Client = coinbase.Client;
+var resources = coinbase.resources;
+Client.init(process.env.COINBASE_API);
 
 //Connect to Mongo
 const connectDB = async () => {
@@ -104,7 +108,7 @@ const calculateOrderAmount = (amount) => {
 app.post("/create-payment-intent", async (req, res) => {
     try {
         const { amount } = req.body;
-        const { email } = req.body;;
+        const { email } = req.body;
 
         // Create a PaymentIntent with the order amount and currency
         const paymentIntent = await stripe.paymentIntents.create({
@@ -128,7 +132,7 @@ app.post("/create-payment-intent", async (req, res) => {
 });
 
 //Stripe API Webhook implementation
-const endpointSecret = "whsec_1eb5aad30bbe004eb79af52738cedd36f095c45574998a8f8fcf8176f44101e9";
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 app.post('/webhook', express.raw({ type: "application/json" }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -144,7 +148,7 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
 
     if (event.type === "payment_intent.succeeded") {
         const paymentIntent = event.data.object;
-        console.log("Payment succeeded!", paymentIntent);
+        // console.log("Payment succeeded!", paymentIntent);
         let user = await User.findOne({ email: paymentIntent.metadata.email })
         if (!user)
             throw new Error('Does not exist.');
@@ -153,7 +157,7 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
             "_id": user._id.toString()
         }, {
             // set amount
-            "credits": userExistingCredits + 40
+            "credits": Number(userExistingCredits) + Number(paymentIntent.amount)
         })
             .then((obj) => {
                 console.log("User credits updated");
@@ -162,7 +166,31 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
                 console.log(err);
             })
     }
+    res.end();
 });
+
+//COINBASE API
+app.post("/payWithCrypto", async (req, res) => {
+    const { amount } = req.body;
+
+    try {
+        const charge = await resources.Charge.create({
+            name: "Test Charge",
+            description: "Test Charge Description",
+            local_price: {
+                amount: amount,
+                currency: "USD"
+            },
+            pricing_type: "fixed_price",
+            metadata: {
+                email: "test@gmail.com"
+            }
+        })
+        res.json({ redirect: charge.hosted_url });
+    } catch (err) {
+        console.log(err);
+    }
+})
 
 //Error handler function
 async function handleErr(err, req, res, next) {

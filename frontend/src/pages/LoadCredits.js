@@ -6,6 +6,7 @@ import "../styles/Global.css";
 import "../styles/LoadCredits.css";
 import { FaBitcoin, FaRegCreditCard } from "react-icons/fa";
 import { setUserLoadAmount } from "../redux/actions/UserAction";
+import axios from "../api/axios";
 
 export default function LoadCredits() {
   const dispatch = useDispatch();
@@ -57,7 +58,16 @@ export default function LoadCredits() {
             <div
               className="paymentOptionCard"
               onClick={() => {
-                navigate("/pay/crypto");
+                // FIX THIS!!!!!!!
+                axios
+                .post("/payWithCrypto", { amount: 50 }, { withCredentials: true })
+                .then((res) => {
+                  window.location.href = res.data.redirect;
+                })
+                .catch((e) => {
+                  console.log("Error: ", e);
+                });
+                // navigate("/pay/crypto");
               }}
             >
               <p>Crypto Currency</p>
