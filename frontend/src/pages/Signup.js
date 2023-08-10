@@ -10,6 +10,7 @@ import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
 import {
+  setUserCreditAmount,
   setUserEmail,
   setUserJoinedDate,
   setUserLoggedIn,
@@ -98,6 +99,7 @@ export default function Signup() {
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           dispatch(setUserName(inputUserName));
+          dispatch(setUserCreditAmount(0));
           dispatch(setUserJoinedDate(getCurrDateTimeInISO()));
           dispatch(setUserEmail(inputEmail));
           dispatch(setUserLoggedIn(true));
