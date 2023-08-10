@@ -190,7 +190,10 @@ export default function AccountSettings({ currentPage = "username" }) {
       return;
     }
 
-    if (!validateEmailOnSubmit(inputEmail, setErrMsg)) {
+    if (
+      !validateEmailOnSubmit(inputEmail, setErrMsg) ||
+      !validateEmailOnSubmit(confirmInputEmail, setErrMsg)
+    ) {
       setLoading(false);
       return;
     }
