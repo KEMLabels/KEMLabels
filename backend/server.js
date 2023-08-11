@@ -1,29 +1,35 @@
+//Include Modules
 const express = require("express");
 const app = express();
 const cors = require('cors');
-const bcrypt = require("bcrypt")
-const axios = require('axios')
+const bcrypt = require("bcrypt");
 const session = require('express-session');
-const dotenv = require("dotenv")
+const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-dotenv.config();
-require('express-async-errors');
 const mongoose = require('mongoose');
+require('express-async-errors');
+
+//Configure mongoose, app, and dotenv
 mongoose.set('strictQuery', false);
 app.enable('trust proxy');
+dotenv.config();
 
+//Retrieve API keys from env
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const coinbaseApiKey = process.env.COINBASE_API;
 
+//Initiate payment methods API's
 const stripe = require("stripe")(stripeSecretKey);
 var coinbase = require('coinbase-commerce-node');
 var Client = coinbase.Client;
 var resources = coinbase.resources;
-Client.init(process.env.COINBASE_API);
+Client.init(coinbaseApiKey);
 
-//Connect to Mongo
+//Connect to Mongo and set up MongoDBStore
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true });
@@ -34,16 +40,16 @@ const connectDB = async () => {
     }
 }
 
-//Import schema modules
-const User = require('./model/users.js');
-const tempTokens = require('./model/tempToken.js');
-const tempOTPS = require('./model/tempOTPs.js');
-
 const MongoDBStore = require('connect-mongodb-session')(session);
 const store = new MongoDBStore({
     uri: process.env.DB_STRING,
     collection: 'sessions',
 });
+
+//Import schema modules
+const User = require('./model/users.js');
+const tempTokens = require('./model/tempToken.js');
+const tempOTPS = require('./model/tempOTPs.js');
 
 //Start app
 app.use('/', express.static(__dirname + '/public'));
@@ -83,6 +89,19 @@ app.use(session({
     },
     store: store,
 }));
+app.use((req, res, next) => {
+    const currentTime = new Date().getTime();
+    const lastActivityTime = req.session.lastActivityTime || currentTime;
+
+    // Update last activity time
+    req.session.lastActivityTime = currentTime;
+
+    // Convert lastActivityTime to a human-readable date and time
+    const formattedLastActivityTime = new Date(lastActivityTime).toLocaleString();
+    console.log("Last activity time:", formattedLastActivityTime);
+
+    next(); // Continue processing the request
+});
 
 //Set up transporter for nodemailer
 const transporter = nodemailer.createTransport({
@@ -94,7 +113,6 @@ const transporter = nodemailer.createTransport({
 });
 
 //STRIPE API
-
 app.get("/getStripePublicKey", (req, res) => {
     const key = stripePublicKey;
     res.json(key);
@@ -130,9 +148,6 @@ app.post("/create-payment-intent", async (req, res) => {
         res.send({ err });
     }
 });
-
-//Stripe API Webhook implementation
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 app.post('/webhook', express.raw({ type: "application/json" }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
@@ -518,6 +533,81 @@ app.post("/checkOTP", async (req, res) => {
 
 })
 
+//Account settings
+app.post("/UpdateUsername", async (req, res) => {
+    try {
+        const { userName } = req.body;
+
+        if (userName === req.session.user.userName) {
+            throw new Error("You cannot change your username to the one you currently have.");
+        }
+
+        // Check if the new username is already used by another user
+        const userNameAlreadyUsed = await User.findOne({ userName: userName });
+        if (userNameAlreadyUsed) {
+            throw new Error("This username is already associated with an account.");
+        }
+
+        // Retrieve the user from the session
+        const user = await User.findOne({ _id: req.session.user._id });
+        if (!user) {
+            throw new Error("An unexpected error occurred. Please try again later.");
+        }
+
+        const currentDate = new Date();
+        if (user.userNameLastChanged) {
+            // Calculate the time difference in hours and minutes
+            const timeDiff = Math.abs(currentDate - user.userNameLastChanged);
+            const hoursPassed = Math.floor(timeDiff / 3600000);
+            const minutesPassed = Math.floor((timeDiff % 3600000) / 60000);
+
+            const remainingHours = 24 - hoursPassed;
+            const remainingMinutes = 60 - minutesPassed;
+
+            if (remainingHours > 0 || (remainingHours === 0 && remainingMinutes > 0)) {
+                throw new Error(`You must wait ${remainingHours} hours and ${remainingMinutes} minutes before you can change your username again.`);
+            }
+        }
+
+        // Update the username and userNameLastChanged
+        await User.updateOne(
+            { "_id": user._id.toString() },
+            { "userName": userName, "userNameLastChanged": currentDate }
+        );
+
+        console.log("Updated username");
+        sendUserNameChangeEmail(user.email);
+        return res.status(200).json({ msg: 'Username updated successfully.' });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
+    }
+});
+
+function sendUserNameChangeEmail(emailAddress) {
+    const sendOneTimePasscodeEmail = {
+        from: process.env.MAIL_USER,
+        to: emailAddress,
+        subject: 'KEMLabels Security Alert',
+        attachments: [{
+            filename: 'Logo.png',
+            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            cid: 'logo'
+        }],
+        html: `
+        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
+        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
+        <p>You have requested to change your username.</p>
+        <p>If you didn't initiate this request, someone might be using your account. Check and secure your account now.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team!</p>
+        </div>`,
+    }
+    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
+        if (err) console.log(err)
+    });
+}
+
 //Reset password
 app.post("/updateUserPass", async (req, res) => {
     try {
@@ -579,8 +669,10 @@ app.get('*', (req, res) => {
     throw new Error('PAGE NOT FOUND');
 })
 
+//Initiate Error handler
 app.use(handleErr);
 
+//Start server
 connectDB().then(() => {
     app.listen(process.env.PORT, () => {
         console.log("Server started on port " + process.env.PORT);
