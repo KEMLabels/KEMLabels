@@ -647,13 +647,13 @@ app.post("/sendEmailChangeConfirmation", async (req, res) => {
         const currentEmail = req.session.user.email;
 
         if (newEmail === currentEmail) {
-            throw new Error("You cannot change your username to the one you currently have.");
+            throw new Error("You cannot change your email to the one you currently have.");
         }
 
         // Check if the new username is already used by another user
         const emailAlreadyUsed = await User.findOne({ email: newEmail });
         if (emailAlreadyUsed) {
-            throw new Error("This username is already associated with an account.");
+            throw new Error("This email is already associated with an account.");
         }
 
         const otp = Math.floor(1000 + Math.random() * 9000);
