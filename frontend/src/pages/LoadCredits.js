@@ -26,15 +26,16 @@ export default function LoadCredits() {
     dispatch(setUserLoadAmount(0));
   }, [isLoggedIn, dispatch, navigate]);
 
-  const handleLoadCredits = (e, navigation) => {
+  const handleLoadCredits = (e) => {
     e.preventDefault();
     if (!loadAmount || loadAmount < 1) {
       dispatch(setUserLoadAmount(0));
       setErrMsg("Please enter an amount that is greater than $1.00.");
       setLoadAmountFieldInvalid(true);
-      return;
-    } else dispatch(setUserLoadAmount(loadAmount));
-    navigate(navigation);
+      return false;
+    }
+    dispatch(setUserLoadAmount(loadAmount));
+    return true;
   };
 
   return (
@@ -95,19 +96,22 @@ export default function LoadCredits() {
             <div className="paymentOptionCardGroup">
               <div
                 className="paymentOptionCard"
-                onClick={(e) => handleLoadCredits(e, "/pay/credit-card")}
+                onClick={(e) => {
+                  if (!handleLoadCredits(e)) return;
+                  navigate("/pay/credit-card");
+                }}
               >
                 <p>Credit / Debit Card</p>
                 <FaRegCreditCard />
               </div>
               <div
                 className="paymentOptionCard"
-                onClick={() => {
-                  // FIX THIS!!!!!!!
+                onClick={(e) => {
+                  if (!handleLoadCredits(e)) return;
                   axios
                     .post(
                       "/payWithCrypto",
-                      { amount: 50 },
+                      { amount: loadAmount },
                       { withCredentials: true }
                     )
                     .then((res) => {
@@ -116,7 +120,6 @@ export default function LoadCredits() {
                     .catch((e) => {
                       console.log("Error: ", e);
                     });
-                  // navigate("/pay/crypto");
                 }}
               >
                 <p>Crypto Currency</p>
