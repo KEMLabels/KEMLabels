@@ -95,7 +95,7 @@ export default function AccountSettings({ currentPage = "username" }) {
           e?.response?.data?.msg ===
             "This username is already associated with an account." ||
           e?.response?.data?.msg ===
-            "You cannot change your username to the one you currently have." ||
+            "You cannot change your username to the same one you currently have." ||
           e?.response?.data?.msg.startsWith("You must wait")
         ) {
           setErrMsg(e.response.data.msg);

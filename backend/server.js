@@ -569,7 +569,7 @@ app.post("/UpdateUsername", async (req, res) => {
         const { userName } = req.body;
 
         if (userName === req.session.user.userName) {
-            throw new Error("You cannot change your username to the one you currently have.");
+            throw new Error("You cannot change your username to the same one you currently have.");
         }
 
         // Check if the new username is already used by another user
