@@ -30,7 +30,7 @@ export default function AccountDropdownMenu({
         </div>
         <div className="profileDetailsRow">
           <p className="profileDetailsLabel">Credits:</p>
-          <p className="profileDetailsValue">{`$${creditAmount}.00`}</p>
+          <p className="profileDetailsValue">{`$${Number(creditAmount).toFixed(2)}`}</p>
         </div>
         <div className="profileDetailsRow">
           <p className="profileDetailsLabel">Members since:</p>
