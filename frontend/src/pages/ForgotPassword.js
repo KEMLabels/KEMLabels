@@ -89,7 +89,7 @@ export default function ForgotPassword() {
 
     if (email === "") {
       setLoading(false);
-      setErrMsg("All fields are required.");
+      setErrMsg("Please fill out all required fields.");
       return;
     }
     axios
@@ -101,14 +101,14 @@ export default function ForgotPassword() {
           sendInitialRequest();
           document.getElementById("resetPasswordForm").reset();
           setResetPasswordStep("verifyOTP");
-          setInfoMsg("Email has been sent. Please check your inbox.");
+          setInfoMsg("An email has been sent. Please check your inbox.");
         }
       })
       .catch((e) => {
         console.log("Error: ", e);
         if (
           e?.response?.data?.msg ===
-          "This email is not associated with an account."
+          "Hmm... this email is not associated with an account. Please try again."
         ) {
           setErrMsg(e.response.data.msg);
         } else
@@ -303,7 +303,7 @@ export default function ForgotPassword() {
                   }}
                 >
                   <BiErrorCircle size={18} color="#FF0033" />
-                  Please wait to re-send another email
+                  Please wait a moment to send another email.
                 </span>
               )}
             </div>

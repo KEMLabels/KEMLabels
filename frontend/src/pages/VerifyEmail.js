@@ -59,7 +59,7 @@ export default function VerifyEmail() {
   const submit = (e) => {
     e.preventDefault();
     setLoading(true);
-    setErrMsg("Please wait to re-send another email");
+    setErrMsg("Please wait a moment to send another email.");
     setResentEmail(true);
 
     if (verifyEmailState.attempts === 10) {

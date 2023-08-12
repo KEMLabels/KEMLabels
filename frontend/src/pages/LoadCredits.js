@@ -30,7 +30,7 @@ export default function LoadCredits() {
     e.preventDefault();
     if (!loadAmount || loadAmount < 1) {
       dispatch(setUserLoadAmount(0));
-      setErrMsg("Please enter an amount greater than $1.00");
+      setErrMsg("Please enter an amount that is greater than $1.00.");
       setLoadAmountFieldInvalid(true);
       return;
     } else dispatch(setUserLoadAmount(loadAmount));

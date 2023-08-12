@@ -415,9 +415,6 @@ app.get('/users/:id/verify/:token', async (req, res) => {
         return res.json({ redirect: '/' });
     } catch (err) {
         console.log(err);
-        if (err.message === 'Link Invalid' || err.message === 'Link Expired') {
-            return res.status(400).json({ msg: err.message });
-        }
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -460,7 +457,7 @@ app.post("/emailExists", async (req, res) => {
         }
 
         const emailExists = await User.findOne({ email: data.email })
-        if (!emailExists) throw new Error('This email is not associated with an account.');
+        if (!emailExists) throw new Error('Hmm... this email is not associated with an account. Please try again.');
         else res.json({ emailExists });
     } catch (err) {
         console.log(err);

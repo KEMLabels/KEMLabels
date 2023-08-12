@@ -63,7 +63,7 @@ export default function CheckoutForm({
             // Only update the total credit amount if it has not been updated yet
             const newCreditAmount = Number(creditAmount) + Number(loadedAmount);
             if (newCreditAmount !== creditAmount) {
-              // TODO: Update the total credits on MongoDB here
+              // TODO: Connect Stripe webhook to domain once published
               dispatch(setUserCreditAmount(newCreditAmount));
               dispatch(setUserLoadAmount(0)); // Reset load amount
             }
@@ -71,17 +71,17 @@ export default function CheckoutForm({
             setErrMsg("");
             break;
           case "processing":
-            setInfoMsg("Your payment is processing.");
+            setInfoMsg("Your payment is processing. Please wait a moment.");
             setSuccessMsg("");
             setErrMsg("");
             break;
           case "requires_payment_method":
-            setErrMsg("Your payment was not successful, please try again.");
+            setErrMsg("Your payment was not successful. Please try again.");
             setSuccessMsg("");
             setInfoMsg("");
             break;
           default:
-            setErrMsg("Something went wrong.");
+            setErrMsg("Something went wrong. Please try again.");
             setSuccessMsg("");
             setInfoMsg("");
             break;

@@ -110,7 +110,22 @@ export default function AccountSettings({ currentPage = "username" }) {
   //#endregion
 
   //#region Change email helper functions
-  // TODO: Fix this OTP email since its sent to NEW email
+  function updateEmailCall() {
+    axios
+      .post(
+        "/updateEmailAddress",
+        { newEmail: confirmInputEmail },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      });
+  }
+
   // Confirm email change via OTP
   function validateOTP(e) {
     e.preventDefault();
@@ -126,19 +141,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       )
       .then((res) => {
         console.log(res);
-        axios
-          .post(
-            "/updateEmailAddress",
-            { newEmail: confirmInputEmail },
-            { withCredentials: true }
-          )
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((e) => {
-            console.log("Error: ", e);
-            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-          });
+        updateEmailCall();
         setSuccessMsg(
           "Verification successful and your email has been updated! Redirecting you to the login page..."
         );
@@ -165,13 +168,13 @@ export default function AccountSettings({ currentPage = "username" }) {
       });
   }
 
-  // TODO: Fix axios call here to resend OTP to NEW email
+  // Resend email request for change email
   function sendResetRequest(e) {
     e.preventDefault();
     setInfoMsg(
       `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
     );
-    setErrMsg("Please wait to re-send another email.");
+    setErrMsg("Please wait a moment to send another email...");
     setVerificationEmail(true);
 
     axios
@@ -195,15 +198,13 @@ export default function AccountSettings({ currentPage = "username" }) {
       });
   }
 
-  // TODO: Update user's NEW email in the /sendEmailChangeConfirmation call
-  // NEW EMAIL: {confirmInputEmail}, OLD EMAIL: {email}
   // Send OTP to new email and notice to old email
   function sendVerificationCode(e) {
     e.preventDefault();
     setLoading(true);
 
     if (inputEmail === "" || confirmInputEmail === "") {
-      setErrMsg("All fields are required.");
+      setErrMsg("Please fill out all required fields.");
       setLoading(false);
       return;
     }
@@ -234,7 +235,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         setInfoMsg(
           `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
         );
-        setErrMsg("Please wait to re-send another email.");
+        setErrMsg("Please wait a moment to send another email...");
         setVerificationEmail(true);
         setShowOTPField(true);
         setTimeout(() => {
@@ -246,9 +247,9 @@ export default function AccountSettings({ currentPage = "username" }) {
         console.log("Error: ", e);
         if (
           e?.response?.data?.msg ===
-            "You cannot change your username to the one you currently have." ||
+            "You cannot change your email to the one you currently have." ||
           e?.response?.data?.msg ===
-            "This username is already associated with an account."
+            "This email is already associated with an account."
         ) {
           setErrMsg(e.response.data.msg);
         } else {
@@ -258,8 +259,6 @@ export default function AccountSettings({ currentPage = "username" }) {
       .finally(() => {
         setLoading(false);
       });
-
-    setLoading(false); // Remove this later since its in the .finally in Axios call
   }
   //#endregion
 

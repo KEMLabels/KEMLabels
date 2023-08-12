@@ -16,11 +16,13 @@ export function lengthRangeCheck(value, min, max) {
 
 export function validateUsernameOnSubmit(username, setErrMsg) {
   if (!lengthRangeCheck(username, 3, 15)) {
-    return setErrMsg("Username must be between 3 and 15 characters.");
+    return setErrMsg(
+      "Please ensure your username is between 3 and 15 characters."
+    );
   }
   if (!regex.username.test(username)) {
     return setErrMsg(
-      "Invalid username. Only alphabets, numbers, dash, underscores, and periods are allowed."
+      "Please ensure your username consists of only alphabets, numbers, dashes, underscores, and periods."
     );
   }
   return true;
@@ -28,9 +30,14 @@ export function validateUsernameOnSubmit(username, setErrMsg) {
 
 export function validateEmailOnSubmit(email, setErrMsg) {
   if (!lengthRangeCheck(email, 3, 100)) {
-    return setErrMsg("Email must be between 3 and 100 characters.");
+    return setErrMsg(
+      "Please ensure your email is between 3 and 100 characters."
+    );
   }
-  if (!regex.email.test(email)) return setErrMsg("Invalid email.");
+  if (!regex.email.test(email))
+    return setErrMsg(
+      "The email you entered doesn't look right. Please try again."
+    );
   return true;
 }
 
@@ -48,11 +55,13 @@ export function validatePasswordSpecialChar(password) {
 
 export function validatePasswordOnSubmit(password, setErrMsg) {
   if (!lengthRangeCheck(password, 8, 50)) {
-    return setErrMsg("Password must be between 8 and 50 characters.");
+    return setErrMsg(
+      "Please ensure your password is be between 8 and 50 characters."
+    );
   }
   if (!regex.passwordCombined.test(password)) {
     return setErrMsg(
-      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+      "Please ensure your password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
     );
   }
   return true;
