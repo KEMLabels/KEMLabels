@@ -122,6 +122,24 @@ function StripeAmountField({
           placeholder={placeholder}
           disabled={disabled}
           step={0.5}
+          onKeyDown={(e) => {
+            const key = e.key;
+
+            // Allow certain keys: digits, dot, backspace, delete, arrow keys, and tab
+            if (
+              /^[0-9.]$/.test(key) ||
+              key === "Backspace" ||
+              key === "Delete" ||
+              key.startsWith("Arrow") ||
+              key === "Tab" ||
+              ((e.ctrlKey || e.metaKey) && key === "a")
+            ) {
+              return;
+            }
+
+            // Prevent the event for all other keys
+            e.preventDefault();
+          }}
           onBlur={() => {
             let inputValue = currentValue;
             if (inputValue) {

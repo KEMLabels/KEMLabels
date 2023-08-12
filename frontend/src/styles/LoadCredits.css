@@ -47,14 +47,28 @@
   margin-top: 1px;
 }
 
+#loadCredits .stripePaymentForm .stripeFieldGroup {
+  flex-direction: row;
+}
+
+#loadCredits .stripePaymentForm .stripeFieldGroup .loadAmountField {
+  width: 50%;
+}
+
 @media screen and (max-width: 768px) {
   .paymentOptionCardGroup .paymentOptionCard {
     padding: 1rem 1.5rem;
+  }
+  #loadCredits .stripePaymentForm .stripeFieldGroup .loadAmountField {
+    width: 70%;
   }
 }
 
 @media screen and (max-width: 576px) {
   .paymentOptionCardGroup {
     flex-direction: column;
+  }
+  #loadCredits .stripePaymentForm .stripeFieldGroup .loadAmountField {
+    width: 100%;
   }
 }

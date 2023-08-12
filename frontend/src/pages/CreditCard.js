@@ -8,19 +8,25 @@ import "../styles/Stripe.css";
 import axios from "../api/axios";
 import CheckoutForm from "../components/CheckoutForm";
 import PageLayout from "../components/PageLayout";
+import AlertMessage from "../components/AlertMessage";
+import Button from "../components/Button";
 
 export default function CreditCard() {
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const email = useSelector((state) => state.auth.email);
+  const loadedAmount = useSelector((state) => state.auth.loadAmount);
   const creditAmount = useSelector((state) => state.auth.creditAmount);
 
   const [clientSecret, setClientSecret] = useState("");
   const [stripeKey, setStripeKey] = useState("");
   const [hasStripeKey, SetHasStripeKey] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [loadCreditSuccess, setLoadCreditSuccess] = useState(false);
+  const [returnHomeBtnLoading, setReturnHomeBtnLoading] = useState(false);
+  const [loadAgainBtnLoading, setLoadAgainBtnLoading] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -43,12 +49,28 @@ export default function CreditCard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: email,
-        amount: creditAmount.toString() === "0" ? 1 : Number(creditAmount),
+        amount: Number(loadedAmount),
       }),
     })
       .then((res) => res.json())
-      .then((data) => setClientSecret(data.clientSecret));
-  }, [isLoggedIn, email, creditAmount]);
+      .then((data) => {
+        setClientSecret(data.clientSecret);
+        if (
+          !loadCreditSuccess &&
+          !clientSecret &&
+          (!loadedAmount || loadedAmount === 0)
+        ) {
+          navigate("/loadcredits");
+        }
+      });
+  }, [
+    isLoggedIn,
+    navigate,
+    email,
+    loadedAmount,
+    loadCreditSuccess,
+    clientSecret,
+  ]);
 
   // Only load stripePromise if stripeKey is obtained
   const stripePromise =
@@ -92,15 +114,55 @@ export default function CreditCard() {
               </>
             )}
           </div>
-          {clientSecret && hasStripeKey && stripeKey && (
-            <Elements options={options} stripe={stripePromise}>
-              <CheckoutForm
-                errorMsg={errMsg}
-                useremail={email}
-                setLoadCreditSuccess={setLoadCreditSuccess}
-                loadCreditSuccess={loadCreditSuccess}
-              />
-            </Elements>
+          {!loadCreditSuccess ? (
+            clientSecret &&
+            hasStripeKey &&
+            stripeKey && (
+              <Elements options={options} stripe={stripePromise}>
+                <CheckoutForm
+                  errorMsg={errMsg}
+                  setSuccessMsg={setSuccessMsg}
+                  useremail={email}
+                  setLoadCreditSuccess={setLoadCreditSuccess}
+                  loadCreditSuccess={loadCreditSuccess}
+                />
+              </Elements>
+            )
+          ) : (
+            <div className="stripePaymentForm" id="payment-form">
+              {errMsg && <AlertMessage msg={errMsg} type="error" />}
+              {successMsg && <AlertMessage msg={successMsg} type="success" />}
+
+              <p className="totalCredsUpdate">
+                Your updated total credits is now{" "}
+                <strong>${Number(creditAmount).toFixed(2)}.</strong>
+              </p>
+              <div className="loadSuccessBtnGroup">
+                <Button
+                  text="Return home"
+                  fill="outline"
+                  loading={returnHomeBtnLoading}
+                  customStyle={{ width: "100%" }}
+                  onClickEvent={() => {
+                    setReturnHomeBtnLoading(true);
+                    setTimeout(() => {
+                      navigate("/");
+                    }, 100);
+                  }}
+                />
+                <Button
+                  text="Load again"
+                  loading={loadAgainBtnLoading}
+                  customStyle={{ width: "100%" }}
+                  onClickEvent={() => {
+                    setLoadAgainBtnLoading(true);
+                    setTimeout(() => {
+                      navigate("/loadcredits");
+                    }, 100);
+                  }}
+                />
+              </div>
+            </div>
           )}
         </div>
       </div>

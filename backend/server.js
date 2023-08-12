@@ -154,6 +154,7 @@ const calculateOrderAmount = (amount) => {
 
 app.post("/create-payment-intent", async (req, res) => {
     try {
+        // amount is in dollars so convert to cents in paymentIntent
         const { amount } = req.body;
         const { email } = req.body;
 
@@ -192,7 +193,7 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
 
     if (event.type === "payment_intent.succeeded") {
         const paymentIntent = event.data.object;
-        // console.log("Payment succeeded!", paymentIntent);
+        console.log("Payment succeeded!", paymentIntent);
         let user = await User.findOne({ email: paymentIntent.metadata.email })
         if (!user)
             throw new Error('Does not exist.');
@@ -201,7 +202,8 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
             "_id": user._id.toString()
         }, {
             // set amount
-            "credits": Number(userExistingCredits) + Number(paymentIntent.amount)
+            // paymentIntent.amount is in cents so convert to dollars
+            "credits": Number(userExistingCredits) + Number(paymentIntent.amount / 100) 
         })
             .then((obj) => {
                 console.log("User credits updated");
@@ -210,7 +212,7 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
                 console.log(err);
             })
     }
-    res.end();
+    res.status(200).end();
 });
 
 //COINBASE API
@@ -522,7 +524,7 @@ function sendOTPEmail(OTPPasscode, emailAddress) {
         <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
         <p>You have requested to reset the password for your account.</p>
         <p>To confirm your email address, please enter the 4 digit code below.</p>
-        <div style="margin: 2rem; text-align: center;"><h1 style="font-size: ;letter-spacing: 5px">${OTPPasscode}</h1></div>
+        <div style="margin: 2rem; text-align: center;"><h1 style="letter-spacing: 5px">${OTPPasscode}</h1></div>
         <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
         <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
         <p>Thank you,<br/>KEMLabels Team!</p>

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   PaymentElement,
@@ -13,30 +12,25 @@ import {
 import { StripeAmountField, StripeInputField } from "./Field";
 import AlertMessage from "./AlertMessage";
 import Button from "./Button";
+import { Link } from "react-router-dom";
 
 export default function CheckoutForm({
   useremail,
   errorMsg,
-  loadCreditSuccess,
+  setSuccessMsg,
   setLoadCreditSuccess,
 }) {
   const stripe = useStripe();
   const elements = useElements();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const creditAmount = useSelector((state) => state.auth.creditAmount);
   const loadedAmount = useSelector((state) => state.auth.loadAmount);
 
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [returnHomeBtnLoading, setReturnHomeBtnLoading] = useState(false);
-  const [loadAgainBtnLoading, setLoadAgainBtnLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-  const [loadAmount, setLoadAmount] = useState("");
-  const [loadAmountFieldInvalid, setLoadAmountFieldInvalid] = useState(false);
 
   const paymentElementRef = useRef(null);
 
@@ -102,6 +96,7 @@ export default function CheckoutForm({
     stripe,
     elements,
     errorMsg,
+    setSuccessMsg,
     creditAmount,
     loadedAmount,
     dispatch,
@@ -118,14 +113,6 @@ export default function CheckoutForm({
     }
 
     setIsLoading(true);
-
-    if (!loadAmount || loadAmount < 1) {
-      dispatch(setUserLoadAmount(0));
-      setErrMsg("Please enter an amount greater than $1.00");
-      setLoadAmountFieldInvalid(true);
-      setIsLoading(false);
-      return;
-    } else dispatch(setUserLoadAmount(loadAmount));
 
     stripe
       .confirmPayment({
@@ -152,17 +139,14 @@ export default function CheckoutForm({
         // Handle any other errors that might occur during the request
         console.log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-
-    setIsLoading(false);
   };
 
   const paymentElementOptions = {
     layout: "tabs",
-  };
-
-  const handleInputChange = () => {
-    setErrMsg("");
   };
 
   if (isPageLoading) return;
@@ -170,91 +154,54 @@ export default function CheckoutForm({
     <form className="stripePaymentForm" id="payment-form">
       {errMsg && <AlertMessage msg={errMsg} type="error" />}
       {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
-      {successMsg && <AlertMessage msg={successMsg} type="success" />}
-      {!loadCreditSuccess ? (
-        <>
-          <div className="stripeFieldGroup">
-            <StripeInputField
-              containerClassName="emailField"
-              fieldType="email"
-              label="Email"
-              disabled
-              initialValue={useremail}
-              placeholder="Email"
-              minLength={3}
-              maxLength={100}
-            />
-            <StripeAmountField
-              containerClassName="loadAmountField"
-              fieldType="number"
-              label="Load amount"
-              placeholder="0"
-              currentValue={loadAmount}
-              prefix="$"
-              postfix="USD"
-              onChangeEvent={(e) => {
-                handleInputChange();
-                setLoadAmountFieldInvalid(false);
-                setLoadAmount(e.target.value);
-              }}
-              customStyle={
-                loadAmountFieldInvalid ? { border: "2px solid #df1b41" } : {}
-              }
-              customContainerStyle={{ width: "35%" }}
-            />
-          </div>
-          <PaymentElement
-            id="payment-element"
-            options={paymentElementOptions}
-            refs={paymentElementRef}
-            onChange={handleInputChange}
-          />
-          <Button
-            btnType="submit"
-            text="Submit"
-            loading={isLoading}
-            disabled={isLoading || !stripe || !elements}
-            onClickEvent={handleSubmit}
-            customStyle={{
-              padding: "8px 12px",
-              borderRadius: "4px",
-              width: "100%",
-            }}
-          />
-        </>
-      ) : (
-        <>
-          <p className="totalCredsUpdate">
-            Your updated total credits is now{" "}
-            <strong>${Number(creditAmount).toFixed(2)}.</strong>
-          </p>
-          <div className="loadSuccessBtnGroup">
-            <Button
-              text="Return home"
-              fill="outline"
-              loading={returnHomeBtnLoading}
-              customStyle={{ width: "100%" }}
-              onClickEvent={() => {
-                setReturnHomeBtnLoading(true);
-                setTimeout(() => {
-                  navigate("/");
-                }, 100);
-              }}
-            />
-            <Button
-              text="Load again"
-              loading={loadAgainBtnLoading}
-              customStyle={{ width: "100%" }}
-              onClickEvent={() => {
-                setLoadAgainBtnLoading(true);
-                setTimeout(() => {
-                  navigate("/loadcredits");
-                }, 100);
-              }}
-            />
-          </div>
-        </>
-      )}
+      <div className="stripeFieldGroup">
+        <StripeInputField
+          containerClassName="emailField"
+          fieldType="email"
+          label="Email"
+          disabled
+          initialValue={useremail}
+          placeholder="Email"
+          minLength={3}
+          maxLength={100}
+        />
+        <StripeAmountField
+          containerClassName="loadAmountField"
+          fieldType="number"
+          label="Load amount"
+          currentValue={loadedAmount}
+          prefix="$"
+          postfix="USD"
+          disabled
+        />
+      </div>
+      <PaymentElement
+        id="payment-element"
+        options={paymentElementOptions}
+        refs={paymentElementRef}
+        onChange={() => setErrMsg("")}
+      />
+      <Button
+        btnType="submit"
+        text="Submit"
+        loading={isLoading}
+        disabled={isLoading || !stripe || !elements}
+        onClickEvent={handleSubmit}
+        customStyle={{
+          padding: "8px 12px",
+          borderRadius: "4px",
+          width: "100%",
+        }}
+      />
+      <div style={{ textAlign: "center", width: "100%", marginTop: "1rem" }}>
+        <Link
+          to="/loadcredits"
+          className="link"
+          style={{ color: "#9e9e9e", fontWeight: 400 }}
+        >
+          Go back
+        </Link>
+      </div>
     </form>
   );
 }
