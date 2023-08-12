@@ -65,10 +65,6 @@ export default function AccountSettings({ currentPage = "username" }) {
   }, [isLoggedIn, currentPage, dropdownSettingsOptions, navigate]);
 
   //#region Change username helper functions
-  // TODO: Add this call in backend to update username
-  // TODO: if the user has already changed their username
-  // in the past 24 hours send an error message, do this in the backend?
-  // TODO: Add the checks in the catch statements for the backend with same error messages
   function updateUsernameCall(e) {
     e.preventDefault();
     setLoading(true);
@@ -90,17 +86,17 @@ export default function AccountSettings({ currentPage = "username" }) {
         else {
           dispatch(setUserName(inputUserName));
           navigate("/account/change-username");
-          setSuccessMsg("Username updated successfully."); // TODO for Towa: Check if this works
+          setSuccessMsg("Username updated successfully.");
         }
       })
       .catch((e) => {
         console.log("Error: ", e);
         if (
           e?.response?.data?.msg ===
-          "This username is already associated with an account." ||
+            "This username is already associated with an account." ||
           e?.response?.data?.msg ===
-          "You cannot change your username to the one you currently have." ||
-          e?.response?.data?.msg.startsWith('You must wait')
+            "You cannot change your username to the one you currently have." ||
+          e?.response?.data?.msg.startsWith("You must wait")
         ) {
           setErrMsg(e.response.data.msg);
         } else {
@@ -123,18 +119,26 @@ export default function AccountSettings({ currentPage = "username" }) {
     setErrMsg("");
 
     axios
-      .post("/checkOTP", { enteredOTP, email: confirmInputEmail }, { withCredentials: true })
+      .post(
+        "/checkOTP",
+        { enteredOTP, email: confirmInputEmail },
+        { withCredentials: true }
+      )
       .then((res) => {
         console.log(res);
         axios
-          .post("/updateEmailAddress", { newEmail: confirmInputEmail }, { withCredentials: true })
+          .post(
+            "/updateEmailAddress",
+            { newEmail: confirmInputEmail },
+            { withCredentials: true }
+          )
           .then((res) => {
             console.log(res);
           })
           .catch((e) => {
             console.log("Error: ", e);
             setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-          })
+          });
         setSuccessMsg(
           "Verification successful and your email has been updated! Redirecting you to the login page..."
         );
@@ -171,7 +175,11 @@ export default function AccountSettings({ currentPage = "username" }) {
     setVerificationEmail(true);
 
     axios
-      .post("/generateNewOTP", { email: confirmInputEmail }, { withCredentials: true })
+      .post(
+        "/generateNewOTP",
+        { email: confirmInputEmail },
+        { withCredentials: true }
+      )
       .then((res) => {
         console.log(res.data);
       })
@@ -216,7 +224,11 @@ export default function AccountSettings({ currentPage = "username" }) {
 
     // TODO: Add this call in backend that sends email to new and old email (2 different emails)
     axios
-      .post("/sendEmailChangeConfirmation", { newEmail: confirmInputEmail }, { withCredentials: true })
+      .post(
+        "/sendEmailChangeConfirmation",
+        { newEmail: confirmInputEmail },
+        { withCredentials: true }
+      )
       .then((res) => {
         console.log(res);
         setInfoMsg(
@@ -234,9 +246,9 @@ export default function AccountSettings({ currentPage = "username" }) {
         console.log("Error: ", e);
         if (
           e?.response?.data?.msg ===
-          "You cannot change your username to the one you currently have." ||
+            "You cannot change your username to the one you currently have." ||
           e?.response?.data?.msg ===
-          "This username is already associated with an account."
+            "This username is already associated with an account."
         ) {
           setErrMsg(e.response.data.msg);
         } else {
