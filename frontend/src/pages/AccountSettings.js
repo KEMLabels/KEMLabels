@@ -97,9 +97,10 @@ export default function AccountSettings({ currentPage = "username" }) {
         console.log("Error: ", e);
         if (
           e?.response?.data?.msg ===
-            "This username is already associated with an account." ||
+          "This username is already associated with an account." ||
           e?.response?.data?.msg ===
-            "You have already changed your username once in the past 24 hours. Please try again later."
+          "You cannot change your username to the one you currently have." ||
+          e?.response?.data?.msg.startsWith('You must wait')
         ) {
           setErrMsg(e.response.data.msg);
         } else {
@@ -122,9 +123,18 @@ export default function AccountSettings({ currentPage = "username" }) {
     setErrMsg("");
 
     axios
-      .post("/checkOTP", { enteredOTP, email }, { withCredentials: true })
+      .post("/checkOTP", { enteredOTP, email: confirmInputEmail }, { withCredentials: true })
       .then((res) => {
         console.log(res);
+        axios
+          .post("/updateEmailAddress", { newEmail: confirmInputEmail }, { withCredentials: true })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((e) => {
+            console.log("Error: ", e);
+            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          })
         setSuccessMsg(
           "Verification successful and your email has been updated! Redirecting you to the login page..."
         );
@@ -161,7 +171,7 @@ export default function AccountSettings({ currentPage = "username" }) {
     setVerificationEmail(true);
 
     axios
-      .post("/generateNewOTP", { email }, { withCredentials: true })
+      .post("/generateNewOTP", { email: confirmInputEmail }, { withCredentials: true })
       .then((res) => {
         console.log(res.data);
       })
@@ -204,33 +214,40 @@ export default function AccountSettings({ currentPage = "username" }) {
       return;
     }
 
-    setInfoMsg(
-      `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
-    );
-    setErrMsg("Please wait to re-send another email.");
-    setVerificationEmail(true);
-    setShowOTPField(true);
-
     // TODO: Add this call in backend that sends email to new and old email (2 different emails)
     axios
-      .get("/sendEmailChangeConfirmation", { withCredentials: true })
+      .post("/sendEmailChangeConfirmation", { newEmail: confirmInputEmail }, { withCredentials: true })
       .then((res) => {
         console.log(res);
+        setInfoMsg(
+          `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
+        );
+        setErrMsg("Please wait to re-send another email.");
+        setVerificationEmail(true);
+        setShowOTPField(true);
+        setTimeout(() => {
+          setVerificationEmail(false);
+          setErrMsg("");
+        }, 15000);
       })
       .catch((e) => {
         console.log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        if (
+          e?.response?.data?.msg ===
+          "You cannot change your username to the one you currently have." ||
+          e?.response?.data?.msg ===
+          "This username is already associated with an account."
+        ) {
+          setErrMsg(e.response.data.msg);
+        } else {
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        }
       })
       .finally(() => {
         setLoading(false);
       });
 
     setLoading(false); // Remove this later since its in the .finally in Axios call
-
-    setTimeout(() => {
-      setVerificationEmail(false);
-      setErrMsg("");
-    }, 15000);
   }
   //#endregion
 

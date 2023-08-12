@@ -89,19 +89,29 @@ app.use(session({
     },
     store: store,
 }));
-app.use((req, res, next) => {
-    const currentTime = new Date().getTime();
-    const lastActivityTime = req.session.lastActivityTime || currentTime;
+// app.use((req, res, next) => {
+//     const currentTime = new Date().getTime();
+//     const lastActivityTime = req.session.lastActivityTime || currentTime;
 
-    // Update last activity time
-    req.session.lastActivityTime = currentTime;
+//     // Calculate the time difference in milliseconds
+//     const timeDifference = currentTime - lastActivityTime;
 
-    // Convert lastActivityTime to a human-readable date and time
-    const formattedLastActivityTime = new Date(lastActivityTime).toLocaleString();
-    console.log("Last activity time:", formattedLastActivityTime);
+//     // Update last activity time
+//     req.session.lastActivityTime = currentTime;
 
-    next(); // Continue processing the request
-});
+//     // Check if the user has been inactive for 10 or more minutes (600,000 milliseconds)
+//     if (timeDifference >= 600000) {
+//         // Destroy the session
+//         req.session.destroy((err) => {
+//             if (err) {
+//                 console.error("Error destroying session:", err);
+//             } else {
+//                 console.log("Session destroyed due to inactivity.");
+//             }
+//         });
+//     }
+//     next(); // Continue processing the request
+// });
 
 //Set up transporter for nodemailer
 const transporter = nodemailer.createTransport({
@@ -111,6 +121,25 @@ const transporter = nodemailer.createTransport({
         pass: process.env.MAIL_PASS
     }
 });
+
+//Middleware to check inactivity
+// app.get("/isSessionActive", (req, res) => {
+//     if (req.session && req.session.lastActivityTime) {
+//         const currentTime = new Date().getTime();
+//         const timeDifference = currentTime - req.session.lastActivityTime;
+        
+//         if (timeDifference >= 600000) {
+//             // Session is inactive
+//             res.status(401).send({ active: false });
+//         } else {
+//             // Session is active
+//             res.status(200).send({ active: true });
+//         }
+//     } else {
+//         // No session
+//         res.status(401).send({ active: false });
+//     }
+// });
 
 //STRIPE API
 app.get("/getStripePublicKey", (req, res) => {
@@ -478,7 +507,6 @@ async function generateOTPHelper(email) {
     sendOTPEmail(otp, email);
 }
 
-// TODO: ADD USERNAME
 function sendOTPEmail(OTPPasscode, emailAddress) {
     const sendOneTimePasscodeEmail = {
         from: process.env.MAIL_USER,
@@ -492,7 +520,7 @@ function sendOTPEmail(OTPPasscode, emailAddress) {
         html: `
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
         <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
-        <p>You have requested to reset the password for your account with the username, <strong>USERNAME</strong>.</p>
+        <p>You have requested to reset the password for your account.</p>
         <p>To confirm your email address, please enter the 4 digit code below.</p>
         <div style="margin: 2rem; text-align: center;"><h1 style="font-size: ;letter-spacing: 5px">${OTPPasscode}</h1></div>
         <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
@@ -562,7 +590,13 @@ app.post("/UpdateUsername", async (req, res) => {
             const minutesPassed = Math.floor((timeDiff % 3600000) / 60000);
 
             const remainingHours = 24 - hoursPassed;
-            const remainingMinutes = 60 - minutesPassed;
+            let remainingMinutes = 60 - minutesPassed;
+
+            if (remainingHours === 24) {
+                if (remainingHours > 0 || (remainingHours === 0 && remainingMinutes > 0)) {
+                    throw new Error(`You must wait ${remainingHours} hours before you can change your username again.`);
+                }
+            }
 
             if (remainingHours > 0 || (remainingHours === 0 && remainingMinutes > 0)) {
                 throw new Error(`You must wait ${remainingHours} hours and ${remainingMinutes} minutes before you can change your username again.`);
@@ -598,6 +632,130 @@ function sendUserNameChangeEmail(emailAddress) {
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
         <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
         <p>You have requested to change your username.</p>
+        <p>If you didn't initiate this request, someone might be using your account. Check and secure your account now.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team!</p>
+        </div>`,
+    }
+    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
+        if (err) console.log(err)
+    });
+}
+
+app.post("/sendEmailChangeConfirmation", async (req, res) => {
+    try {
+        const { newEmail } = req.body
+        const currentEmail = req.session.user.email;
+
+        if (newEmail === currentEmail) {
+            throw new Error("You cannot change your username to the one you currently have.");
+        }
+
+        // Check if the new username is already used by another user
+        const emailAlreadyUsed = await User.findOne({ email: newEmail });
+        if (emailAlreadyUsed) {
+            throw new Error("This username is already associated with an account.");
+        }
+
+        const otp = Math.floor(1000 + Math.random() * 9000);
+
+        const create_OTP = new tempOTPS({
+            passcode: otp,
+            email: newEmail
+        })
+        create_OTP.save()
+        sendEmailChangeRequestEmail(currentEmail, newEmail, otp)
+        return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${newEmail}.` });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
+    }
+})
+
+function sendEmailChangeRequestEmail(currentEmail, newEmail, OTPPasscode) {
+    const sendOneTimePasscodeEmail = {
+        from: process.env.MAIL_USER,
+        to: newEmail,
+        subject: 'KEMLabels Email Change OTP',
+        attachments: [{
+            filename: 'Logo.png',
+            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            cid: 'logo'
+        }],
+        html: `
+        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
+        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
+        <p>You have requested to change the email for your account.</p>
+        <p>To confirm your email address, please enter the 4 digit code below.</p>
+        <div style="margin: 2rem; text-align: center;"><h1 style="font-size: ;letter-spacing: 5px">${OTPPasscode}</h1></div>
+        <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team!</p>
+        </div>`,
+    }
+    const sendSecurityAlert = {
+        from: process.env.MAIL_USER,
+        to: currentEmail,
+        subject: 'KEMLabels Security Alert',
+        attachments: [{
+            filename: 'Logo.png',
+            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            cid: 'logo'
+        }],
+        html: `
+        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
+        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
+        <p>You have requested to change your email address.</p>
+        <p>If you didn't initiate this request, someone might be using your account. Check and secure your account now.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team!</p>
+        </div>`,
+    }
+    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
+        if (err) console.log(err)
+    });
+    transporter.sendMail(sendSecurityAlert, function (err, info) {
+        if (err) console.log(err)
+    });
+}
+
+app.post("/updateEmailAddress", async (req, res) => {
+    try {
+        const { newEmail } = req.body;
+
+        const user = await User.findOne({ _id: req.session.user._id });
+        if (!user) {
+            throw new Error("An unexpected error occurred. Please try again later.");
+        }
+
+        await User.updateOne(
+            { "_id": user._id.toString() },
+            { "email": newEmail }
+        );
+
+        console.log("Updated email");
+        sendEmailChangeEmail(newEmail);
+        return res.status(200).json({ msg: 'Username updated successfully.' });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
+    }
+})
+
+function sendEmailChangeEmail(emailAddress) {
+    const sendOneTimePasscodeEmail = {
+        from: process.env.MAIL_USER,
+        to: emailAddress,
+        subject: 'KEMLabels Email Updated',
+        attachments: [{
+            filename: 'Logo.png',
+            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            cid: 'logo'
+        }],
+        html: `
+        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
+        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
+        <p>Your email address has been successfully updated.</p>
         <p>If you didn't initiate this request, someone might be using your account. Check and secure your account now.</p>
         <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
         <p>Thank you,<br/>KEMLabels Team!</p>
