@@ -48,10 +48,8 @@ export default function VerifyEmail() {
             e?.response?.data?.msg ===
             "Please check your inbox for a verification link to verify your account."
           ) {
-            setErrMsg("");
             setInfoMsg(e.response.data.msg);
           } else {
-            setInfoMsg("");
             setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
           }
         });
@@ -81,12 +79,10 @@ export default function VerifyEmail() {
         .catch((e) => {
           console.log("Error: ", e);
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-        })
-        .finally(() => {
-          setLoading(false);
         });
       setTimeout(() => {
         setResentEmail(false);
+        setLoading(false);
         setErrMsg("");
       }, 15000);
     }
