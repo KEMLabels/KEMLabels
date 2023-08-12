@@ -48,7 +48,7 @@ export default function AccountDropdownMenu({
       <AccountDropdownLink
         type="load"
         text="Load credits"
-        link="/loadcredits"
+        link="/load-credits"
       />
       <AccountDropdownLink
         type="history"

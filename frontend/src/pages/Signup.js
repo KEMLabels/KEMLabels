@@ -47,7 +47,7 @@ export default function Signup() {
   });
 
   useEffect(() => {
-    if (isLoggedIn) navigate("/verifyemail");
+    if (isLoggedIn) navigate("/verify-email");
   }, [isLoggedIn, navigate]);
 
   // Validate password field during input change
@@ -199,11 +199,11 @@ export default function Signup() {
             />
             <p className="disclaimer">
               By signing up to create an account I accept KEMLabel's{" "}
-              <Link className="link" to="/termsandconditions">
+              <Link className="link" to="/terms-and-conditions">
                 Terms and Conditions
               </Link>{" "}
               and{" "}
-              <Link className="link" to="/privacypolicy">
+              <Link className="link" to="/privacy-policy">
                 Privacy Policy
               </Link>
               .

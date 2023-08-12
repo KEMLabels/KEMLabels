@@ -95,7 +95,7 @@ export default function LoadCredits() {
             <div className="paymentOptionCardGroup">
               <div
                 className="paymentOptionCard"
-                onClick={(e) => handleLoadCredits(e, "/pay/creditcard")}
+                onClick={(e) => handleLoadCredits(e, "/pay/credit-card")}
               >
                 <p>Credit / Debit Card</p>
                 <FaRegCreditCard />

@@ -19,17 +19,17 @@ export default function App() {
         <Route path="/" element={<Home />}></Route>
         <Route path="/signin" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
-        <Route path="/privacypolicy" element={<PrivacyPolicy />}></Route>
+        <Route path="/privacy-policy" element={<PrivacyPolicy />}></Route>
         <Route
-          path="/termsandconditions"
+          path="/terms-and-conditions"
           element={<TermsAndConditions />}
         ></Route>
-        <Route path="/forgotpassword" element={<ForgotPassword />}></Route>
+        <Route path="/forgot-password" element={<ForgotPassword />}></Route>
         <Route
           path="/users/:id/verify/:token"
           element={<VerifyEmailConfirmation />}
         ></Route>
-        <Route path="/verifyemail" element={<VerifyEmail />}></Route>
+        <Route path="/verify-email" element={<VerifyEmail />}></Route>
         <Route
           path="/account/change-username"
           element={<AccountSettings currentPage="username" />}
@@ -42,8 +42,8 @@ export default function App() {
           path="/account/change-password"
           element={<AccountSettings currentPage="password" />}
         ></Route>
-        <Route path="/loadcredits" element={<LoadCredits />}></Route>
-        <Route path="/pay/creditcard" element={<CreditCard />}></Route>
+        <Route path="/load-credits" element={<LoadCredits />}></Route>
+        <Route path="/pay/credit-card" element={<CreditCard />}></Route>
         <Route path="*" element={<Error />}></Route>
       </Routes>
     </BrowserRouter>

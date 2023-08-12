@@ -75,7 +75,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
               <NavLink
                 type="load"
                 text="Load Credits"
-                link="/loadcredits"
+                link="/load-credits"
                 isNavlink
               />
               <NavLink

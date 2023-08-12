@@ -319,7 +319,7 @@ app.post("/signup", async (req, res) => {
 
         req.session.user = new_user;
         req.session.isLoggedIn = true;
-        res.json({ redirect: '/verifyemail' });
+        res.json({ redirect: '/verify-email' });
     } catch (err) {
         console.log(err);
         return res.status(400).json({ msg: err.message });

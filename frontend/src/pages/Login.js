@@ -36,13 +36,13 @@ export default function Login() {
           withCredentials: true,
         })
         .then((res) => {
-          if (res.data.errMsg) navigate("/verifyemail");
+          if (res.data.errMsg) navigate("/verify-email");
           else navigate(res.data.redirect);
         })
         .catch((e) => {
           console.log("Error: ", e);
           if (e?.response?.data?.msg === "User is not verified") {
-            navigate("/verifyemail");
+            navigate("/verify-email");
           } else {
             setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
           }
@@ -123,7 +123,7 @@ export default function Login() {
               minLength={8}
               maxLength={50}
             />
-            <Link to="/forgotpassword" className="linkAlt">
+            <Link to="/forgot-password" className="linkAlt">
               Forgot password?
             </Link>
             <Button
@@ -134,11 +134,11 @@ export default function Login() {
             />
             <p className="disclaimer">
               By continuing, you agree to KEMLabel's{" "}
-              <Link className="link" to="/termsandconditions">
+              <Link className="link" to="/terms-and-conditions">
                 Terms and Conditions
               </Link>{" "}
               and{" "}
-              <Link className="link" to="/privacypolicy">
+              <Link className="link" to="/privacy-policy">
                 Privacy Policy
               </Link>
               .

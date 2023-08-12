@@ -60,7 +60,7 @@ export default function CreditCard() {
           !clientSecret &&
           (!loadedAmount || loadedAmount === 0)
         ) {
-          navigate("/loadcredits");
+          navigate("/load-credits");
         }
       });
   }, [
@@ -157,7 +157,7 @@ export default function CreditCard() {
                   onClickEvent={() => {
                     setLoadAgainBtnLoading(true);
                     setTimeout(() => {
-                      navigate("/loadcredits");
+                      navigate("/load-credits");
                     }, 100);
                   }}
                 />

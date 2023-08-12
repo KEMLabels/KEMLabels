@@ -119,7 +119,7 @@ export default function CheckoutForm({
         elements,
         confirmParams: {
           // Make sure to change this to your payment completion page
-          return_url: "http://localhost:3000/pay/creditcard", // TODO: Change this to the domain
+          return_url: "http://localhost:3000/pay/credit-card", // TODO: Change this to the domain
           receipt_email: useremail,
         },
       })
@@ -195,7 +195,7 @@ export default function CheckoutForm({
       />
       <div style={{ textAlign: "center", width: "100%", marginTop: "1rem" }}>
         <Link
-          to="/loadcredits"
+          to="/load-credits"
           className="link"
           style={{ color: "#9e9e9e", fontWeight: 400 }}
         >
