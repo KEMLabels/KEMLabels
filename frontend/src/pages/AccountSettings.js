@@ -223,7 +223,6 @@ export default function AccountSettings({ currentPage = "username" }) {
       return;
     }
 
-    // TODO: Add this call in backend that sends email to new and old email (2 different emails)
     axios
       .post(
         "/sendEmailChangeConfirmation",
