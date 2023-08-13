@@ -33,7 +33,7 @@ export default function AccountSettings({ currentPage = "username" }) {
   const [inputUserName, setInputUserName] = useState("");
   const [inputEmail, setInputEmail] = useState("");
   const [confirmInputEmail, setConfirmInputEmail] = useState("");
-  const [sendVerificationEmail, setVerificationEmail] = useState(false);
+  const [sendVerificationEmail, setSendVerificationEmail] = useState(false);
   const [showOTPField, setShowOTPField] = useState(false);
   const [enteredOTP, setEnteredOTP] = useState("");
   const [inputPassword, setInputPassword] = useState("");
@@ -180,7 +180,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
     );
     setErrMsg("Please wait a moment to send another email...");
-    setVerificationEmail(true);
+    setSendVerificationEmail(true);
 
     axios
       .post(
@@ -197,14 +197,14 @@ export default function AccountSettings({ currentPage = "username" }) {
       })
       .finally(() => {
         setTimeout(() => {
-          setVerificationEmail(false);
+          setSendVerificationEmail(false);
           setErrMsg("");
         }, 15000);
       });
   }
 
   // Send OTP to new email and notice to old email
-  function sendVerificationCode(e) {
+  function sendEmailVerificationCode(e) {
     e.preventDefault();
     setLoading(true);
 
@@ -240,10 +240,10 @@ export default function AccountSettings({ currentPage = "username" }) {
           `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
         );
         setErrMsg("Please wait a moment to send another email...");
-        setVerificationEmail(true);
+        setSendVerificationEmail(true);
         setShowOTPField(true);
         setTimeout(() => {
-          setVerificationEmail(false);
+          setSendVerificationEmail(false);
           setErrMsg("");
         }, 15000);
       })
