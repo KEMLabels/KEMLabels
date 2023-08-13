@@ -288,7 +288,7 @@ export default function AccountSettings({ currentPage = "username" }) {
   }
 
   // Resend email request for change email and password
-  function sendResetRequest(e) {
+  function sendResendRequest(e) {
     e.preventDefault();
     if (currentPage === "email") {
       setInfoMsg(
@@ -503,7 +503,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   disabled={sendVerificationEmail}
                   loading={sendVerificationEmail}
                   text="Resend email"
-                  onClickEvent={sendResetRequest}
+                  onClickEvent={sendResendRequest}
                   customStyle={{ width: "100%", maxWidth: "300px" }}
                 />
               )}
@@ -625,7 +625,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   disabled={sendVerificationEmail}
                   loading={sendVerificationEmail}
                   text="Resend email"
-                  onClickEvent={sendResetRequest}
+                  onClickEvent={sendResendRequest}
                   customStyle={{ width: "100%", maxWidth: "300px" }}
                 />
               )}

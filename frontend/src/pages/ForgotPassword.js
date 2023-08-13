@@ -130,7 +130,7 @@ export default function ForgotPassword() {
     }
   }
 
-  function sendResetRequest(e) {
+  function sendResendRequest(e) {
     e.preventDefault();
     setLoading(true);
     setResentEmail(true);
@@ -265,7 +265,7 @@ export default function ForgotPassword() {
             >
               <Button
                 fill="outline"
-                onClickEvent={sendResetRequest}
+                onClickEvent={sendResendRequest}
                 text="Resend email"
                 disabled={resentEmail}
                 loading={loading}
