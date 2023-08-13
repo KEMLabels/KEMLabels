@@ -364,7 +364,10 @@ export default function AccountSettings({ currentPage = "username" }) {
     axios
       .post(
         "/sendPasswordChangeConfirmation",
-        { eneteredPassword: currentInputPassword, newPassword: confirmInputPassword },
+        {
+          eneteredPassword: currentInputPassword,
+          newPassword: confirmInputPassword,
+        },
         { withCredentials: true }
       )
       .then((res) => {
