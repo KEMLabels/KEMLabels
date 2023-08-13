@@ -9,14 +9,16 @@ import "react-dropdown/style.css";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 import { NavLink, useNavigate } from "react-router-dom";
-import { InputField } from "../components/Field";
+import { InputField, PasswordField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import {
   validateEmailOnSubmit,
+  validatePasswordOnSubmit,
   validateUsernameOnSubmit,
 } from "../utils/Validation";
 import axios from "../api/axios";
 import { clearSession, setUserName } from "../redux/actions/UserAction";
+import { validatePasswordOnTyping } from "../utils/Helpers";
 
 export default function AccountSettings({ currentPage = "username" }) {
   const dispatch = useDispatch();
@@ -30,13 +32,22 @@ export default function AccountSettings({ currentPage = "username" }) {
   const [errMsg, setErrMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+
   const [inputUserName, setInputUserName] = useState("");
   const [inputEmail, setInputEmail] = useState("");
   const [confirmInputEmail, setConfirmInputEmail] = useState("");
   const [sendVerificationEmail, setSendVerificationEmail] = useState(false);
   const [showOTPField, setShowOTPField] = useState(false);
   const [enteredOTP, setEnteredOTP] = useState("");
+  const [currentInputPassword, setCurrentInputPassword] = useState("");
   const [inputPassword, setInputPassword] = useState("");
+  const [confirmInputPassword, setConfirmInputPassword] = useState("");
+  const [passwordValid, setPasswordValid] = useState({
+    length: true,
+    uppercase: true,
+    number: true,
+    specialChar: true,
+  });
 
   const dropdownSettingsOptions = useMemo(
     () => [
@@ -68,6 +79,29 @@ export default function AccountSettings({ currentPage = "username" }) {
     setSuccessMsg("");
     setInfoMsg("");
     setErrMsg("");
+  }
+
+  function resetEmailFields() {
+    setInputEmail("");
+    setConfirmInputEmail("");
+    setSendVerificationEmail(false);
+    setShowOTPField(false);
+    setEnteredOTP("");
+  }
+
+  function resetPasswordFields() {
+    setInputPassword("");
+    setCurrentInputPassword("");
+    setConfirmInputPassword("");
+    setPasswordValid({
+      length: true,
+      uppercase: true,
+      number: true,
+      specialChar: true,
+    });
+    setSendVerificationEmail(false);
+    setShowOTPField(false);
+    setEnteredOTP("");
   }
 
   //#region Change username helper functions
@@ -129,77 +163,6 @@ export default function AccountSettings({ currentPage = "username" }) {
       .catch((e) => {
         console.log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-      });
-  }
-
-  // Confirm email change via OTP
-  function validateOTP(e) {
-    e.preventDefault();
-    setLoading(true);
-    clearMessages();
-
-    axios
-      .post(
-        "/checkOTP",
-        { enteredOTP, email: confirmInputEmail },
-        { withCredentials: true }
-      )
-      .then((res) => {
-        console.log(res);
-        updateEmailCall();
-        setSuccessMsg(
-          "Verification successful and your email has been updated! Redirecting you to the login page..."
-        );
-        setTimeout(() => {
-          setSuccessMsg("");
-          axios.get("/logout", { withCredentials: true });
-          dispatch(clearSession());
-          navigate("/signin");
-        }, 3000);
-      })
-      .catch((e) => {
-        console.log("Error: ", e);
-        if (
-          e?.response?.data?.msg ===
-          "Hmm... your code was incorrect. Please try again."
-        ) {
-          setErrMsg(e.response.data.msg);
-        } else {
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }
-
-  // Resend email request for change email
-  function sendResetRequest(e) {
-    e.preventDefault();
-    setInfoMsg(
-      `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
-    );
-    setErrMsg("Please wait a moment to send another email...");
-    setSendVerificationEmail(true);
-
-    axios
-      .post(
-        "/generateNewOTP",
-        { email: confirmInputEmail },
-        { withCredentials: true }
-      )
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((e) => {
-        console.log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-      })
-      .finally(() => {
-        setTimeout(() => {
-          setSendVerificationEmail(false);
-          setErrMsg("");
-        }, 15000);
       });
   }
 
@@ -266,6 +229,176 @@ export default function AccountSettings({ currentPage = "username" }) {
   }
   //#endregion
 
+  //#region Change email and password helper functions
+  // Confirm email or password change via OTP
+  function validateOTP(e) {
+    e.preventDefault();
+    setLoading(true);
+    clearMessages();
+
+    axios
+      .post(
+        "/checkOTP",
+        {
+          enteredOTP,
+          email: currentPage === "email" ? confirmInputEmail : email,
+        },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res);
+        if (currentPage === "email") {
+          updateEmailCall();
+          setSuccessMsg(
+            "Verification successful and your email has been updated! Redirecting you to the login page..."
+          );
+        } else if (currentPage === "password") {
+          updatePasswordCall();
+          setSuccessMsg(
+            "Verification successful and your password has been updated!! Redirecting you to the login page..."
+          );
+        }
+        setTimeout(() => {
+          setSuccessMsg("");
+          axios.get("/logout", { withCredentials: true });
+          dispatch(clearSession());
+          navigate("/signin");
+        }, 3000);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        if (
+          e?.response?.data?.msg ===
+          "Hmm... your code was incorrect. Please try again."
+        ) {
+          setErrMsg(e.response.data.msg);
+        } else {
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
+  // Resend email request for change email and password
+  function sendResetRequest(e) {
+    e.preventDefault();
+    if (currentPage === "email") {
+      setInfoMsg(
+        `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
+      );
+    } else {
+      setInfoMsg(
+        `A confirmation email with instructions has been sent to ${email}.`
+      );
+    }
+    setErrMsg("Please wait a moment to send another email...");
+    setSendVerificationEmail(true);
+
+    axios
+      .post(
+        "/generateNewOTP",
+        { email: currentPage === "email" ? confirmInputEmail : email },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setSendVerificationEmail(false);
+          setErrMsg("");
+        }, 15000);
+      });
+  }
+  //#endregion
+
+  //#region Change password helper functions
+  function updatePasswordCall() {
+    axios
+      .post(
+        "/updatePassword",
+        { newPassword: confirmInputPassword },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      });
+  }
+
+  // Send OTP to email
+  function sendPasswordVerificationCode(e) {
+    e.preventDefault();
+    setLoading(true);
+
+    if (
+      currentInputPassword === "" ||
+      inputPassword === "" ||
+      confirmInputPassword === ""
+    ) {
+      setErrMsg("Please fill out all required fields.");
+      setLoading(false);
+      return;
+    }
+
+    if (!validatePasswordOnSubmit(inputPassword, setErrMsg)) {
+      setLoading(false);
+      return;
+    }
+
+    if (inputPassword !== confirmInputPassword) {
+      setErrMsg("New passwords don't match. Please try again.");
+      setLoading(false);
+      return;
+    }
+
+    axios
+      .post(
+        "/sendPasswordChangeConfirmation",
+        { newPassword: confirmInputPassword },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res);
+        setInfoMsg(
+          `A confirmation email with instructions has been sent to ${email}.`
+        );
+        setErrMsg("Please wait a moment to send another email...");
+        setSendVerificationEmail(true);
+        setShowOTPField(true);
+        setTimeout(() => {
+          setSendVerificationEmail(false);
+          setErrMsg("");
+        }, 15000);
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        if (
+          e?.response?.data?.msg ===
+            "Looks like you have entered the same password that you are using now. Please enter a differernt password." ||
+          e?.response?.data?.msg ===
+            "Hmm... your current password is incorrect. Please try again." ||
+          e?.response?.data?.msg?.startsWith("You must wait")
+        ) {
+          setErrMsg(e.response.data.msg);
+        } else {
+          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }
+
   function renderHeading() {
     switch (currentPage) {
       case "email":
@@ -283,7 +416,10 @@ export default function AccountSettings({ currentPage = "username" }) {
         return (
           <div className="headings">
             <h2>Change password</h2>
-            <p>To change your password, please update the fields below.</p>
+            <p>
+              To change your password, please update the fields below and follow
+              the instructions when you receive a confirmation email.
+            </p>
           </div>
         );
       default:
@@ -375,7 +511,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   !showOTPField ? "Send verification code" : "Confirm changes"
                 }
                 onClickEvent={
-                  !showOTPField ? sendVerificationCode : validateOTP
+                  !showOTPField ? sendEmailVerificationCode : validateOTP
                 }
                 customStyle={{ width: "100%", maxWidth: "300px" }}
               />
@@ -383,7 +519,128 @@ export default function AccountSettings({ currentPage = "username" }) {
           </form>
         );
       case "password":
-        return null;
+        return (
+          <form action="POST" className="settingsFieldContainer">
+            {!showOTPField ? (
+              <>
+                <PasswordField
+                  containerClassName="settingsField"
+                  onChangeEvent={(e) => {
+                    setCurrentInputPassword(e.target.value);
+                    clearMessages();
+                  }}
+                  currentValue={currentInputPassword}
+                  placeholder="Current password"
+                  minLength={8}
+                  maxLength={50}
+                />
+                <PasswordField
+                  containerClassName="settingsField"
+                  onChangeEvent={(e) => {
+                    setInputPassword(e.target.value);
+                    validatePasswordOnTyping(e.target.value, setPasswordValid);
+                    clearMessages();
+                  }}
+                  currentValue={inputPassword}
+                  placeholder="New password"
+                  minLength={8}
+                  maxLength={50}
+                />
+                <PasswordField
+                  containerClassName="settingsField"
+                  onChangeEvent={(e) => {
+                    setConfirmInputPassword(e.target.value);
+                    clearMessages();
+                  }}
+                  currentValue={confirmInputPassword}
+                  placeholder="Confirm new password"
+                  minLength={8}
+                  maxLength={50}
+                />
+                <div
+                  className="passwordRequirements"
+                  style={{ paddingBottom: "3rem" }}
+                >
+                  <p>Password must include:</p>
+                  <ul>
+                    <li
+                      className={passwordValid.length ? "" : "invalidPassword"}
+                    >
+                      8 - 50 characters
+                    </li>
+                    <li
+                      className={
+                        passwordValid.uppercase ? "" : "invalidPassword"
+                      }
+                    >
+                      1 uppercase letter
+                    </li>
+                    <li
+                      className={passwordValid.number ? "" : "invalidPassword"}
+                    >
+                      1 number
+                    </li>
+                    <li
+                      className={
+                        passwordValid.specialChar ? "" : "invalidPassword"
+                      }
+                    >
+                      1 special character
+                    </li>
+                  </ul>
+                </div>
+              </>
+            ) : (
+              <div className="otpContainer">
+                <VerificationInput
+                  length={4}
+                  autoFocus
+                  placeholder="*"
+                  validChars="0-9"
+                  classNames={{
+                    container: "otpInputContainer",
+                    character: "otpText",
+                    characterInactive: "inactiveText",
+                    characterSelected: "selectedText",
+                  }}
+                  onChange={(value) => {
+                    setEnteredOTP(value);
+                    clearMessages();
+                  }}
+                />
+              </div>
+            )}
+            <div className="btnGroup">
+              {showOTPField && (
+                <Button
+                  fill="outline"
+                  disabled={sendVerificationEmail}
+                  loading={sendVerificationEmail}
+                  text="Resend email"
+                  onClickEvent={sendResetRequest}
+                  customStyle={{ width: "100%", maxWidth: "300px" }}
+                />
+              )}
+              <Button
+                btnType="submit"
+                disabled={
+                  !currentInputPassword ||
+                  !inputPassword ||
+                  !confirmInputPassword ||
+                  (showOTPField && enteredOTP.length !== 4)
+                }
+                loading={loading}
+                text={
+                  !showOTPField ? "Send verification code" : "Confirm changes"
+                }
+                onClickEvent={
+                  !showOTPField ? sendPasswordVerificationCode : validateOTP
+                }
+                customStyle={{ width: "100%", maxWidth: "300px" }}
+              />
+            </div>
+          </form>
+        );
       default:
       case "username":
         return (
@@ -425,24 +682,20 @@ export default function AccountSettings({ currentPage = "username" }) {
             switch (e.label) {
               case "Change email":
                 setInputUserName("");
-                setInputPassword("");
+                resetPasswordFields();
                 clearMessages();
                 navigate("/account/change-email");
                 break;
               case "Change password":
                 setInputUserName("");
-                setInputEmail("");
-                setConfirmInputEmail("");
-                setShowOTPField(false);
+                resetEmailFields();
                 clearMessages();
                 navigate("/account/change-password");
                 break;
               default:
               case "Change username":
-                setInputEmail("");
-                setConfirmInputEmail("");
-                setShowOTPField(false);
-                setInputPassword("");
+                resetEmailFields();
+                resetPasswordFields();
                 clearMessages();
                 navigate("/account/change-username");
                 break;
@@ -459,10 +712,8 @@ export default function AccountSettings({ currentPage = "username" }) {
               className="link"
               to="/account/change-username"
               onClick={() => {
-                setInputEmail("");
-                setConfirmInputEmail("");
-                setShowOTPField(false);
-                setInputPassword("");
+                resetEmailFields();
+                resetPasswordFields();
                 clearMessages();
               }}
             >
@@ -473,7 +724,7 @@ export default function AccountSettings({ currentPage = "username" }) {
               to="/account/change-email"
               onClick={() => {
                 setInputUserName("");
-                setInputPassword("");
+                resetPasswordFields();
                 clearMessages();
               }}
             >
@@ -484,9 +735,7 @@ export default function AccountSettings({ currentPage = "username" }) {
               to="/account/change-password"
               onClick={() => {
                 setInputUserName("");
-                setInputEmail("");
-                setConfirmInputEmail("");
-                setShowOTPField(false);
+                resetEmailFields();
                 clearMessages();
               }}
             >
