@@ -648,14 +648,9 @@ app.post("/UpdateUsername", async (req, res) => {
             const remainingHours = 24 - hoursPassed;
             let remainingMinutes = 60 - minutesPassed;
 
-            if (remainingHours === 24) {
-                if (remainingHours > 0 || (remainingHours === 0 && remainingMinutes > 0)) {
-                    throw new Error(`You must wait ${remainingHours} hours before you can change your username again.`);
-                }
-            }
-
             if (remainingHours > 0 || (remainingHours === 0 && remainingMinutes > 0)) {
-                throw new Error(`You must wait ${remainingHours} hours and ${remainingMinutes} minutes before you can change your username again.`);
+                if (remainingHours === 24) throw new Error(`You must wait ${remainingHours} hours before you can change your username again.`);
+                else throw new Error(`You must wait ${remainingHours} hours and ${remainingMinutes} minutes before you can change your username again.`);
             }
         }
 
