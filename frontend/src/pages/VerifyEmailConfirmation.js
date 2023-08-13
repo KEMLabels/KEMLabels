@@ -48,7 +48,7 @@ export default function VerifyEmailConfirmation() {
           <>
             <h1 style={{ textAlign: "center" }}>Your email link is invalid!</h1>{" "}
             <p style={{ opacity: "0.7", textAlign: "center" }}>
-              We're sorry, but your email link doesn't seem right. Please{" "}
+              We're sorry, but your email link doesn't seem right. Please login and{" "}
               <Link to="/verify-email" className="link">
                 request a new link here.
               </Link>
@@ -62,7 +62,7 @@ export default function VerifyEmailConfirmation() {
               Your email link has expired!
             </h1>{" "}
             <p style={{ opacity: "0.7", textAlign: "center" }}>
-              We're sorry, but your email link has expired. Please{" "}
+              We're sorry, but your email link has expired. Please login and{" "}
               <Link to="/verify-email" className="link">
                 request a new link here.
               </Link>
