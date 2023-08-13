@@ -322,8 +322,8 @@ export default function AccountSettings({ currentPage = "username" }) {
   function updatePasswordCall() {
     axios
       .post(
-        "/updatePassword",
-        { newPassword: confirmInputPassword },
+        "/updateUserPass",
+        { email: email, password: confirmInputPassword },
         { withCredentials: true }
       )
       .then((res) => {
@@ -364,7 +364,7 @@ export default function AccountSettings({ currentPage = "username" }) {
     axios
       .post(
         "/sendPasswordChangeConfirmation",
-        { newPassword: confirmInputPassword },
+        { eneteredPassword: currentInputPassword, newPassword: confirmInputPassword },
         { withCredentials: true }
       )
       .then((res) => {

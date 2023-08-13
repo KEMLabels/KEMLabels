@@ -127,7 +127,7 @@ const transporter = nodemailer.createTransport({
 //     if (req.session && req.session.lastActivityTime) {
 //         const currentTime = new Date().getTime();
 //         const timeDifference = currentTime - req.session.lastActivityTime;
-        
+
 //         if (timeDifference >= 600000) {
 //             // Session is inactive
 //             res.status(401).send({ active: false });
@@ -203,7 +203,7 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
         }, {
             // set amount
             // paymentIntent.amount is in cents so convert to dollars
-            "credits": Number(userExistingCredits) + Number(paymentIntent.amount / 100) 
+            "credits": Number(userExistingCredits) + Number(paymentIntent.amount / 100)
         })
             .then((obj) => {
                 console.log("User credits updated");
@@ -560,7 +560,64 @@ app.post("/checkOTP", async (req, res) => {
 
 })
 
+app.post("/updateUserPass", async (req, res) => {
+    try {
+        const { email, password } = req.body
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const userData = await User.findOne({ email: email })
+        if (!userData) throw new Error("Unexpected error occured");
+
+        User.updateOne({
+            "_id": userData._id.toString()
+        }, {
+            "password": hashedPassword
+        })
+            .then((obj) => {
+                console.log("Updated Password");
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+
+        sendChangePasswordConfirmation(email);
+
+        res.json({ redirect: '/signin' });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ msg: err.message });
+    }
+})
+
+function sendChangePasswordConfirmation(emailAddress) {
+    const changePassConfirmation = {
+        from: process.env.MAIL_USER,
+        to: emailAddress,
+        subject: 'Password Has Been Changed - Ensure Your Account\'s Safety',
+        attachments: [{
+            filename: 'Logo.png',
+            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            cid: 'logo'
+        }],
+        html: `
+        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
+        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
+        <h1 style="margin-bottom: 2rem;">Did you change your password?</h1>
+        <p>We noticed the password for your KEMLabels' account was recently changed. If this was you, rest assured that your new password is now in effect. No further action is required and you can safely ignore this email.</p>
+        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team!</p>
+        </div>`,
+    }
+    transporter.sendMail(changePassConfirmation, function (err, info) {
+        if (err) console.log(err)
+    });
+}
+
 //Account settings
+
+//Username Change
 app.post("/UpdateUsername", async (req, res) => {
     try {
         const { userName } = req.body;
@@ -641,6 +698,7 @@ function sendUserNameChangeEmail(emailAddress) {
     });
 }
 
+//Email Change
 app.post("/sendEmailChangeConfirmation", async (req, res) => {
     try {
         const { newEmail } = req.body
@@ -650,7 +708,7 @@ app.post("/sendEmailChangeConfirmation", async (req, res) => {
             throw new Error("You cannot change your email to the one you currently have.");
         }
 
-        // Check if the new username is already used by another user
+        // Check if the new email is already used by another user
         const emailAlreadyUsed = await User.findOne({ email: newEmail });
         if (emailAlreadyUsed) {
             throw new Error("This email is already associated with an account.");
@@ -765,43 +823,39 @@ function sendEmailChangeEmail(emailAddress) {
     });
 }
 
-//Reset password
-app.post("/updateUserPass", async (req, res) => {
+//Password Change
+app.post("/sendPasswordChangeConfirmation", async (req, res) => {
     try {
-        const { email, password } = req.body
+        const { eneteredPassword, newPassword } = req.body;
+        const currentPassword = req.session.user.password;
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const comparePassword = await bcrypt.compare(eneteredPassword, currentPassword);
+        if (!comparePassword) throw new Error("Hmm... your current password is incorrect. Please try again.");
 
-        const userData = await User.findOne({ email: email })
-        if (!userData) throw new Error("Unexpected error occured");
+        const comparePassWithNewPass = await bcrypt.compare(newPassword, currentPassword);
+        if (comparePassWithNewPass) throw new Error("Looks like you have entered the same password that you are using now. Please enter a differernt password.");
 
-        User.updateOne({
-            "_id": userData._id.toString()
-        }, {
-            "password": hashedPassword
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        const userEmail = req.session.user.email;
+
+        const create_OTP = new tempOTPS({
+            passcode: otp,
+            email: userEmail
         })
-            .then((obj) => {
-                console.log("Updated Password");
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-
-        sendChangePasswordConfirmation(email);
-
-        res.json({ redirect: '/signin' });
+        create_OTP.save()
+        sendPasswordChangeRequestEmail(userEmail, otp)
+        return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${userEmail}.` });
     } catch (err) {
         console.log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
 
-function sendChangePasswordConfirmation(emailAddress) {
-    const changePassConfirmation = {
+function sendPasswordChangeRequestEmail(emailAddress, OTPPasscode) {
+    const sendOneTimePasscodeEmail = {
         from: process.env.MAIL_USER,
         to: emailAddress,
-        subject: 'Password Has Been Changed - Ensure Your Account\'s Safety',
+        subject: 'KEMLabels Password Change OTP',
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
@@ -810,13 +864,15 @@ function sendChangePasswordConfirmation(emailAddress) {
         html: `
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
         <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
-        <h1 style="margin-bottom: 2rem;">Did you change your password?</h1>
-        <p>We noticed the password for your KEMLabels' account was recently changed. If this was you, rest assured that your new password is now in effect. No further action is required and you can safely ignore this email.</p>
-        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>You have requested to change the password for your account.</p>
+        <p>To confirm your email address, please enter the 4 digit code below.</p>
+        <div style="margin: 2rem; text-align: center;"><h1 style="font-size: ;letter-spacing: 5px">${OTPPasscode}</h1></div>
+        <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
         <p>Thank you,<br/>KEMLabels Team!</p>
         </div>`,
     }
-    transporter.sendMail(changePassConfirmation, function (err, info) {
+    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
         if (err) console.log(err)
     });
 }
