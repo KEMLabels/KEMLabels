@@ -64,6 +64,12 @@ export default function AccountSettings({ currentPage = "username" }) {
     }
   }, [isLoggedIn, currentPage, dropdownSettingsOptions, navigate]);
 
+  function clearMessages() {
+    setSuccessMsg("");
+    setInfoMsg("");
+    setErrMsg("");
+  }
+
   //#region Change username helper functions
   function updateUsernameCall(e) {
     e.preventDefault();
@@ -130,8 +136,7 @@ export default function AccountSettings({ currentPage = "username" }) {
   function validateOTP(e) {
     e.preventDefault();
     setLoading(true);
-    setInfoMsg("");
-    setErrMsg("");
+    clearMessages();
 
     axios
       .post(
@@ -307,9 +312,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   containerClassName="settingsField"
                   onChangeEvent={(e) => {
                     setInputEmail(e.target.value);
-                    setErrMsg("");
-                    setInfoMsg("");
-                    setSuccessMsg("");
+                    clearMessages();
                   }}
                   currentValue={inputEmail}
                   placeholder="New email"
@@ -321,9 +324,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   containerClassName="settingsField"
                   onChangeEvent={(e) => {
                     setConfirmInputEmail(e.target.value);
-                    setErrMsg("");
-                    setInfoMsg("");
-                    setSuccessMsg("");
+                    clearMessages();
                   }}
                   currentValue={confirmInputEmail}
                   placeholder="Confirm new email"
@@ -346,9 +347,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   }}
                   onChange={(value) => {
                     setEnteredOTP(value);
-                    setErrMsg("");
-                    setInfoMsg("");
-                    setSuccessMsg("");
+                    clearMessages();
                   }}
                 />
               </div>
@@ -392,8 +391,7 @@ export default function AccountSettings({ currentPage = "username" }) {
             <InputField
               onChangeEvent={(e) => {
                 setInputUserName(e.target.value);
-                setErrMsg("");
-                setSuccessMsg("");
+                clearMessages();
               }}
               containerClassName="settingsField"
               currentValue={inputUserName}
@@ -428,9 +426,7 @@ export default function AccountSettings({ currentPage = "username" }) {
               case "Change email":
                 setInputUserName("");
                 setInputPassword("");
-                setSuccessMsg("");
-                setInfoMsg("");
-                setErrMsg("");
+                clearMessages();
                 navigate("/account/change-email");
                 break;
               case "Change password":
@@ -438,9 +434,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 setInputEmail("");
                 setConfirmInputEmail("");
                 setShowOTPField(false);
-                setSuccessMsg("");
-                setInfoMsg("");
-                setErrMsg("");
+                clearMessages();
                 navigate("/account/change-password");
                 break;
               default:
@@ -449,9 +443,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 setConfirmInputEmail("");
                 setShowOTPField(false);
                 setInputPassword("");
-                setSuccessMsg("");
-                setInfoMsg("");
-                setErrMsg("");
+                clearMessages();
                 navigate("/account/change-username");
                 break;
             }
@@ -471,9 +463,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 setConfirmInputEmail("");
                 setShowOTPField(false);
                 setInputPassword("");
-                setSuccessMsg("");
-                setInfoMsg("");
-                setErrMsg("");
+                clearMessages();
               }}
             >
               Change username
@@ -484,9 +474,7 @@ export default function AccountSettings({ currentPage = "username" }) {
               onClick={() => {
                 setInputUserName("");
                 setInputPassword("");
-                setSuccessMsg("");
-                setInfoMsg("");
-                setErrMsg("");
+                clearMessages();
               }}
             >
               Change email
@@ -499,9 +487,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 setInputEmail("");
                 setConfirmInputEmail("");
                 setShowOTPField(false);
-                setSuccessMsg("");
-                setInfoMsg("");
-                setErrMsg("");
+                clearMessages();
               }}
             >
               Change password
