@@ -395,8 +395,7 @@ export default function AccountSettings({ currentPage = "username" }) {
           e?.response?.data?.msg ===
             "Looks like you have entered the same password that you are using now. Please enter a differernt password." ||
           e?.response?.data?.msg ===
-            "Hmm... your current password is incorrect. Please try again." ||
-          e?.response?.data?.msg?.startsWith("You must wait")
+            "Hmm... your current password is incorrect. Please try again."
         ) {
           setErrMsg(e.response.data.msg);
         } else {
