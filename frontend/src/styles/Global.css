@@ -206,6 +206,10 @@ body {
   transition: all ease-in-out 0.3s;
 }
 
+.fieldContainer .fieldInput.password {
+  padding-right: 2.5rem;
+}
+
 .fieldContainer .fieldInput:focus {
   border-bottom: solid 1px var(--primaryColor);
 }
