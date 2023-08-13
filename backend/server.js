@@ -221,8 +221,7 @@ app.post("/payWithCrypto", async (req, res) => {
 
     try {
         const charge = await resources.Charge.create({
-            name: "Test Charge",
-            description: "Test Charge Description",
+            name: "KEMLabels Credit Deposit",
             local_price: {
                 amount: amount,
                 currency: "USD"
@@ -230,7 +229,8 @@ app.post("/payWithCrypto", async (req, res) => {
             pricing_type: "fixed_price",
             metadata: {
                 email: "test@gmail.com"
-            }
+            },
+            cancel_url: "http://localhost:3000/load-credits"
         })
         res.json({ redirect: charge.hosted_url });
     } catch (err) {
@@ -729,10 +729,10 @@ app.post("/updateEmailAddress", async (req, res) => {
 
         await User.updateOne(
             { "_id": user._id.toString() },
-            { "email": newEmail }
+            { "email": newEmail, "verified": false }
         );
 
-        console.log("Updated email");
+        console.log("Updated email and unverified user");
         sendEmailChangeEmail(newEmail);
         return res.status(200).json({ msg: 'Username updated successfully.' });
     } catch (err) {
