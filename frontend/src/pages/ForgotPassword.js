@@ -12,14 +12,8 @@ import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
 import { setForgetPassEmailAttempts } from "../redux/actions/UserAction";
-import {
-  lengthRangeCheck,
-  validatePasswordNumber,
-  validatePasswordOnSubmit,
-  validatePasswordSpecialChar,
-  validatePasswordUppercase,
-} from "../utils/Validation";
-import { getCurrDateTime } from "../utils/Helpers";
+import { validatePasswordOnSubmit } from "../utils/Validation";
+import { getCurrDateTime, validatePasswordOnTyping } from "../utils/Helpers";
 
 export default function ForgotPassword() {
   const dispatch = useDispatch();
@@ -71,17 +65,6 @@ export default function ForgotPassword() {
       setIsLoading(false);
     }
   }, [isLoggedIn, verifyForgetPassEmailState, dispatch, navigate]);
-
-  // Validate password field during input change
-  function validatePasswordOnTyping(password) {
-    const passwordValid = {
-      length: lengthRangeCheck(password, 8, 50),
-      uppercase: validatePasswordUppercase(password),
-      number: validatePasswordNumber(password),
-      specialChar: validatePasswordSpecialChar(password),
-    };
-    setPasswordValid(passwordValid);
-  }
 
   const sendVerificationCode = (e) => {
     e.preventDefault();
@@ -381,7 +364,7 @@ export default function ForgotPassword() {
             <PasswordField
               onChangeEvent={(e) => {
                 setPassword(e.target.value);
-                validatePasswordOnTyping(e.target.value);
+                validatePasswordOnTyping(e.target.value, setPasswordValid);
                 setErrMsg("");
               }}
               placeholder="Password"

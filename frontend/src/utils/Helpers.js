@@ -1,3 +1,10 @@
+import {
+  lengthRangeCheck,
+  validatePasswordNumber,
+  validatePasswordSpecialChar,
+  validatePasswordUppercase,
+} from "./Validation";
+
 export function getCurrDateTimeInISO() {
   const date = new Date();
   date.toLocaleString("en", {
@@ -25,4 +32,15 @@ export function getCurrDateTime() {
     timeZone: "America/Vancouver",
   });
   return formatter.format(new Date());
+}
+
+// Validate password field during input change
+export function validatePasswordOnTyping(password, setPasswordValid) {
+  const passwordValid = {
+    length: lengthRangeCheck(password, 8, 50),
+    uppercase: validatePasswordUppercase(password),
+    number: validatePasswordNumber(password),
+    specialChar: validatePasswordSpecialChar(password),
+  };
+  setPasswordValid(passwordValid);
 }

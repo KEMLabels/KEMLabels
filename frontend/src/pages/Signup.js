@@ -18,15 +18,14 @@ import {
   setUserName,
 } from "../redux/actions/UserAction";
 import {
-  lengthRangeCheck,
   validateEmailOnSubmit,
-  validatePasswordNumber,
   validatePasswordOnSubmit,
-  validatePasswordSpecialChar,
-  validatePasswordUppercase,
   validateUsernameOnSubmit,
 } from "../utils/Validation";
-import { getCurrDateTimeInISO } from "../utils/Helpers";
+import {
+  getCurrDateTimeInISO,
+  validatePasswordOnTyping,
+} from "../utils/Helpers";
 
 export default function Signup() {
   const dispatch = useDispatch();
@@ -49,17 +48,6 @@ export default function Signup() {
   useEffect(() => {
     if (isLoggedIn) navigate("/verify-email");
   }, [isLoggedIn, navigate]);
-
-  // Validate password field during input change
-  function validatePasswordOnTyping(password) {
-    const passwordValid = {
-      length: lengthRangeCheck(password, 8, 50),
-      uppercase: validatePasswordUppercase(password),
-      number: validatePasswordNumber(password),
-      specialChar: validatePasswordSpecialChar(password),
-    };
-    setPasswordValid(passwordValid);
-  }
 
   // Validate all fields before submitting
   function validateFields() {
@@ -163,7 +151,7 @@ export default function Signup() {
             <PasswordField
               onChangeEvent={(e) => {
                 setInputPassword(e.target.value);
-                validatePasswordOnTyping(e.target.value);
+                validatePasswordOnTyping(e.target.value, setPasswordValid);
                 setErrMsg("");
               }}
               placeholder="Password"
