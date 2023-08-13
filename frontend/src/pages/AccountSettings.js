@@ -109,6 +109,12 @@ export default function AccountSettings({ currentPage = "username" }) {
     e.preventDefault();
     setLoading(true);
 
+    if (inputUserName === "") {
+      setErrMsg("Please fill out the required field.");
+      setLoading(false);
+      return;
+    }
+
     if (!validateUsernameOnSubmit(inputUserName, setErrMsg)) {
       setLoading(false);
       return;
