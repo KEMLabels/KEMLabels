@@ -7,6 +7,7 @@ const session = require('express-session');
 const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
 const nodemailer = require('nodemailer');
+const cron = require('node-cron');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 require('express-async-errors');
@@ -288,8 +289,8 @@ app.post("/signup", async (req, res) => {
         const { userName, email, password } = req.body
 
         const data = {
-            userName: userName,
-            email: email,
+            userName: userName.toLowerCase(),
+            email: email.toLowerCase(),
             password: password
         }
 
@@ -453,7 +454,7 @@ app.post("/emailExists", async (req, res) => {
         const { email } = req.body
 
         const data = {
-            email: email
+            email: email.toLowerCase()
         }
 
         const emailExists = await User.findOne({ email: data.email })
@@ -472,7 +473,7 @@ app.post("/forgotpassword", async (req, res) => {
 
 app.post("/generateNewOTP", async (req, res) => {
     const { email, type } = req.body
-    const findOTP = await tempOTPS.findOne({ email: email });
+    const findOTP = await tempOTPS.findOne({ email: email.toLowerCase() });
     if (findOTP) {
         console.log(findOTP)
         tempOTPS.deleteOne({
@@ -584,7 +585,7 @@ app.post("/checkOTP", async (req, res) => {
         const { enteredOTP } = req.body
         const { email } = req.body
         console.log('entered code: ' + enteredOTP);
-        const tempCode = await tempOTPS.findOne({ email: email });
+        const tempCode = await tempOTPS.findOne({ email: email.toLowerCase() });
         if (!tempCode) throw new Error("Invalid Code");
         console.log('correct code: ' + tempCode.passcode);
         if (Number(enteredOTP) !== Number(tempCode.passcode)) {
@@ -614,7 +615,7 @@ app.post("/updateUserPass", async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const userData = await User.findOne({ email: email })
+        const userData = await User.findOne({ email: email.toLowerCase() })
         if (!userData) throw new Error("Unexpected error occured");
 
         User.updateOne({
@@ -668,6 +669,8 @@ function sendPasswordChangeEmail(emailAddress) {
 app.post("/UpdateUsername", async (req, res) => {
     try {
         const { userName } = req.body;
+
+        const userNameData = userName.toLowerCase();
         
         // Retrieve the user from the session
         const user = await User.findOne({ _id: req.session.user._id });
@@ -691,12 +694,12 @@ app.post("/UpdateUsername", async (req, res) => {
             }
         }
 
-        if (userName === req.session.user.userName) {
+        if (userNameData === req.session.user.userName) {
             throw new Error("You cannot change your username to the same one you currently have.");
         }
 
         // Check if the new username is already used by another user
-        const userNameAlreadyUsed = await User.findOne({ userName: userName });
+        const userNameAlreadyUsed = await User.findOne({ userName: userNameData });
         if (userNameAlreadyUsed) {
             throw new Error("This username is already associated with an account.");
         }
@@ -704,7 +707,7 @@ app.post("/UpdateUsername", async (req, res) => {
         // Update the username and userNameLastChanged
         await User.updateOne(
             { "_id": user._id.toString() },
-            { "userName": userName, "userNameLastChanged": currentDate }
+            { "userName": userNameData, "userNameLastChanged": currentDate }
         );
 
         console.log("Updated username");
@@ -746,12 +749,12 @@ app.post("/sendEmailChangeConfirmation", async (req, res) => {
         const { newEmail } = req.body
         const currentEmail = req.session.user.email;
 
-        if (newEmail === currentEmail) {
+        if (newEmail.toLowerCase() === currentEmail) {
             throw new Error("You cannot change your email to the one you currently have.");
         }
 
         // Check if the new email is already used by another user
-        const emailAlreadyUsed = await User.findOne({ email: newEmail });
+        const emailAlreadyUsed = await User.findOne({ email: newEmail.toLowerCase() });
         if (emailAlreadyUsed) {
             throw new Error("This email is already associated with an account.");
         }
@@ -763,8 +766,8 @@ app.post("/sendEmailChangeConfirmation", async (req, res) => {
             email: newEmail
         })
         create_OTP.save()
-        sendEmailChangeRequestEmail(currentEmail, newEmail, otp)
-        return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${newEmail}.` });
+        sendEmailChangeRequestEmail(currentEmail, newEmail.toLowerCase(), otp)
+        return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${newEmail.toLowerCase()}.` });
     } catch (err) {
         console.log(err);
         return res.status(400).json({ msg: err.message });
@@ -807,11 +810,11 @@ app.post("/updateEmailAddress", async (req, res) => {
 
         await User.updateOne(
             { "_id": user._id.toString() },
-            { "email": newEmail, "verified": false }
+            { "email": newEmail.toLowerCase(), "verified": false }
         );
 
         console.log("Updated email and unverified user");
-        sendEmailChangeEmail(newEmail);
+        sendEmailChangeEmail(newEmail.toLowerCase());
         return res.status(200).json({ msg: 'Username updated successfully.' });
     } catch (err) {
         console.log(err);
@@ -870,6 +873,20 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
         return res.status(400).json({ msg: err.message });
     }
 })
+
+//CRON
+// Schedule a task to run every 24 hours
+cron.schedule('0 0 */1 * *', async () => {
+    try {
+        console.log('cron running');
+        const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  
+      // Delete unverified accounts created more than 24 hours ago
+      await User.deleteMany({ verified: false, createdAt: { $lt: twentyFourHoursAgo } });
+    } catch (err) {
+      console.error('Error deleting unverified accounts:', err);
+    }
+  });
 
 //404 NOT FOUND
 app.get('*', (req, res) => {
