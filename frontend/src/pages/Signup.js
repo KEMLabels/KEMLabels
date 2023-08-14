@@ -131,7 +131,7 @@ export default function Signup() {
           <form action="POST" className="authFormContainer">
             <InputField
               onChangeEvent={(e) => {
-                setInputUserName(e.target.value);
+                setInputUserName(e.target.value.trim().toLowerCase());
                 setErrMsg("");
               }}
               placeholder="Username"
@@ -141,7 +141,7 @@ export default function Signup() {
             <InputField
               fieldType="email"
               onChangeEvent={(e) => {
-                setInputEmail(e.target.value);
+                setInputEmail(e.target.value.trim().toLowerCase());
                 setErrMsg("");
               }}
               placeholder="Email"
@@ -150,8 +150,11 @@ export default function Signup() {
             />
             <PasswordField
               onChangeEvent={(e) => {
-                setInputPassword(e.target.value);
-                validatePasswordOnTyping(e.target.value, setPasswordValid);
+                setInputPassword(e.target.value.trim());
+                validatePasswordOnTyping(
+                  e.target.value.trim(),
+                  setPasswordValid
+                );
                 setErrMsg("");
               }}
               placeholder="Password"

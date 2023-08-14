@@ -458,10 +458,9 @@ export default function AccountSettings({ currentPage = "username" }) {
                   fieldType="email"
                   containerClassName="settingsField"
                   onChangeEvent={(e) => {
-                    setInputEmail(e.target.value);
+                    setInputEmail(e.target.value.trim().toLowerCase());
                     clearMessages();
                   }}
-                  currentValue={inputEmail}
                   placeholder="New email"
                   minLength={3}
                   maxLength={100}
@@ -470,10 +469,9 @@ export default function AccountSettings({ currentPage = "username" }) {
                   fieldType="email"
                   containerClassName="settingsField"
                   onChangeEvent={(e) => {
-                    setConfirmInputEmail(e.target.value);
+                    setConfirmInputEmail(e.target.value.trim().toLowerCase());
                     clearMessages();
                   }}
-                  currentValue={confirmInputEmail}
                   placeholder="Confirm new email"
                   minLength={3}
                   maxLength={100}
@@ -537,10 +535,9 @@ export default function AccountSettings({ currentPage = "username" }) {
                 <PasswordField
                   containerClassName="settingsField"
                   onChangeEvent={(e) => {
-                    setCurrentInputPassword(e.target.value);
+                    setCurrentInputPassword(e.target.value.trim());
                     clearMessages();
                   }}
-                  currentValue={currentInputPassword}
                   placeholder="Current password"
                   minLength={8}
                   maxLength={50}
@@ -548,11 +545,10 @@ export default function AccountSettings({ currentPage = "username" }) {
                 <PasswordField
                   containerClassName="settingsField"
                   onChangeEvent={(e) => {
-                    setInputPassword(e.target.value);
-                    validatePasswordOnTyping(e.target.value, setPasswordValid);
+                    setInputPassword(e.target.value.trim());
+                    validatePasswordOnTyping(e.target.value.trim(), setPasswordValid);
                     clearMessages();
                   }}
-                  currentValue={inputPassword}
                   placeholder="New password"
                   minLength={8}
                   maxLength={50}
@@ -560,10 +556,9 @@ export default function AccountSettings({ currentPage = "username" }) {
                 <PasswordField
                   containerClassName="settingsField"
                   onChangeEvent={(e) => {
-                    setConfirmInputPassword(e.target.value);
+                    setConfirmInputPassword(e.target.value.trim());
                     clearMessages();
                   }}
-                  currentValue={confirmInputPassword}
                   placeholder="Confirm new password"
                   minLength={8}
                   maxLength={50}
@@ -658,11 +653,10 @@ export default function AccountSettings({ currentPage = "username" }) {
           <form action="POST" className="settingsFieldContainer">
             <InputField
               onChangeEvent={(e) => {
-                setInputUserName(e.target.value);
+                setInputUserName(e.target.value.trim().toLowerCase());
                 clearMessages();
               }}
               containerClassName="settingsField"
-              currentValue={inputUserName}
               placeholder="New username"
               minLength={3}
               maxLength={15}

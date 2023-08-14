@@ -320,7 +320,7 @@ export default function ForgotPassword() {
             <InputField
               fieldType="email"
               onChangeEvent={(e) => {
-                setEmail(e.target.value);
+                setEmail(e.target.value.trim().toLowerCase());
                 setErrMsg("");
               }}
               placeholder="Email"
@@ -371,8 +371,8 @@ export default function ForgotPassword() {
           <>
             <PasswordField
               onChangeEvent={(e) => {
-                setPassword(e.target.value);
-                validatePasswordOnTyping(e.target.value, setPasswordValid);
+                setPassword(e.target.value.trim());
+                validatePasswordOnTyping(e.target.value.trim(), setPasswordValid);
                 setErrMsg("");
               }}
               placeholder="Password"

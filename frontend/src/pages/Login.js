@@ -107,7 +107,7 @@ export default function Login() {
             <InputField
               fieldType="email"
               onChangeEvent={(e) => {
-                setInputEmail(e.target.value);
+                setInputEmail(e.target.value.trim().toLowerCase());
                 setErrMsg("");
               }}
               placeholder="Email"
@@ -116,7 +116,7 @@ export default function Login() {
             />
             <PasswordField
               onChangeEvent={(e) => {
-                setInputPassword(e.target.value);
+                setInputPassword(e.target.value.trim());
                 setErrMsg("");
               }}
               placeholder="Password"
