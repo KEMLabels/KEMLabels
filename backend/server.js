@@ -358,7 +358,7 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
     const signUpConfirmationEmail = {
         from: process.env.MAIL_USER,
         to: emailAddress,
-        subject: 'Confirmation your email - KEMLabels',
+        subject: 'KEMLabels - Confirm Your Email',
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
@@ -371,7 +371,7 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
         <p>Please use the following link to confirm your email address: <a href="${url}" target="_blank">${url}</a></p>
         <p>If you did not sign up for KEMLabels, you can safely ignore this email.</p>
         <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
-        <p>Thank you,<br/>KEMLabels Team!</p>
+        <p>Thank you,<br/>KEMLabels Team</p>
         </div>`,
     }
     transporter.sendMail(signUpConfirmationEmail, function (err, info) {
@@ -466,19 +466,12 @@ app.post("/emailExists", async (req, res) => {
 })
 
 app.post("/forgotpassword", async (req, res) => {
-    const { email } = req.body
-    const otp = Math.floor(1000 + Math.random() * 9000);
-
-    const create_OTP = new tempOTPS({
-        passcode: otp,
-        email: email
-    })
-    create_OTP.save()
-    sendOTPEmail(otp, email);
+    const { email, type } = req.body
+    generateOTPHelper(email, type);
 })
 
 app.post("/generateNewOTP", async (req, res) => {
-    const { email } = req.body
+    const { email, type } = req.body
     const findOTP = await tempOTPS.findOne({ email: email });
     if (findOTP) {
         console.log(findOTP)
@@ -486,31 +479,31 @@ app.post("/generateNewOTP", async (req, res) => {
             _id: findOTP._id.toString()
         })
             .then(function () {
-                generateOTPHelper(email);
+                generateOTPHelper(email, type);
                 console.log('successfuly deleted');
             }).catch(function (error) {
                 console.log(error); // Failure
             });
     } else {
-        generateOTPHelper(email);
+        generateOTPHelper(email, type);
     }
 })
 
-async function generateOTPHelper(email) {
+async function generateOTPHelper(email, type) {
     const otp = Math.floor(1000 + Math.random() * 9000);
     const create_OTP = new tempOTPS({
         passcode: otp,
         email: email
     })
     create_OTP.save()
-    sendOTPEmail(otp, email);
+    sendOTPEmail(otp, email, type);
 }
 
-function sendOTPEmail(OTPPasscode, emailAddress) {
-    const sendOneTimePasscodeEmail = {
+function sendOTPEmail(OTPPasscode, emailAddress, type) {
+    const resetPasswordOTPEmail = {
         from: process.env.MAIL_USER,
         to: emailAddress,
-        subject: 'KEMLabels Verification Code',
+        subject: 'KEMLabels - Your Verification Code to Reset Password',
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
@@ -519,17 +512,71 @@ function sendOTPEmail(OTPPasscode, emailAddress) {
         html: `
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
         <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
-        <p>You have requested to reset the password for your account.</p>
+        <p>We received a request to reset the password associated with your account.</p>
         <p>To confirm your email address, please enter the 4 digit code below.</p>
         <div style="margin: 2rem; text-align: center;"><h1 style="letter-spacing: 5px">${OTPPasscode}</h1></div>
         <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
         <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
-        <p>Thank you,<br/>KEMLabels Team!</p>
+        <p>Thank you,<br/>KEMLabels Team</p>
         </div>`,
     }
-    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
-        if (err) console.log(err)
-    });
+
+    const changePasswordOTPEmail = {
+        from: process.env.MAIL_USER,
+        to: emailAddress,
+        subject: 'KEMLabels - Your Verification Code to Change Password',
+        attachments: [{
+            filename: 'Logo.png',
+            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            cid: 'logo'
+        }],
+        html: `
+        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
+        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
+        <p>We received a request to change the password associated with your account.</p>
+        <p>To confirm your email address, please enter the 4 digit code below.</p>
+        <div style="margin: 2rem; text-align: center;"><h1 style="letter-spacing: 5px">${OTPPasscode}</h1></div>
+        <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team</p>
+        </div>`,
+    }
+
+    const changeEmailOTPEmail = {
+        from: process.env.MAIL_USER,
+        to: emailAddress,
+        subject: 'KEMLabels - Your Verification Code to Change Email Address',
+        attachments: [{
+            filename: 'Logo.png',
+            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            cid: 'logo'
+        }],
+        html: `
+        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
+        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
+        <p>We received a request to change the email associated with your account.</p>
+        <p>To confirm your new email address, please enter the 4 digit code below.</p>
+        <div style="margin: 2rem; text-align: center;"><h1 style="letter-spacing: 5px">${OTPPasscode}</h1></div>
+        <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team</p>
+        </div>`,
+    }
+
+    const emailTypes = {
+        'resetPassword': resetPasswordOTPEmail,
+        'changePassword': changePasswordOTPEmail,
+        'changeEmail': changeEmailOTPEmail,
+    };
+
+    const selectedEmail = emailTypes[type];
+    if (selectedEmail) {
+        transporter.sendMail(selectedEmail, function (err, info) {
+            if (err) console.log(err)
+        });
+    } else {
+        console.log('Invalid email type');
+    }
 }
 
 app.post("/checkOTP", async (req, res) => {
@@ -582,7 +629,7 @@ app.post("/updateUserPass", async (req, res) => {
                 console.log(err);
             })
 
-        sendChangePasswordConfirmation(email);
+            sendPasswordChangeEmail(email);
 
         res.json({ redirect: '/signin' });
     } catch (err) {
@@ -591,11 +638,11 @@ app.post("/updateUserPass", async (req, res) => {
     }
 })
 
-function sendChangePasswordConfirmation(emailAddress) {
+function sendPasswordChangeEmail(emailAddress) {
     const changePassConfirmation = {
         from: process.env.MAIL_USER,
         to: emailAddress,
-        subject: 'Password Has Been Changed - Ensure Your Account\'s Safety',
+        subject: 'KEMLabels Security Alert - Your Password Has Been Updated',
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
@@ -607,7 +654,7 @@ function sendChangePasswordConfirmation(emailAddress) {
         <h1 style="margin-bottom: 2rem;">Did you change your password?</h1>
         <p>We noticed the password for your KEMLabels' account was recently changed. If this was you, rest assured that your new password is now in effect. No further action is required and you can safely ignore this email.</p>
         <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
-        <p>Thank you,<br/>KEMLabels Team!</p>
+        <p>Thank you,<br/>KEMLabels Team</p>
         </div>`,
     }
     transporter.sendMail(changePassConfirmation, function (err, info) {
@@ -621,17 +668,7 @@ function sendChangePasswordConfirmation(emailAddress) {
 app.post("/UpdateUsername", async (req, res) => {
     try {
         const { userName } = req.body;
-
-        if (userName === req.session.user.userName) {
-            throw new Error("You cannot change your username to the same one you currently have.");
-        }
-
-        // Check if the new username is already used by another user
-        const userNameAlreadyUsed = await User.findOne({ userName: userName });
-        if (userNameAlreadyUsed) {
-            throw new Error("This username is already associated with an account.");
-        }
-
+        
         // Retrieve the user from the session
         const user = await User.findOne({ _id: req.session.user._id });
         if (!user) {
@@ -654,6 +691,16 @@ app.post("/UpdateUsername", async (req, res) => {
             }
         }
 
+        if (userName === req.session.user.userName) {
+            throw new Error("You cannot change your username to the same one you currently have.");
+        }
+
+        // Check if the new username is already used by another user
+        const userNameAlreadyUsed = await User.findOne({ userName: userName });
+        if (userNameAlreadyUsed) {
+            throw new Error("This username is already associated with an account.");
+        }
+
         // Update the username and userNameLastChanged
         await User.updateOne(
             { "_id": user._id.toString() },
@@ -673,7 +720,7 @@ function sendUserNameChangeEmail(emailAddress) {
     const sendOneTimePasscodeEmail = {
         from: process.env.MAIL_USER,
         to: emailAddress,
-        subject: 'KEMLabels Security Alert',
+        subject: 'KEMLabels Security Alert - Your Username Has Been Updated',
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
@@ -682,10 +729,10 @@ function sendUserNameChangeEmail(emailAddress) {
         html: `
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
         <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
-        <p>You have requested to change your username.</p>
-        <p>If you didn't initiate this request, someone might be using your account. Check and secure your account now.</p>
-        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
-        <p>Thank you,<br/>KEMLabels Team!</p>
+        <h1 style="margin-bottom: 2rem;">Did you change your username?</h1>
+        <p>We noticed the username for your KEMLabels' account was recently changed. If this was you, rest assured that your new username is now in effect. No further action is required and you can safely ignore this email.</p>
+        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team</p>
         </div>`,
     }
     transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
@@ -725,30 +772,10 @@ app.post("/sendEmailChangeConfirmation", async (req, res) => {
 })
 
 function sendEmailChangeRequestEmail(currentEmail, newEmail, OTPPasscode) {
-    const sendOneTimePasscodeEmail = {
-        from: process.env.MAIL_USER,
-        to: newEmail,
-        subject: 'KEMLabels Email Change OTP',
-        attachments: [{
-            filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
-            cid: 'logo'
-        }],
-        html: `
-        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
-        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
-        <p>You have requested to change the email for your account.</p>
-        <p>To confirm your email address, please enter the 4 digit code below.</p>
-        <div style="margin: 2rem; text-align: center;"><h1 style="font-size: ;letter-spacing: 5px">${OTPPasscode}</h1></div>
-        <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
-        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
-        <p>Thank you,<br/>KEMLabels Team!</p>
-        </div>`,
-    }
     const sendSecurityAlert = {
         from: process.env.MAIL_USER,
         to: currentEmail,
-        subject: 'KEMLabels Security Alert',
+        subject: 'KEMLabels Security Alert - Email Change Detected on Your Account',
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
@@ -757,18 +784,16 @@ function sendEmailChangeRequestEmail(currentEmail, newEmail, OTPPasscode) {
         html: `
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
         <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
-        <p>You have requested to change your email address.</p>
-        <p>If you didn't initiate this request, someone might be using your account. Check and secure your account now.</p>
-        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
-        <p>Thank you,<br/>KEMLabels Team!</p>
+        <h1 style="margin-bottom: 2rem;">Did you change your email?</h1>
+        <p>We received a request to change the email associated with your account. If this was you, you can safely ignore this email.</p>
+        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team</p>
         </div>`,
     }
-    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
-        if (err) console.log(err)
-    });
     transporter.sendMail(sendSecurityAlert, function (err, info) {
         if (err) console.log(err)
     });
+    sendOTPEmail(OTPPasscode, newEmail, "changeEmail");
 }
 
 app.post("/updateEmailAddress", async (req, res) => {
@@ -798,7 +823,7 @@ function sendEmailChangeEmail(emailAddress) {
     const sendOneTimePasscodeEmail = {
         from: process.env.MAIL_USER,
         to: emailAddress,
-        subject: 'KEMLabels Email Updated',
+        subject: 'KEMLabels Security Alert - Your Email Has Been Updated',
         attachments: [{
             filename: 'Logo.png',
             path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
@@ -807,10 +832,10 @@ function sendEmailChangeEmail(emailAddress) {
         html: `
         <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
         <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
-        <p>Your email address has been successfully updated.</p>
-        <p>If you didn't initiate this request, someone might be using your account. Check and secure your account now.</p>
-        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
-        <p>Thank you,<br/>KEMLabels Team!</p>
+        <h1 style="margin-bottom: 2rem;">Did you change your email?</h1>
+        <p>We noticed the email for your KEMLabels' account was recently changed. If this was you, rest assured that your new email is now in effect. No further action is required and you can safely ignore this email.</p>
+        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
+        <p>Thank you,<br/>KEMLabels Team</p>
         </div>`,
     }
     transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
@@ -837,40 +862,14 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
             passcode: otp,
             email: userEmail
         })
-        create_OTP.save()
-        sendPasswordChangeRequestEmail(userEmail, otp)
+        create_OTP.save();
+        sendOTPEmail(otp, userEmail, "changePassword");
         return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${userEmail}.` });
     } catch (err) {
         console.log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
-
-function sendPasswordChangeRequestEmail(emailAddress, OTPPasscode) {
-    const sendOneTimePasscodeEmail = {
-        from: process.env.MAIL_USER,
-        to: emailAddress,
-        subject: 'KEMLabels Password Change OTP',
-        attachments: [{
-            filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
-            cid: 'logo'
-        }],
-        html: `
-        <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">
-        <div style="max-width:100px; margin-bottom:2rem;"><img src="cid:logo" style="width: 100%;object-fit:contain; object-position:center center;"/></div>
-        <p>You have requested to change the password for your account.</p>
-        <p>To confirm your email address, please enter the 4 digit code below.</p>
-        <div style="margin: 2rem; text-align: center;"><h1 style="font-size: ;letter-spacing: 5px">${OTPPasscode}</h1></div>
-        <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
-        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>
-        <p>Thank you,<br/>KEMLabels Team!</p>
-        </div>`,
-    }
-    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
-        if (err) console.log(err)
-    });
-}
 
 //404 NOT FOUND
 app.get('*', (req, res) => {

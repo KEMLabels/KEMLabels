@@ -119,7 +119,11 @@ export default function ForgotPassword() {
         setResentEmail(false);
       }, 15000);
       axios
-        .post("/forgotpassword", { email }, { withCredentials: true })
+        .post(
+          "/forgotpassword",
+          { email: email, type: "resetPassword" },
+          { withCredentials: true }
+        )
         .then((res) => {
           console.log(res.data);
         })
@@ -152,7 +156,11 @@ export default function ForgotPassword() {
         setLoading(false);
       }, 15000);
       axios
-        .post("/generateNewOTP", { email }, { withCredentials: true })
+        .post(
+          "/generateNewOTP",
+          { email: email, type: "resetPassword" },
+          { withCredentials: true }
+        )
         .then((res) => {
           console.log(res.data);
         })

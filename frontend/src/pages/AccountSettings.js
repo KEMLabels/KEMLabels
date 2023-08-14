@@ -305,7 +305,10 @@ export default function AccountSettings({ currentPage = "username" }) {
     axios
       .post(
         "/generateNewOTP",
-        { email: currentPage === "email" ? confirmInputEmail : email },
+        {
+          email: currentPage === "email" ? confirmInputEmail : email,
+          type: currentPage === "email" ? "changeEmail" : "changePassword",
+        },
         { withCredentials: true }
       )
       .then((res) => {
