@@ -53,7 +53,7 @@ export default function AccountDropdownMenu({
       <AccountDropdownLink
         type="history"
         text="Credit history"
-        link="/creditshistory"
+        link="/credit-history"
       />
       <AccountDropdownLink type="logout" text="Logout" link="/" />
     </div>

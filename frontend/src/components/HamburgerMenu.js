@@ -81,7 +81,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
               <NavLink
                 type="history"
                 text="Credit History"
-                link="/credithistory"
+                link="/credit-history"
                 isNavlink
               />
               <NavLink type="logout" text="Logout" link="/" linkOnClick />
