@@ -7,7 +7,8 @@ import "../styles/Global.css";
 import "../styles/CreditHistory.css";
 import AlertMessage from "../components/AlertMessage";
 import Table from "../components/Table";
-import creditHistoryData from "../content/creditHistoryData";
+import mockCreditHistoryData from "../content/creditHistoryData";
+import axios from "../api/axios";
 
 export default function CreditHistory() {
   const navigate = useNavigate();
@@ -17,13 +18,27 @@ export default function CreditHistory() {
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [timeoutId, setTimeoutId] = useState(null);
+  const [creditHistoryData, setCreditHistoryData] = useState([]);
 
   useEffect(() => {
     // if (!isLoggedIn) navigate("/");
+    
+    // TODO: Add this Axios call to the backend and return Data JSON format
+    axios
+      .get("/getCreditHistory")
+      .then((res) => {
+        if (res) {
+          setCreditHistoryData(res.data);
+        }
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+        setErrMsg("An unexpected error occured. Please try again later.");
+      });
   }, [isLoggedIn, navigate]);
 
   // TODO: Hardcoded data, change it so it comes from API
-  const data = useMemo(() => creditHistoryData, []);
+  const data = useMemo(() => mockCreditHistoryData, []);
 
   /** @type import('@tanstack/react-table').ColumnDef<any> */
   const creditHistoryColumns = [
@@ -82,12 +97,12 @@ export default function CreditHistory() {
     <PageLayout title="Credit History">
       <div className="container">
         <div className="header">
-          <h1>Credit history ({creditHistoryData.length})</h1>
+          <h1>Credit history ({mockCreditHistoryData.length})</h1>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           {successMsg && <AlertMessage msg={successMsg} type="success" />}
         </div>
         <div className="tableContainer">
-          {creditHistoryData.length !== 0 ? (
+          {mockCreditHistoryData.length !== 0 ? (
             <Table data={data} columns={creditHistoryColumns} />
           ) : (
             <p>
