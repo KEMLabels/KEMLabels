@@ -23,6 +23,10 @@ export default function Table({ data, columns, totalRows }) {
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
   const [isMobileView, setIsMobileView] = useState(false);
+  const dropdownItemOptions = ["10", "20", "30", "40", "50"];
+  const [dropdownItemValue, setDropdownItemValue] = useState(
+    dropdownItemOptions[0]
+  );
 
   const table = useReactTable({
     data,
@@ -139,11 +143,31 @@ export default function Table({ data, columns, totalRows }) {
 
   return (
     <>
-      {/* <input
-        type="text"
-        value={filtering}
-        onChange={(e) => setFiltering(e.target.value)}
-      /> */}
+      <div className="tableHeaderActions">
+        {/* <input
+          type="text"
+          value={filtering}
+          onChange={(e) => setFiltering(e.target.value)}
+        /> */}
+        <div className="tableSearch"></div>
+        <div className="tableItemsToShow">
+          <span>Items per page</span>{" "}
+          <Dropdown
+            className="dropdown"
+            controlClassName="dropdownControl"
+            menuClassName="dropdownMenu"
+            options={dropdownItemOptions}
+            onChange={(e) => {
+              setDropdownItemValue(e.label.toString());
+              table.setPageSize(Number(e.value));
+            }}
+            value={dropdownItemOptions.find(
+              (option) => option === dropdownItemValue
+            )}
+          />
+        </div>
+      </div>
+
       <table className="table">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (

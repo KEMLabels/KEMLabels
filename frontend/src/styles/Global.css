@@ -333,7 +333,7 @@ body {
 }
 
 .table {
-  border-collapse: collapse; 
+  border-collapse: collapse;
 }
 
 .table thead tr {
@@ -372,10 +372,33 @@ body {
   text-align: right;
 }
 
-.tablePaginationBtns {
+.tableHeaderActions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tableHeaderActions .tableSearch {
+  width: 70%;
+}
+
+.tableHeaderActions .tableItemsToShow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  width: 30%;
+}
+
+.tableHeaderActions .tableItemsToShow span {
+  font-size: 1.1rem;
+  font-weight: 300;
+  padding-bottom: 1rem;
+}
+
 .tableFooterActions {
   display: flex;
-  justify-content: space-between;  
+  justify-content: space-between;
   padding-top: 2rem;
 }
 
