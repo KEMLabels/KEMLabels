@@ -409,6 +409,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         setLoading(false);
       });
   }
+  //#endregion
 
   function renderHeading() {
     switch (currentPage) {
@@ -546,7 +547,10 @@ export default function AccountSettings({ currentPage = "username" }) {
                   containerClassName="settingsField"
                   onChangeEvent={(e) => {
                     setInputPassword(e.target.value.trim());
-                    validatePasswordOnTyping(e.target.value.trim(), setPasswordValid);
+                    validatePasswordOnTyping(
+                      e.target.value.trim(),
+                      setPasswordValid
+                    );
                     clearMessages();
                   }}
                   placeholder="New password"
@@ -679,9 +683,9 @@ export default function AccountSettings({ currentPage = "username" }) {
       <div className="settingsContainer">
         <h1>Account settings</h1>
         <Dropdown
-          className="settingsDropdown"
-          controlClassName="settingsDropdownControl"
-          menuClassName="settingsDropdownMenu"
+          className="dropdown settingsDropdown"
+          controlClassName="dropdownControl"
+          menuClassName="dropdownMenu"
           options={dropdownSettingsOptions}
           onChange={(e) => {
             switch (e.label) {

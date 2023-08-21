@@ -108,7 +108,11 @@ export default function CreditHistory() {
         </div>
         <div className="tableContainer">
           {creditHistoryDataLength && creditHistoryDataLength > 0 ? (
-            <Table data={data} columns={creditHistoryColumns} />
+            <Table
+              data={data}
+              columns={creditHistoryColumns}
+              totalRows={creditHistoryDataLength}
+            />
           ) : (
             <p>
               Hmm... we don't have any records of loading credits from your

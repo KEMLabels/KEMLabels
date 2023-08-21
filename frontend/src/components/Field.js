@@ -205,7 +205,9 @@ function PasswordField({
     <div className={`fieldContainer ${containerClassName}`}>
       <input
         id={id}
-        className={`fieldInput password ${className} ${disabled ? "disabled" : ""}`}
+        className={`fieldInput password ${className} ${
+          disabled ? "disabled" : ""
+        }`}
         type={showPassword ? "text" : "password"}
         name={name}
         title="Minimum 8 characters"
