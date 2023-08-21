@@ -22,7 +22,7 @@ export default function CreditHistory() {
 
   useEffect(() => {
     // if (!isLoggedIn) navigate("/");
-    
+
     // TODO: Add this Axios call to the backend and return Data JSON format
     axios
       .get("/getCreditHistory")
@@ -37,8 +37,8 @@ export default function CreditHistory() {
       });
   }, [isLoggedIn, navigate]);
 
-  // TODO: Hardcoded data, change it so it comes from API
-  const data = useMemo(() => mockCreditHistoryData, []);
+  const data = useMemo(() => mockCreditHistoryData, []); // TODO: Hardcoded data, change it so it comes from API
+  const creditHistoryDataLength = mockCreditHistoryData?.length; // TODO: Change this to API data
 
   /** @type import('@tanstack/react-table').ColumnDef<any> */
   const creditHistoryColumns = [
@@ -97,12 +97,17 @@ export default function CreditHistory() {
     <PageLayout title="Credit History">
       <div className="container">
         <div className="header">
-          <h1>Credit history ({mockCreditHistoryData.length})</h1>
+          <h1>
+            Credit history{" "}
+            {creditHistoryDataLength && creditHistoryDataLength > 0
+              ? `(${creditHistoryDataLength})`
+              : null}
+          </h1>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           {successMsg && <AlertMessage msg={successMsg} type="success" />}
         </div>
         <div className="tableContainer">
-          {mockCreditHistoryData.length !== 0 ? (
+          {creditHistoryDataLength && creditHistoryDataLength > 0 ? (
             <Table data={data} columns={creditHistoryColumns} />
           ) : (
             <p>
