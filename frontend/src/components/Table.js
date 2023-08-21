@@ -7,10 +7,19 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
 } from "@tanstack/react-table";
-import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import Dropdown from "react-dropdown";
+import {
+  FaCaretDown,
+  FaCaretLeft,
+  FaCaretRight,
+  FaCaretUp,
+  FaStepBackward,
+  FaStepForward,
+} from "react-icons/fa";
 import "../styles/Global.css";
+import { validateTablePagination } from "../utils/Validation";
 
-export default function Table({ data, columns }) {
+export default function Table({ data, columns, totalRows }) {
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
   const [isMobileView, setIsMobileView] = useState(false);
@@ -86,6 +95,48 @@ export default function Table({ data, columns }) {
     );
   }
 
+  function handlePaginationInput(e) {
+    const value = e.target.value;
+    const numValue = parseInt(value);
+
+    // Check if the input is a valid positive integer
+    if (!validateTablePagination(value, numValue, 1, table.getPageCount())) {
+      // Invalid input, reset the input value to the current page index
+      e.target.value = table.getState().pagination.pageIndex + 1;
+    } else {
+      table.setPageIndex(numValue - 1);
+      e.target.value = numValue;
+    }
+  }
+
+  function PaginationControlBtn({ onClickEvent, name, disabled = false }) {
+    function renderIcon() {
+      switch (name) {
+        case "first":
+          return <FaStepBackward size={16} />;
+        case "previous":
+          return <FaCaretLeft size={24} />;
+        case "next":
+          return <FaCaretRight size={24} />;
+        case "last":
+          return <FaStepForward size={16} />;
+        default:
+          return null;
+      }
+    }
+
+    return (
+      <button
+        className="paginationBtnContainer"
+        title={`Go to ${name} page`}
+        disabled={disabled}
+        onClick={onClickEvent}
+      >
+        {renderIcon()}
+      </button>
+    );
+  }
+
   return (
     <>
       {/* <input
@@ -142,24 +193,48 @@ export default function Table({ data, columns }) {
         </tbody>
       </table>
 
-      {/* <div className="tablePaginationBtns">
-        <button onClick={() => table.setPageIndex(0)}>First page</button>
-        <button
-          disabled={!table.getCanPreviousPage()}
-          onClick={() => table.previousPage()}
-        >
-          Previous page
-        </button>
-        <button
-          disabled={!table.getCanNextPage()}
-          onClick={() => table.nextPage()}
-        >
-          Next page
-        </button>
-        <button onClick={() => table.setPageIndex(table.getPageCount() - 1)}>
-          Last page
-        </button>
-      </div> */}
+      <div className="tableFooterActions">
+        <div>
+          <p>
+            {`Showing ${
+              table.getState().pagination.pageIndex + 1
+            } - ${table.getPageCount()} of ${totalRows} items`}
+          </p>
+        </div>
+
+        <div className="tablePaginationBtns">
+          <PaginationControlBtn
+            onClickEvent={() => table.setPageIndex(0)}
+            name="first"
+          />
+          <PaginationControlBtn
+            onClickEvent={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            name="previous"
+          />
+          <p>
+            Page{" "}
+            <input
+              type="number"
+              className="paginationInput"
+              value={table.getState().pagination.pageIndex + 1}
+              onChange={(e) => handlePaginationInput(e)}
+              min={1}
+              max={table.getPageCount()}
+            />
+            of {table.getPageCount()}
+          </p>
+          <PaginationControlBtn
+            onClickEvent={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            name="next"
+          />
+          <PaginationControlBtn
+            onClickEvent={() => table.setPageIndex(table.getPageCount() - 1)}
+            name="last"
+          />
+        </div>
+      </div>
     </>
   );
 }

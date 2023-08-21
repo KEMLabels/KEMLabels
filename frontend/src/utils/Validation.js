@@ -8,6 +8,7 @@ const regex = {
   },
   passwordCombined:
     /^(?=.*[0-9])(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~])(?=.*[A-Z])(?=.*[a-z]).*$/,
+  pagination: /^[1-9]\d*$/,
 };
 
 export function lengthRangeCheck(value, min, max) {
@@ -63,6 +64,22 @@ export function validatePasswordOnSubmit(password, setErrMsg) {
     return setErrMsg(
       "Please ensure your password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
     );
+  }
+  return true;
+}
+
+export function validateTablePagination(
+  value,
+  parsedNumValue,
+  minPage,
+  maxPage
+) {
+  if (
+    !/^[1-9]\d*$/.test(value) ||
+    parsedNumValue < minPage ||
+    parsedNumValue > maxPage
+  ) {
+    return false;
   }
   return true;
 }

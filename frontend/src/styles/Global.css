@@ -373,9 +373,41 @@ body {
 }
 
 .tablePaginationBtns {
+.tableFooterActions {
+  display: flex;
+  justify-content: space-between;  
+  padding-top: 2rem;
+}
+
+.tableFooterActions .tablePaginationBtns {
   display: flex;
   justify-content: center;
-  padding: 2rem 2rem 0;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tableFooterActions .tablePaginationBtns .paginationBtnContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  border: none;
+  background: transparent;
+}
+
+.tableFooterActions .tablePaginationBtns .paginationInput {
+  font-family: "quiet-sans", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: black;
+  padding: 0.5rem;
+  margin: 0 0.5rem;
+  border: solid 1px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  outline: none;
 }
 
 @media screen and (max-width: 1200px) {
