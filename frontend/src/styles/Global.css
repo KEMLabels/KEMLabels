@@ -338,9 +338,32 @@ body {
   text-align: right;
 }
 
+.tablePaginationBtns {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 2rem 0;
+}
+
+@media screen and (max-width: 1200px) {
+  .table tbody td {
+    font-size: 0.9rem;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .globalContainer {
     padding: 5rem;
+  }
+  .table tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .table tbody td {
+    font-size: 1rem;
+    padding: 0 0.5rem 0.25rem;
+    width: 50%;
   }
 }
 

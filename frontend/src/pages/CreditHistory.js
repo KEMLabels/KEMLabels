@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { FaCopy } from "react-icons/fa";
+import { FaRegCopy } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
 import "../styles/Global.css";
 import "../styles/CreditHistory.css";
@@ -71,7 +71,7 @@ export default function CreditHistory() {
             setTimeoutId(cellTimeoutId);
           }}
         >
-          {data.getValue()} <FaCopy />{" "}
+          {data.getValue()} <FaRegCopy />{" "}
         </span>
       ),
     },

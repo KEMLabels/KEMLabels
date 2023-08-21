@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,6 +13,7 @@ import "../styles/Global.css";
 export default function Table({ data, columns }) {
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
+  const [isMobileView, setIsMobileView] = useState(false);
 
   const table = useReactTable({
     data,
@@ -28,6 +29,62 @@ export default function Table({ data, columns }) {
     onSortingChange: setSorting,
     onGlobalFilterChange: setFiltering,
   });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Initial check
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  function renderMobileRow(row) {
+    const [
+      dateCells,
+      timeCells,
+      typeCells,
+      refIdCells,
+      amountCells,
+      statusCells,
+    ] = row.getVisibleCells();
+
+    return (
+      <>
+        <td key={refIdCells.id}>
+          {flexRender(
+            refIdCells.column.columnDef.cell,
+            refIdCells.getContext()
+          )}
+        </td>
+
+        <td key={amountCells.id} className="alignRight">
+          {flexRender(
+            amountCells.column.columnDef.cell,
+            amountCells.getContext()
+          )}
+        </td>
+
+        <td key={typeCells.id + statusCells.id}>
+          {flexRender(typeCells.column.columnDef.cell, typeCells.getContext())}
+          <span style={{ padding: "0 0.5rem" }} />
+          {flexRender(
+            statusCells.column.columnDef.cell,
+            statusCells.getContext()
+          )}
+        </td>
+
+        <td key={dateCells.id + timeCells.id} className="alignRight">
+          {flexRender(dateCells.column.columnDef.cell, dateCells.getContext())}
+          <span style={{ padding: "0 0.25rem" }} />
+          {flexRender(timeCells.column.columnDef.cell, timeCells.getContext())}
+        </td>
+      </>
+    );
+  }
 
   return (
     <>
@@ -65,14 +122,21 @@ export default function Table({ data, columns }) {
         <tbody>
           {table.getRowModel().rows.map((row) => (
             <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className={cell.column.id === "amount" ? "alignRight" : ""}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
+              {isMobileView
+                ? renderMobileRow(row)
+                : row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className={
+                        cell.column.id === "amount" ? "alignRight" : ""
+                      }
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
             </tr>
           ))}
         </tbody>

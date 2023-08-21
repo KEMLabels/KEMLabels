@@ -50,6 +50,10 @@
   transition: all ease-in-out 0.3s;
 }
 
+.container .tableContainer .copyToClipbord svg {
+  color: #212121;
+}
+
 .container .tableContainer .copyToClipbord:hover {
   opacity: 0.5;
 }
@@ -118,9 +122,6 @@
   .container {
     padding: 5rem 5rem 2rem;
   }
-  .table tbody td {
-    font-size: 0.9rem;
-  }
 }
 
 @media screen and (max-width: 992px) {
@@ -162,3 +163,70 @@
   }
 }
 
+@media screen and (max-width: 768px) {
+  :root {
+    --containerPadding: 4rem;
+  }
+  .container {
+    padding: 3rem 2rem 2rem;
+  }
+  .container .tableContainer .table thead {
+    display: none;
+  }
+  /* Ref ID field */
+  .container .tableContainer .table thead th:first-child,
+  .container .tableContainer .table tbody td:first-child {
+    width: 70%;
+  }
+  /* Amount field */
+  .container .tableContainer .table thead th:nth-child(2),
+  .container .tableContainer .table tbody td:nth-child(2) {
+    display: table-cell;
+    width: 30%;
+    font-weight: 600;
+  }
+  /* Type and status field */
+  .container .tableContainer .table thead th:nth-child(3),
+  .container .tableContainer .table tbody td:nth-child(3) {
+    width: 50%;
+    color: #858585;
+  }
+  /* Date and time field */
+  .container .tableContainer .table thead th:nth-child(4),
+  .container .tableContainer .table tbody td:nth-child(4) {
+    width: 50%;
+    color: #858585;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  :root {
+    --containerPadding: 3rem;
+  }
+  .container {
+    padding: 3rem 1.5rem 2rem;
+  }
+  /* Ref ID field */
+  .container .tableContainer .table thead th:first-child,
+  .container .tableContainer .table tbody td:first-child {
+    width: 100%;
+  }
+  /* Amount field */
+  .container .tableContainer .table thead th:nth-child(2),
+  .container .tableContainer .table tbody td:nth-child(2) {
+    width: 30%;
+    text-align: left;
+  }
+  /* Type and status field */
+  .container .tableContainer .table thead th:nth-child(3),
+  .container .tableContainer .table tbody td:nth-child(3) {
+    width: 70%;
+    text-align: right;
+  }
+  /* Date and time field */
+  .container .tableContainer .table thead th:nth-child(4),
+  .container .tableContainer .table tbody td:nth-child(4) {
+    width: 100%;
+    text-align: left;
+  }
+}
