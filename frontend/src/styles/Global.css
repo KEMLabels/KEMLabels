@@ -298,6 +298,46 @@ body {
   color: var(--infoColor);
 }
 
+.table {
+  border-collapse: collapse; 
+}
+
+.table thead tr {
+  border-bottom: solid 1px #dadada;
+}
+
+.table thead th {
+  text-align: left;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 2rem;
+  padding: 0.5rem 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.table thead th svg {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.5rem;
+}
+
+.table tbody tr {
+  border-bottom: solid 1px #f1f1f1;
+}
+
+.table tbody td {
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 2rem;
+  padding: 0.75rem 0.5rem;
+}
+
+.table thead th.alignRight,
+.table tbody td.alignRight {
+  text-align: right;
+}
+
 @media screen and (max-width: 768px) {
   .globalContainer {
     padding: 5rem;

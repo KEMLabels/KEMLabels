@@ -1,0 +1,164 @@
+:root {
+  --containerPadding: 20rem;
+  --tableContainerWidth: calc(100vw - var(--containerPadding));
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 5rem 10rem 2rem;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 83vh;
+  align-items: center;
+}
+
+.container .header {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.container .header .alertMessageContainer {
+  max-width: 600px;
+}
+
+.container .header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.container .tableContainer {
+  width: 100%;
+}
+
+.container .tableContainer p {
+  font-size: 1rem;
+  font-weight: 300;
+}
+
+.container .tableContainer .copyToClipbord {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  -webkit-transition: all ease-in-out 0.3s;
+  -moz-transition: all ease-in-out 0.3s;
+  -ms-transition: all ease-in-out 0.3s;
+  -o-transition: all ease-in-out 0.3s;
+  transition: all ease-in-out 0.3s;
+}
+
+.container .tableContainer .copyToClipbord:hover {
+  opacity: 0.5;
+}
+
+.container .tableContainer .creditStatus {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-weight: 500;
+}
+
+.container .tableContainer .creditStatus.success {
+  background: rgb(0, 204, 102, 0.15);
+  color: var(--successColor);
+}
+
+.container .tableContainer .creditStatus.processing {
+  background: rgb(0, 102, 255, 0.15);
+  color: var(--infoColor);
+}
+
+.container .tableContainer .creditStatus.failed {
+  background: rgb(255, 0, 51, 0.15);
+  color: var(--errorColor);
+}
+
+/* Date field */
+.container .tableContainer .table thead th:first-child,
+.container .tableContainer .table tbody td:first-child {
+  width: calc(var(--tableContainerWidth) * 0.15);
+}
+
+/* Time field */
+.container .tableContainer .table thead th:nth-child(2),
+.container .tableContainer .table tbody td:nth-child(2) {
+  width: calc(var(--tableContainerWidth) * 0.1);
+}
+
+/* Type field */
+.container .tableContainer .table thead th:nth-child(3),
+.container .tableContainer .table tbody td:nth-child(3) {
+  width: calc(var(--tableContainerWidth) * 0.12);
+}
+
+/* ID field */
+.container .tableContainer .table thead th:nth-child(4),
+.container .tableContainer .table tbody td:nth-child(4) {
+  width: calc(var(--tableContainerWidth) * 0.35);
+}
+
+/* Amount field */
+.container .tableContainer .table thead th:nth-child(5),
+.container .tableContainer .table tbody td:nth-child(5) {
+  width: calc(var(--tableContainerWidth) * 0.13);
+}
+
+/* Status field */
+.container .tableContainer .table thead th:nth-child(6),
+.container .tableContainer .table tbody td:nth-child(6) {
+  width: calc(var(--tableContainerWidth) * 0.15);
+}
+
+@media screen and (max-width: 1200px) {
+  :root {
+    --containerPadding: 10rem;
+  }
+  .container {
+    padding: 5rem 5rem 2rem;
+  }
+  .table tbody td {
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  :root {
+    --containerPadding: 6rem;
+  }
+  .container {
+    padding: 5rem 3rem 2rem;
+  }
+  /* Date field */
+  .container .tableContainer .table thead th:first-child,
+  .container .tableContainer .table tbody td:first-child {
+    width: calc(var(--tableContainerWidth) * 0.2);
+  }
+  /* Time field */
+  .container .tableContainer .table thead th:nth-child(2),
+  .container .tableContainer .table tbody td:nth-child(2) {
+    display: none;
+  }
+  /* Type field */
+  .container .tableContainer .table thead th:nth-child(3),
+  .container .tableContainer .table tbody td:nth-child(3) {
+    width: calc(var(--tableContainerWidth) * 0.12);
+  }
+  /* ID field */
+  .container .tableContainer .table thead th:nth-child(4),
+  .container .tableContainer .table tbody td:nth-child(4) {
+    width: calc(var(--tableContainerWidth) * 0.35);
+  }
+  /* Amount field */
+  .container .tableContainer .table thead th:nth-child(5),
+  .container .tableContainer .table tbody td:nth-child(5) {
+    width: calc(var(--tableContainerWidth) * 0.15);
+  }
+  /* Status field */
+  .container .tableContainer .table thead th:nth-child(6),
+  .container .tableContainer .table tbody td:nth-child(6) {
+    width: calc(var(--tableContainerWidth) * 0.18);
+  }
+}
+
