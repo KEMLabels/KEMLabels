@@ -349,6 +349,15 @@ body {
   background-color: var(--primaryColor);
 }
 
+.tableNoResults {
+  text-align: center;
+}
+
+.tableNoResults p strong {
+  font-weight: 600;
+  color: var(--primaryColor);
+}
+
 .table {
   border-collapse: collapse;
 }

@@ -172,54 +172,65 @@ export default function Table({ data, columns, totalRows, setTotalRows }) {
         </div>
       </div>
 
-      <table className="table">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className={header.column.id === "amount" ? "alignRight" : ""}
-                  onClick={header.column.getToggleSortingHandler()}
-                >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                  {
+      {totalRows > 0 ? (
+        <table className="table">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className={
+                      header.column.id === "amount" ? "alignRight" : ""
+                    }
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
                     {
-                      asc: <FaCaretUp />,
-                      desc: <FaCaretDown />,
-                    }[header.column.getIsSorted() ?? null]
-                  }
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
+                      {
+                        asc: <FaCaretUp />,
+                        desc: <FaCaretDown />,
+                      }[header.column.getIsSorted() ?? null]
+                    }
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
 
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
-              {isMobileView
-                ? renderMobileRow(row)
-                : row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className={
-                        cell.column.id === "amount" ? "alignRight" : ""
-                      }
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id}>
+                {isMobileView
+                  ? renderMobileRow(row)
+                  : row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className={
+                          cell.column.id === "amount" ? "alignRight" : ""
+                        }
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div className="tableNoResults">
+          <p>
+            Hmm... we couldn't find a match for <strong>"{filtering}"</strong>.
+            Please try seraching by another keyword.
+          </p>
+        </div>
+      )}
 
       <div className="tableFooterActions">
         <div>
