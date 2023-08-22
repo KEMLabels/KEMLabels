@@ -13,9 +13,19 @@ export default function HamburgerMenu({ sessionStatus = false }) {
   function HideHamburgerOnWindowClick() {
     window.onclick = (e) => {
       if (showHamburgerMenu && !e.target.matches(".hamburgerMenu")) {
-        setShowHamburgerMenu(false);
+        closeHamburgerMenu();
       }
     };
+  }
+
+  function openHamburgerMenu() {
+    document.body.style.overflow = "hidden";
+    setShowHamburgerMenu(true);
+  }
+
+  function closeHamburgerMenu() {
+    document.body.style.overflow = null;
+    setShowHamburgerMenu(false);
   }
 
   return (
@@ -23,7 +33,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
       <button
         className="iconButton"
         style={{ marginTop: "5px" }}
-        onClick={() => setShowHamburgerMenu(true)}
+        onClick={openHamburgerMenu}
       >
         <FaBars size={24} />
       </button>
@@ -43,10 +53,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
             <h1>KEMLabels</h1>
           </Link>
 
-          <button
-            className="iconButton"
-            onClick={() => setShowHamburgerMenu(false)}
-          >
+          <button className="iconButton" onClick={closeHamburgerMenu}>
             <IoCloseSharp size={24} style={{ marginTop: "5px" }} />
           </button>
         </div>

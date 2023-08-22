@@ -131,7 +131,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 90%;
+  width: 85%;
   height: 100vh;
   background-color: white;
   padding: 3rem 2rem;
@@ -145,11 +145,12 @@
   -ms-transition: all ease-in-out 0.4s;
   -o-transition: all ease-in-out 0.4s;
   transition: all ease-in-out 0.4s;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: none;
   z-index: 5;
 }
 
 .hamburgerMenu.active {
+  box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.2);
   -webkit-transform: translateX(0);
   -moz-transform: translateX(0);
   -ms-transform: translateX(0);
