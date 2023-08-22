@@ -19,7 +19,7 @@ import "../styles/Global.css";
 import { validateTablePagination } from "../utils/Validation";
 import { SearchField } from "./Field";
 
-export default function Table({ data, columns, totalRows }) {
+export default function Table({ data, columns, totalRows, setTotalRows }) {
   const [sorting, setSorting] = useState([]);
   const [filtering, setFiltering] = useState("");
   const [isMobileView, setIsMobileView] = useState(false);
@@ -43,6 +43,8 @@ export default function Table({ data, columns, totalRows }) {
     onGlobalFilterChange: setFiltering,
   });
 
+  useEffect(() => setTotalRows(table.getFilteredRowModel().rows.length));
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth <= 768);
@@ -53,7 +55,7 @@ export default function Table({ data, columns, totalRows }) {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  });
 
   function renderMobileRow(row) {
     const [
