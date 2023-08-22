@@ -17,6 +17,7 @@ import {
 } from "react-icons/md";
 import "../styles/Global.css";
 import { validateTablePagination } from "../utils/Validation";
+import { SearchField } from "./Field";
 
 export default function Table({ data, columns, totalRows }) {
   const [sorting, setSorting] = useState([]);
@@ -143,12 +144,14 @@ export default function Table({ data, columns, totalRows }) {
   return (
     <>
       <div className="tableHeaderActions">
-        {/* <input
-          type="text"
-          value={filtering}
-          onChange={(e) => setFiltering(e.target.value)}
-        /> */}
-        <div className="tableSearch"></div>
+        <div className="tableSearch">
+          <SearchField
+            className="tableSearchField"
+            placeholder="Search for payment type, amount, date, etc."
+            currentValue={filtering}
+            onChangeEvent={(e) => setFiltering(e.target.value)}
+          />
+        </div>
         <div className="tableItemsToShow">
           <span>Items per page</span>{" "}
           <Dropdown
@@ -241,7 +244,7 @@ export default function Table({ data, columns, totalRows }) {
               type="number"
               className="paginationInput"
               value={table.getState().pagination.pageIndex + 1}
-              onChange={(e) => handlePaginationInput(e)}
+              onChange={handlePaginationInput}
               min={1}
               max={table.getPageCount()}
             />

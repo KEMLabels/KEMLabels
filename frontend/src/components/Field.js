@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../styles/Global.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { MdSearch } from "react-icons/md";
 
 function InputField({
   id,
@@ -235,4 +236,46 @@ function PasswordField({
   );
 }
 
-export { InputField, PasswordField, StripeAmountField, StripeInputField };
+function SearchField({
+  id,
+  className = "",
+  containerClassName = "",
+  name = "",
+  fieldType = "text",
+  title = "",
+  initialValue,
+  currentValue,
+  placeholder = "",
+  onChangeEvent,
+  customStyle,
+}) {
+  return (
+    <div className={`fieldContainer ${containerClassName}`}>
+      <div className="searchIcon">
+        <MdSearch />
+      </div>
+      <input
+        id={id}
+        className={`fieldInput searchField ${className}`}
+        type={fieldType}
+        name={name}
+        title={title}
+        style={{ ...customStyle }}
+        defaultValue={initialValue}
+        value={currentValue}
+        placeholder={placeholder}
+        onChange={(e) => {
+          if (onChangeEvent) onChangeEvent(e);
+        }}
+      />
+    </div>
+  );
+}
+
+export {
+  InputField,
+  PasswordField,
+  StripeAmountField,
+  StripeInputField,
+  SearchField,
+};

@@ -189,6 +189,18 @@ body {
   align-items: center;
 }
 
+.fieldContainer .searchIcon {
+  display: flex;
+  position: absolute;
+  padding-left: 1rem;
+}
+
+.fieldContainer .searchIcon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #858585;
+}
+
 .fieldContainer .fieldInput {
   font-family: "quiet-sans", sans-serif;
   font-size: 1.1rem;
@@ -204,6 +216,10 @@ body {
   -ms-transition: all ease-in-out 0.3s;
   -o-transition: all ease-in-out 0.3s;
   transition: all ease-in-out 0.3s;
+}
+
+.fieldContainer .fieldInput.searchField {
+  padding-left: 3rem;
 }
 
 .fieldContainer .fieldInput.password {
@@ -381,6 +397,10 @@ body {
 
 .tableHeaderActions .tableSearch {
   width: 70%;
+}
+
+.tableHeaderActions .tableSearch .searchField {
+  max-width: 500px;
 }
 
 .tableHeaderActions .tableItemsToShow {
