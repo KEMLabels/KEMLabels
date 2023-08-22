@@ -8,14 +8,13 @@ import {
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import Dropdown from "react-dropdown";
+import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import {
-  FaCaretDown,
-  FaCaretLeft,
-  FaCaretRight,
-  FaCaretUp,
-  FaStepBackward,
-  FaStepForward,
-} from "react-icons/fa";
+  MdChevronLeft,
+  MdChevronRight,
+  MdFirstPage,
+  MdLastPage,
+} from "react-icons/md";
 import "../styles/Global.css";
 import { validateTablePagination } from "../utils/Validation";
 
@@ -117,13 +116,13 @@ export default function Table({ data, columns, totalRows }) {
     function renderIcon() {
       switch (name) {
         case "first":
-          return <FaStepBackward size={16} />;
+          return <MdFirstPage size={24} />;
         case "previous":
-          return <FaCaretLeft size={24} />;
+          return <MdChevronLeft size={24} />;
         case "next":
-          return <FaCaretRight size={24} />;
+          return <MdChevronRight size={24} />;
         case "last":
-          return <FaStepForward size={16} />;
+          return <MdLastPage size={24} />;
         default:
           return null;
       }
