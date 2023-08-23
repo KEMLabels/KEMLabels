@@ -590,6 +590,7 @@ app.get('/getCreditHistory', async (req, res) => {
     try {
         const paymentIntent = await stripe.paymentIntents.search({
             query: `status:\'succeeded\' AND metadata[\'email\']:\'${req.session.user.email}\'`,
+            limit: 100,
         });
 
         const formattedPaymentIntents = [];
@@ -600,13 +601,19 @@ app.get('/getCreditHistory', async (req, res) => {
             const createdDate = format(new Date(createdTimestamp * 1000), 'MMMM dd, yyyy');
             const createdTime = format(new Date(createdTimestamp * 1000), 'hh:mm a');
 
+            const statusMapping = {
+                succeeded: 'Success',
+                processing: 'Processing',
+            };
+            const status = statusMapping[intent.status] || 'Failed';
+
             formattedPaymentIntents.push({
                 refId: intent.id,
                 paymentDate: createdDate,
                 paymentTime: createdTime,
                 amount: intent.amount / 100, // convert to dollars
-                type: "Stripe",
-                status: intent.status,
+                type: 'Stripe',
+                status: status,
             });
         }
 
