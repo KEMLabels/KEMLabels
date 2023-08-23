@@ -18,7 +18,7 @@ export default function VerifyEmailConfirmation() {
   const [linkErrMsg, setLinkErrMsg] = useState("");
 
   useEffect(() => {
-    const url = `${process.env.BACKEND_SERVER}/users/${param.id}/verify/${param.token}`;
+    const url = `${process.env.REACT_APP_BACKEND_SERVER}/users/${param.id}/verify/${param.token}`;
     axios
       .get(url, { withCredentials: true })
       .then((res) => {
@@ -49,7 +49,8 @@ export default function VerifyEmailConfirmation() {
           <>
             <h1 style={{ textAlign: "center" }}>Your email link is invalid!</h1>{" "}
             <p style={{ opacity: "0.7", textAlign: "center" }}>
-              We're sorry, but your email link doesn't seem right. Please login and{" "}
+              We're sorry, but your email link doesn't seem right. Please login
+              and{" "}
               <Link to="/verify-email" className="link">
                 request a new link here.
               </Link>

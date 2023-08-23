@@ -119,7 +119,7 @@ export default function CheckoutForm({
         elements,
         confirmParams: {
           // Make sure to change this to your payment completion page
-          return_url: `${process.env.FRONTEND_SERVER}/pay/credit-card`,
+          return_url: `${process.env.REACT_APP_FRONTEND_SERVER}/pay/credit-card`,
           receipt_email: useremail,
         },
       })
@@ -130,8 +130,10 @@ export default function CheckoutForm({
         // be redirected to an intermediate site first to authorize the payment, then
         // redirected to the `return_url`.
         if (error.type === "card_error" || error.type === "validation_error") {
+          Log("Error: ", error);
           setErrMsg(error.message);
         } else {
+          Log("Error: ", error);
           setErrMsg("An unexpected error occurred. Please try again later.");
         }
       })
