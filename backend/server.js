@@ -655,7 +655,7 @@ function sendPasswordChangeEmail(emailAddress) {
 app.get('/getCreditHistory', async (req, res) => {
     try {
         const paymentIntent = await stripe.paymentIntents.search({
-            query: `status:\'succeeded\' AND metadata[\'email\']:\'vi9veltpvpstaff@gmail.com\'`,
+            query: `status:\'succeeded\' AND metadata[\'email\']:\'${req.session.user.email}\'`,
         });
 
         const formattedPaymentIntents = [];

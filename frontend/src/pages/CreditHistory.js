@@ -17,18 +17,19 @@ export default function CreditHistory() {
 
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [isFetching, setIsFetching] = useState(true);
   const [timeoutId, setTimeoutId] = useState(null);
   const [creditHistoryData, setCreditHistoryData] = useState([]);
 
-  const data = useMemo(() => mockCreditHistoryData, []); // TODO: Hardcoded data, change it so it comes from API
-  const [totaRows, setTotalRows] = useState(mockCreditHistoryData?.length || 0); // TODO: Change this to API data
+  const data = useMemo(() => creditHistoryData, [creditHistoryData]);
+  const [totalRows, setTotalRows] = useState(creditHistoryData.length);
 
   useEffect(() => {
     // if (!isLoggedIn) navigate("/");
 
     // TODO: Add this Axios call to the backend and return Data JSON format
     axios
-      .get("/getCreditHistory" , {
+      .get("/getCreditHistory", {
         withCredentials: true,
       })
       .then((res) => {
@@ -38,7 +39,10 @@ export default function CreditHistory() {
       })
       .catch((e) => {
         console.log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later.");
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      })
+      .finally(() => {
+        setIsFetching(false);
       });
   }, [isLoggedIn, navigate]);
 
@@ -95,20 +99,21 @@ export default function CreditHistory() {
     },
   ];
 
+  if (isFetching) return null;
   return (
     <PageLayout title="Credit History">
       <div className="container">
         <div className="header">
-          <h1>Credit history {`(${totaRows})`}</h1>
+          <h1>Credit history {`(${totalRows})`}</h1>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           {successMsg && <AlertMessage msg={successMsg} type="success" />}
         </div>
         <div className="tableContainer">
-          {mockCreditHistoryData?.length > 0 ? (
+          {creditHistoryData.length > 0 ? (
             <Table
               data={data}
               columns={creditHistoryColumns}
-              totalRows={totaRows}
+              totalRows={totalRows}
               setTotalRows={setTotalRows}
             />
           ) : (
