@@ -7,7 +7,6 @@ import "../styles/Global.css";
 import "../styles/CreditHistory.css";
 import AlertMessage from "../components/AlertMessage";
 import Table from "../components/Table";
-import mockCreditHistoryData from "../content/creditHistoryData";
 import axios from "../api/axios";
 import Log from "../components/Log";
 
