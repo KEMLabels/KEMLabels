@@ -7,6 +7,7 @@ import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 import { setVerifyEmailAttempts } from "../redux/actions/UserAction";
 import { getCurrDateTime } from "../utils/Helpers";
+import Log from "../components/Log";
 
 export default function VerifyEmail() {
   const dispatch = useDispatch();
@@ -43,7 +44,7 @@ export default function VerifyEmail() {
           }
         })
         .catch((e) => {
-          console.log("Error: ", e);
+          Log("Error: ", e);
           if (
             e?.response?.data?.msg ===
             "Please check your inbox for a verification link to verify your account."
@@ -74,10 +75,10 @@ export default function VerifyEmail() {
       axios
         .get("/generateToken", { withCredentials: true })
         .then((res) => {
-          console.log(res);
+          Log(res);
         })
         .catch((e) => {
-          console.log("Error: ", e);
+          Log("Error: ", e);
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         });
       setTimeout(() => {

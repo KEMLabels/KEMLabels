@@ -5,6 +5,7 @@ import { FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 import AlertMessage from "../components/AlertMessage";
+import Log from "../components/Log";
 
 export default function VerifyEmailConfirmation() {
   const param = useParams();
@@ -21,11 +22,11 @@ export default function VerifyEmailConfirmation() {
     axios
       .get(url, { withCredentials: true })
       .then((res) => {
-        console.log(res);
+        Log(res);
         setvalidURL(true);
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         setvalidURL(false);
         if (
           e?.response?.data?.msg === "Link Invalid" ||

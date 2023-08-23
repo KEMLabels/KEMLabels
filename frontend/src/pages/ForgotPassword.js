@@ -14,6 +14,7 @@ import AlertMessage from "../components/AlertMessage";
 import { setForgetPassEmailAttempts } from "../redux/actions/UserAction";
 import { validatePasswordOnSubmit } from "../utils/Validation";
 import { getCurrDateTime, validatePasswordOnTyping } from "../utils/Helpers";
+import Log from "../components/Log";
 
 export default function ForgotPassword() {
   const dispatch = useDispatch();
@@ -78,7 +79,7 @@ export default function ForgotPassword() {
     axios
       .post("/emailExists", { email }, { withCredentials: true })
       .then((res) => {
-        console.log(res.data);
+        Log(res.data);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           sendInitialRequest();
@@ -88,7 +89,7 @@ export default function ForgotPassword() {
         }
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         if (
           e?.response?.data?.msg ===
           "Hmm... this email is not associated with an account. Please try again."
@@ -125,10 +126,10 @@ export default function ForgotPassword() {
           { withCredentials: true }
         )
         .then((res) => {
-          console.log(res.data);
+          Log(res.data);
         })
         .catch((e) => {
-          console.log("Error: ", e);
+          Log("Error: ", e);
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         });
     }
@@ -162,10 +163,10 @@ export default function ForgotPassword() {
           { withCredentials: true }
         )
         .then((res) => {
-          console.log(res.data);
+          Log(res.data);
         })
         .catch((e) => {
-          console.log("Error: ", e);
+          Log("Error: ", e);
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         })
         .finally(() => {
@@ -182,7 +183,7 @@ export default function ForgotPassword() {
     axios
       .post("/checkOTP", { enteredOTP, email }, { withCredentials: true })
       .then((res) => {
-        console.log(res);
+        Log(res);
         document.getElementById("resetPasswordForm").reset();
         setResetPasswordStep("changePassword");
         setErrMsg("");
@@ -192,7 +193,7 @@ export default function ForgotPassword() {
         }, 5000);
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         if (
           e?.response?.data?.msg ===
           "Hmm... your code was incorrect. Please try again."
@@ -220,7 +221,7 @@ export default function ForgotPassword() {
     axios
       .post("/updateUserPass", { email, password }, { withCredentials: true })
       .then((res) => {
-        console.log(res);
+        Log(res);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           setRedirecting(true);
@@ -234,7 +235,7 @@ export default function ForgotPassword() {
         }
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       })
       .finally(() => {

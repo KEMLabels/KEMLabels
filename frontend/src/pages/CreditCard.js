@@ -10,6 +10,7 @@ import CheckoutForm from "../components/CheckoutForm";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
+import Log from "../components/Log";
 
 export default function CreditCard() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function CreditCard() {
         }
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later.");
       });
 
@@ -53,7 +54,7 @@ export default function CreditCard() {
       }
     })
     .then((res) => {
-      console.log('response: ' + JSON.stringify(res.data));
+      Log('response: ' + JSON.stringify(res.data));
       // You can access response.data to get the data returned by the server
       setClientSecret(res.data.clientSecret);
       if (

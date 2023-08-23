@@ -13,6 +13,7 @@ import { StripeAmountField, StripeInputField } from "./Field";
 import AlertMessage from "./AlertMessage";
 import Button from "./Button";
 import { Link } from "react-router-dom";
+import Log from "./Log";
 
 export default function CheckoutForm({
   useremail,
@@ -89,7 +90,7 @@ export default function CheckoutForm({
         setIsPageLoading(false);
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       });
   }, [
@@ -137,7 +138,7 @@ export default function CheckoutForm({
       })
       .catch((e) => {
         // Handle any other errors that might occur during the request
-        console.log("Error: ", e);
+        Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       })
       .finally(() => {

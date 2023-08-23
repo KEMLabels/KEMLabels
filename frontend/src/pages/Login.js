@@ -17,6 +17,7 @@ import {
   setUserLoggedIn,
   setUserName,
 } from "../redux/actions/UserAction";
+import Log from "../components/Log";
 
 export default function Login() {
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ export default function Login() {
           else navigate(res.data.redirect);
         })
         .catch((e) => {
-          console.log("Error: ", e);
+          Log("Error: ", e);
           if (e?.response?.data?.msg === "User is not verified") {
             navigate("/verify-email");
           } else {
@@ -76,7 +77,7 @@ export default function Login() {
         }
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         if (e?.response?.data?.msg === "Incorrect email or password.") {
           setErrMsg(e.response.data.msg);
         } else

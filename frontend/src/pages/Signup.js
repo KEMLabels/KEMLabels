@@ -26,6 +26,7 @@ import {
   getCurrDateTimeInISO,
   validatePasswordOnTyping,
 } from "../utils/Helpers";
+import Log from "../components/Log";
 
 export default function Signup() {
   const dispatch = useDispatch();
@@ -84,7 +85,7 @@ export default function Signup() {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res);
+        Log(res);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           dispatch(setUserName(inputUserName));
@@ -96,7 +97,7 @@ export default function Signup() {
         }
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         if (
           e?.response?.data?.msg ===
             "This username is already associated with an account." ||

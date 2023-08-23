@@ -19,6 +19,7 @@ import {
 import axios from "../api/axios";
 import { clearSession, setUserName } from "../redux/actions/UserAction";
 import { validatePasswordOnTyping } from "../utils/Helpers";
+import Log from "../components/Log";
 
 export default function AccountSettings({ currentPage = "username" }) {
   const dispatch = useDispatch();
@@ -127,7 +128,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res);
+        Log(res);
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
           dispatch(setUserName(inputUserName));
@@ -136,7 +137,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         }
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         if (
           e?.response?.data?.msg ===
             "This username is already associated with an account." ||
@@ -164,10 +165,10 @@ export default function AccountSettings({ currentPage = "username" }) {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res);
+        Log(res);
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       });
   }
@@ -204,7 +205,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res);
+        Log(res);
         setInfoMsg(
           `A confirmation email with instructions has been sent to ${confirmInputEmail}.`
         );
@@ -217,7 +218,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         }, 15000);
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         if (
           e?.response?.data?.msg ===
             "You cannot change your email to the one you currently have." ||
@@ -252,7 +253,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res);
+        Log(res);
         if (currentPage === "email") {
           updateEmailCall();
           setSuccessMsg(
@@ -272,7 +273,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         }, 3000);
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         if (
           e?.response?.data?.msg ===
           "Hmm... your code was incorrect. Please try again."
@@ -312,10 +313,10 @@ export default function AccountSettings({ currentPage = "username" }) {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res.data);
+        Log(res.data);
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       })
       .finally(() => {
@@ -336,10 +337,10 @@ export default function AccountSettings({ currentPage = "username" }) {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res);
+        Log(res);
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       });
   }
@@ -380,7 +381,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res);
+        Log(res);
         setInfoMsg(
           `A confirmation email with instructions has been sent to ${email}.`
         );
@@ -393,7 +394,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         }, 15000);
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         if (
           e?.response?.data?.msg ===
             "Looks like you have entered the same password that you are using now. Please enter a differernt password." ||

@@ -10,6 +10,7 @@ import { setUserLoadAmount } from "../redux/actions/UserAction";
 import axios from "../api/axios";
 import AlertMessage from "../components/AlertMessage";
 import { StripeAmountField } from "../components/Field";
+import Log from "../components/Log";
 
 export default function LoadCredits() {
   const dispatch = useDispatch();
@@ -118,7 +119,7 @@ export default function LoadCredits() {
                       window.location.href = res.data.redirect;
                     })
                     .catch((e) => {
-                      console.log("Error: ", e);
+                      Log("Error: ", e);
                     });
                 }}
               >

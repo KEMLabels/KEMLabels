@@ -9,6 +9,7 @@ import AlertMessage from "../components/AlertMessage";
 import Table from "../components/Table";
 import mockCreditHistoryData from "../content/creditHistoryData";
 import axios from "../api/axios";
+import Log from "../components/Log";
 
 export default function CreditHistory() {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ export default function CreditHistory() {
         }
       })
       .catch((e) => {
-        console.log("Error: ", e);
+        Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       })
       .finally(() => {
