@@ -605,7 +605,6 @@ app.get('/getCreditHistory', async (req, res) => {
                 succeeded: 'Success',
                 processing: 'Processing',
             };
-            const status = statusMapping[intent.status] || 'Failed';
 
             formattedPaymentIntents.push({
                 refId: intent.id,
@@ -613,7 +612,7 @@ app.get('/getCreditHistory', async (req, res) => {
                 paymentTime: createdTime,
                 amount: intent.amount / 100, // convert to dollars
                 type: 'Stripe',
-                status: status,
+                status: statusMapping[intent.status] || 'Failed',
             });
         }
 
