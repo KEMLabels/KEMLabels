@@ -88,8 +88,8 @@ app.use(session({
     cookie: {
         maxAge: 600000,
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        // secure: true,
+        // sameSite: 'none',
     },
     store: store,
 }));
@@ -916,15 +916,20 @@ app.get('*', (req, res) => {
 app.use(handleErr);
 
 // Create SSL options
-const options = {
-    key: fs.readFileSync('path_to_private_key.pem'),
-    cert: fs.readFileSync('path_to_ssl_certificate.pem')
-};
+// const options = {
+//     key: fs.readFileSync('path_to_private_key.pem'),
+//     cert: fs.readFileSync('path_to_ssl_certificate.pem')
+// };
 
 //Start server
-const server = https.createServer(options, app);
+// const server = https.createServer(options, app);
+// connectDB().then(() => {
+//     server.listen(process.env.PORT, () => {
+//         console.log("Server is running on port " + process.env.PORT);
+//     });
+// });
 connectDB().then(() => {
-    server.listen(8081, () => {
-        console.log('Server is running on port 8081');
+    app.listen(process.env.PORT, () => {
+        console.log("Server is running on port " + process.env.PORT);
     });
-})
+});
