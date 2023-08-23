@@ -604,7 +604,7 @@ app.get('/getCreditHistory', async (req, res) => {
                 refId: intent.id,
                 paymentDate: createdDate,
                 paymentTime: createdTime,
-                amount: intent.amount,
+                amount: intent.amount / 100, // convert to dollars
                 type: "Stripe",
                 status: intent.status,
             });
