@@ -14,6 +14,7 @@ const https = require('https');
 const fs = require('fs');
 const { format } = require('date-fns');
 require('express-async-errors');
+const log = require('./log');
 
 //Configure mongoose, app, and dotenv
 mongoose.set('strictQuery', false);
@@ -39,9 +40,9 @@ const isDevelopmentEnv = () => process.env.NODE_ENV === 'dev';
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true });
-        console.log(`Connected to DB`);
+        log(`Connected to DB`);
     } catch (error) {
-        console.log("Couldn't connect to DB: ", error);
+        log("Couldn't connect to DB: ", error);
         process.exit(1);
     }
 }
@@ -158,7 +159,7 @@ app.post("/create-payment-intent", async (req, res) => {
             clientSecret: paymentIntent.client_secret,
         });
     } catch (err) {
-        console.log(err);
+        log(err);
         res.send({ err });
     }
 });
@@ -168,18 +169,18 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
 
     let event;
 
-    console.log(req.body);
+    log(req.body);
 
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
-        console.log("Failed to verify webook." + err);
+        log("Failed to verify webook." + err);
         return;
     }
 
     if (event.type === "payment_intent.succeeded") {
         const paymentIntent = event.data.object;
-        console.log("Payment succeeded!", paymentIntent);
+        log("Payment succeeded!", paymentIntent);
         let user = await User.findOne({ email: paymentIntent.metadata.email })
         if (!user)
             throw new Error('Does not exist.');
@@ -192,10 +193,10 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
                 "credits": Number(userExistingCredits) + Number(paymentIntent.amount / 100)
             })
             .then((obj) => {
-                console.log("User credits updated");
+                log("User credits updated");
             })
             .catch((err) => {
-                console.log(err);
+                log(err);
             })
     }
     res.status(200).end();
@@ -220,13 +221,13 @@ app.post("/payWithCrypto", async (req, res) => {
         })
         res.json({ redirect: charge.hosted_url });
     } catch (err) {
-        console.log(err);
+        log(err);
     }
 })
 
 //Error handler function
 async function handleErr(err, req, res, next) {
-    console.log(err.message)
+    log(err.message)
     return res.json({ errMsg: err.message })
 }
 
@@ -259,7 +260,7 @@ app.post('/signin', async (req, res) => {
             }
         }
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -309,7 +310,7 @@ app.post("/signup", async (req, res) => {
         req.session.isLoggedIn = true;
         res.json({ redirect: '/verify-email' });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -322,9 +323,9 @@ app.get("/generateToken", async (req, res) => {
             _id: findToken._id.toString()
         })
             .then(function () {
-                console.log('successfuly deleted');
+                log('successfuly deleted');
             }).catch(function (error) {
-                console.log(error); // Failure
+                log(error); // Failure
             });
     }
     generateTokenHelper(req.session.user._id, req.session.user.email);
@@ -338,7 +339,7 @@ async function generateTokenHelper(userID, email) {
     })
     create_token.save()
     const url = `${process.env.FRONTEND_SERVER}/users/${userID}/verify/${token}`;
-    console.log(url);
+    log(url);
     sendSignUpConfirmationEmail(email, url);
 }
 
@@ -363,7 +364,7 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
         </div>`,
     }
     transporter.sendMail(signUpConfirmationEmail, function (err, info) {
-        if (err) console.log(err)
+        if (err) log(err)
     });
 }
 
@@ -385,24 +386,24 @@ app.get('/users/:id/verify/:token', async (req, res) => {
                 "verified": true
             })
             .then((obj) => {
-                console.log("User has been verified");
+                log("User has been verified");
             })
             .catch((err) => {
-                console.log(err);
+                log(err);
             })
 
         tempTokens.deleteOne({
             token: req.params.token
         })
             .then(function () {
-                console.log('successfuly deleted');
+                log('successfuly deleted');
             }).catch(function (error) {
-                console.log(error); // Failure
+                log(error); // Failure
             });
 
         return res.json({ redirect: '/' });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -416,7 +417,7 @@ app.get('/isUserVerified', async (req, res) => {
         if (!verified) throw new Error('Please check your inbox for a verification link to verify your account.');
         else res.json({ redirect: '/' });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 
@@ -430,7 +431,7 @@ app.get('/checkVerification', async (req, res) => {
         if (!verified) throw new Error('User is not verified');
         res.json({ redirect: '/' });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -448,7 +449,7 @@ app.post("/emailExists", async (req, res) => {
         if (!emailExists) throw new Error('Hmm... this email is not associated with an account. Please try again.');
         else res.json({ emailExists });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -462,15 +463,15 @@ app.post("/generateNewOTP", async (req, res) => {
     const { email, type } = req.body
     const findOTP = await tempOTPS.findOne({ email: email.toLowerCase() });
     if (findOTP) {
-        console.log(findOTP)
+        log(findOTP)
         tempOTPS.deleteOne({
             _id: findOTP._id.toString()
         })
             .then(function () {
                 generateOTPHelper(email, type);
-                console.log('successfuly deleted');
+                log('successfuly deleted');
             }).catch(function (error) {
-                console.log(error); // Failure
+                log(error); // Failure
             });
     } else {
         generateOTPHelper(email, type);
@@ -560,10 +561,10 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
     const selectedEmail = emailTypes[type];
     if (selectedEmail) {
         transporter.sendMail(selectedEmail, function (err, info) {
-            if (err) console.log(err)
+            if (err) log(err)
         });
     } else {
-        console.log('Invalid email type');
+        log('Invalid email type');
     }
 }
 
@@ -571,10 +572,10 @@ app.post("/checkOTP", async (req, res) => {
     try {
         const { enteredOTP } = req.body
         const { email } = req.body
-        console.log('entered code: ' + enteredOTP);
+        log('entered code: ' + enteredOTP);
         const tempCode = await tempOTPS.findOne({ email: email.toLowerCase() });
         if (!tempCode) throw new Error("Invalid Code");
-        console.log('correct code: ' + tempCode.passcode);
+        log('correct code: ' + tempCode.passcode);
         if (Number(enteredOTP) !== Number(tempCode.passcode)) {
             throw new Error('Hmm... your code was incorrect. Please try again.');
         } else {
@@ -582,14 +583,14 @@ app.post("/checkOTP", async (req, res) => {
                 passcode: enteredOTP
             })
                 .then(function () {
-                    console.log('successfuly deleted');
+                    log('successfuly deleted');
                 }).catch(function (error) {
-                    console.log(error); // Failure
+                    log(error); // Failure
                 });
         }
         res.status(200).json("success");
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 
@@ -611,17 +612,17 @@ app.post("/updateUserPass", async (req, res) => {
                 "password": hashedPassword
             })
             .then((obj) => {
-                console.log("Updated Password");
+                log("Updated Password");
             })
             .catch((err) => {
-                console.log(err);
+                log(err);
             })
 
         sendPasswordChangeEmail(email);
 
         res.json({ redirect: '/signin' });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -646,7 +647,7 @@ function sendPasswordChangeEmail(emailAddress) {
         </div>`,
     }
     transporter.sendMail(changePassConfirmation, function (err, info) {
-        if (err) console.log(err)
+        if (err) log(err)
     });
 }
 
@@ -677,10 +678,10 @@ app.get('/getCreditHistory', async (req, res) => {
             });
         }
 
-        console.log(formattedPaymentIntents);
+        log(formattedPaymentIntents);
         res.send(formattedPaymentIntents);
     } catch (err) {
-        console.log(err);
+        log(err);
         res.status(500).send('An error occurred.');
     }
 })
@@ -730,11 +731,11 @@ app.post("/UpdateUsername", async (req, res) => {
             { "userName": userNameData, "userNameLastChanged": currentDate }
         );
 
-        console.log("Updated username");
+        log("Updated username");
         sendUserNameChangeEmail(user.email);
         return res.status(200).json({ msg: 'Username updated successfully.' });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 });
@@ -759,7 +760,7 @@ function sendUserNameChangeEmail(emailAddress) {
         </div>`,
     }
     transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
-        if (err) console.log(err)
+        if (err) log(err)
     });
 }
 
@@ -789,7 +790,7 @@ app.post("/sendEmailChangeConfirmation", async (req, res) => {
         sendEmailChangeRequestEmail(currentEmail, newEmail.toLowerCase(), otp)
         return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${newEmail.toLowerCase()}.` });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -814,7 +815,7 @@ function sendEmailChangeRequestEmail(currentEmail, newEmail, OTPPasscode) {
         </div>`,
     }
     transporter.sendMail(sendSecurityAlert, function (err, info) {
-        if (err) console.log(err)
+        if (err) log(err)
     });
     sendOTPEmail(OTPPasscode, newEmail, "changeEmail");
 }
@@ -833,11 +834,11 @@ app.post("/updateEmailAddress", async (req, res) => {
             { "email": newEmail.toLowerCase(), "verified": false }
         );
 
-        console.log("Updated email and unverified user");
+        log("Updated email and unverified user");
         sendEmailChangeEmail(newEmail.toLowerCase());
         return res.status(200).json({ msg: 'Username updated successfully.' });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -862,7 +863,7 @@ function sendEmailChangeEmail(emailAddress) {
         </div>`,
     }
     transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
-        if (err) console.log(err)
+        if (err) log(err)
     });
 }
 
@@ -889,7 +890,7 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
         sendOTPEmail(otp, userEmail, "changePassword");
         return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${userEmail}.` });
     } catch (err) {
-        console.log(err);
+        log(err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -898,7 +899,7 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
 // Schedule a task to run every 24 hours
 cron.schedule('0 0 */1 * *', async () => {
     try {
-        console.log('cron running');
+        log('cron running');
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
         // Delete unverified accounts created more than 24 hours ago
@@ -920,7 +921,7 @@ app.use(handleErr);
 if (isDevelopmentEnv()) {
     connectDB().then(() => {
         app.listen(process.env.PORT, () => {
-            console.log("Server is running on port " + process.env.PORT);
+            log("Server is running on port " + process.env.PORT);
         });
     });
 } else {
@@ -933,7 +934,7 @@ if (isDevelopmentEnv()) {
     const server = https.createServer(options, app);
     connectDB().then(() => {
         server.listen(process.env.PORT, () => {
-            console.log("Server is running on port " + process.env.PORT);
+            log("Server is running on port " + process.env.PORT);
         });
     });
 }
