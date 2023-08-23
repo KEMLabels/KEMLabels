@@ -44,32 +44,31 @@ export default function CreditCard() {
       });
 
     // Create PaymentIntent as soon as the page loads
-    fetch("/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: email,
-        amount: Number(loadedAmount),
-      }),
+    axios.post("/create-payment-intent", {
+      email: email,
+      amount: Number(loadedAmount),
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
-      .then((res) => res.json())
-      .then((data) => {
-        setClientSecret(data.clientSecret);
-        if (
-          !loadCreditSuccess &&
-          !clientSecret &&
-          (!loadedAmount || loadedAmount === 0)
-        ) {
-          navigate("/load-credits");
-        }
-      });
+    .then((res) => {
+      console.log('response: ' + JSON.stringify(res.data));
+      // You can access response.data to get the data returned by the server
+      setClientSecret(res.data.clientSecret);
+      if (
+        !loadCreditSuccess &&
+        !clientSecret &&
+        (!loadedAmount || loadedAmount === 0)
+      ) {
+        navigate("/load-credits");
+      }
+    })
+    .catch((error) => {
+      // Handle errors here
+      console.error('An error occurred:', error);
+    });
   }, [
-    isLoggedIn,
-    navigate,
-    email,
-    loadedAmount,
-    loadCreditSuccess,
-    clientSecret,
   ]);
 
   // Only load stripePromise if stripeKey is obtained

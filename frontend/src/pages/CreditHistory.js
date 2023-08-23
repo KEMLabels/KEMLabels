@@ -28,7 +28,9 @@ export default function CreditHistory() {
 
     // TODO: Add this Axios call to the backend and return Data JSON format
     axios
-      .get("/getCreditHistory")
+      .get("/getCreditHistory" , {
+        withCredentials: true,
+      })
       .then((res) => {
         if (res) {
           setCreditHistoryData(res.data);

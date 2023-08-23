@@ -10,11 +10,14 @@ const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const https = require('https');
+const fs = require('fs');
+const { format } = require('date-fns');
 require('express-async-errors');
 
 //Configure mongoose, app, and dotenv
 mongoose.set('strictQuery', false);
-app.enable('trust proxy');
+app.set('trust proxy', 1);
 dotenv.config();
 
 //Retrieve API keys from env
@@ -66,14 +69,14 @@ function customJsonParser(req, res, next) {
 app.use(customJsonParser);
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+const whitelist = 'http://localhost:3000/'
 app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000/");
+    res.header("Access-Control-Allow-Origin", whitelist);
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
-const whitelist = 'http://localhost:3000'
 app.use(cors({
-    origin: whitelist,
+    origin: "http://localhost:3000",
     methods: ['POST', 'GET', 'PATCH', 'OPTIONS'],
     credentials: true
 }));
@@ -81,42 +84,21 @@ app.use(session({
     name: 'sessionID',
     secret: 'strongass',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         maxAge: 600000,
         httpOnly: true,
-        // secure: true,
-        // sameSite: 'none',
+        secure: true,
+        sameSite: 'none',
     },
     store: store,
 }));
-// app.use((req, res, next) => {
-//     const currentTime = new Date().getTime();
-//     const lastActivityTime = req.session.lastActivityTime || currentTime;
 
-//     // Calculate the time difference in milliseconds
-//     const timeDifference = currentTime - lastActivityTime;
-
-//     // Update last activity time
-//     req.session.lastActivityTime = currentTime;
-
-//     // Check if the user has been inactive for 10 or more minutes (600,000 milliseconds)
-//     if (timeDifference >= 600000) {
-//         // Destroy the session
-//         req.session.destroy((err) => {
-//             if (err) {
-//                 console.error("Error destroying session:", err);
-//             } else {
-//                 console.log("Session destroyed due to inactivity.");
-//             }
-//         });
-//     }
-//     next(); // Continue processing the request
-// });
 
 //Set up transporter for nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
+    // host: 'smtp.gmail.com',
     auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS
@@ -185,10 +167,12 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
 
     let event;
 
+    console.log(req.body);
+
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
-        console.log("Failed to verify webook.");
+        console.log("Failed to verify webook." + err);
         return;
     }
 
@@ -202,10 +186,10 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
         User.updateOne({
             "_id": user._id.toString()
         }, {
-            // set amount
-            // paymentIntent.amount is in cents so convert to dollars
-            "credits": Number(userExistingCredits) + Number(paymentIntent.amount / 100)
-        })
+                // set amount
+                // paymentIntent.amount is in cents so convert to dollars
+                "credits": Number(userExistingCredits) + Number(paymentIntent.amount / 100)
+            })
             .then((obj) => {
                 console.log("User credits updated");
             })
@@ -231,7 +215,7 @@ app.post("/payWithCrypto", async (req, res) => {
             metadata: {
                 email: "test@gmail.com"
             },
-            cancel_url: "http://localhost:3000/load-credits"
+            cancel_url: "https://kemlabels.com/load-credits"
         })
         res.json({ redirect: charge.hosted_url });
     } catch (err) {
@@ -247,29 +231,31 @@ async function handleErr(err, req, res, next) {
 
 //Signing in
 app.post('/signin', async (req, res) => {
-    const { email, password } = req.body
-
-    const data = {
-        email: email,
-        password: password
-    }
-    var emailAddress = data.email.toLowerCase();
     try {
+        const { email, password } = req.body
+
+        const data = {
+            email: email,
+            password: password
+        }
+        var emailAddress = data.email.toLowerCase();
         let user = await User.findOne({ email: emailAddress })
         if (!user)
             throw new Error('Incorrect email or password.');
-        const comparePass = await bcrypt.compare(password, user.password);
-        if (!comparePass) {
-            throw new Error('Incorrect email or password.');
-        } else {
-            req.session.user = user;
-            req.session.isLoggedIn = true;
-            const userInfo = {
-                credits: user.credits,
-                userName: user.userName,
-                joinedDate: user.createdAt,
+        else {
+            const comparePass = await bcrypt.compare(password, user.password);
+            if (!comparePass) {
+                throw new Error('Incorrect email or password.');
+            } else {
+                req.session.user = user;
+                req.session.isLoggedIn = true;
+                const userInfo = {
+                    credits: user.credits,
+                    userName: user.userName,
+                    joinedDate: user.createdAt,
+                }
+                res.json({ redirect: '/', userInfo });
             }
-            res.json({ redirect: '/', userInfo });
         }
     } catch (err) {
         console.log(err);
@@ -315,7 +301,7 @@ app.post("/signup", async (req, res) => {
             userid: new_user._id
         })
         create_token.save()
-        const url = `http://localhost:3000/users/${new_user._id}/verify/${token}`;
+        const url = `https://kemlabels.com/users/${new_user._id}/verify/${token}`;
         await sendSignUpConfirmationEmail(data.email, url);
 
         req.session.user = new_user;
@@ -350,7 +336,7 @@ async function generateTokenHelper(userID, email) {
         userid: userID
     })
     create_token.save()
-    const url = `http://localhost:3000/users/${userID}/verify/${token}`;
+    const url = `https://kemlabels.com/users/${userID}/verify/${token}`;
     console.log(url);
     sendSignUpConfirmationEmail(email, url);
 }
@@ -362,7 +348,7 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
         subject: 'KEMLabels - Confirm Your Email',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            path: __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -395,8 +381,8 @@ app.get('/users/:id/verify/:token', async (req, res) => {
         User.updateOne({
             "_id": user._id.toString()
         }, {
-            "verified": true
-        })
+                "verified": true
+            })
             .then((obj) => {
                 console.log("User has been verified");
             })
@@ -507,7 +493,7 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
         subject: 'KEMLabels - Your Verification Code to Reset Password',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            path: __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -528,7 +514,7 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
         subject: 'KEMLabels - Your Verification Code to Change Password',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            path: __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -549,7 +535,7 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
         subject: 'KEMLabels - Your Verification Code to Change Email Address',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            path: __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -621,8 +607,8 @@ app.post("/updateUserPass", async (req, res) => {
         User.updateOne({
             "_id": userData._id.toString()
         }, {
-            "password": hashedPassword
-        })
+                "password": hashedPassword
+            })
             .then((obj) => {
                 console.log("Updated Password");
             })
@@ -630,7 +616,7 @@ app.post("/updateUserPass", async (req, res) => {
                 console.log(err);
             })
 
-            sendPasswordChangeEmail(email);
+        sendPasswordChangeEmail(email);
 
         res.json({ redirect: '/signin' });
     } catch (err) {
@@ -646,7 +632,7 @@ function sendPasswordChangeEmail(emailAddress) {
         subject: 'KEMLabels Security Alert - Your Password Has Been Updated',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            path: __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -665,13 +651,46 @@ function sendPasswordChangeEmail(emailAddress) {
 
 //Account settings
 
+//Credit history
+app.get('/getCreditHistory', async (req, res) => {
+    try {
+        const paymentIntent = await stripe.paymentIntents.search({
+            query: `status:\'succeeded\' AND metadata[\'email\']:\'vi9veltpvpstaff@gmail.com\'`,
+        });
+
+        const formattedPaymentIntents = [];
+
+        for (const intent of paymentIntent.data) {
+            const createdTimestamp = intent.created;
+
+            const createdDate = format(new Date(createdTimestamp * 1000), 'MMMM dd, yyyy');
+            const createdTime = format(new Date(createdTimestamp * 1000), 'hh:mm a');
+
+            formattedPaymentIntents.push({
+                refId: intent.id,
+                paymentDate: createdDate,
+                paymentTime: createdTime,
+                amount: intent.amount,
+                type: "Stripe",
+                status: intent.status,
+            });
+        }
+
+        console.log(formattedPaymentIntents);
+        res.send(formattedPaymentIntents);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send('An error occurred.');
+    }
+})
+
 //Username Change
 app.post("/UpdateUsername", async (req, res) => {
     try {
         const { userName } = req.body;
 
         const userNameData = userName.toLowerCase();
-        
+
         // Retrieve the user from the session
         const user = await User.findOne({ _id: req.session.user._id });
         if (!user) {
@@ -726,7 +745,7 @@ function sendUserNameChangeEmail(emailAddress) {
         subject: 'KEMLabels Security Alert - Your Username Has Been Updated',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            path: __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -781,7 +800,7 @@ function sendEmailChangeRequestEmail(currentEmail, newEmail, OTPPasscode) {
         subject: 'KEMLabels Security Alert - Email Change Detected on Your Account',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            path: __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -829,7 +848,7 @@ function sendEmailChangeEmail(emailAddress) {
         subject: 'KEMLabels Security Alert - Your Email Has Been Updated',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -8) + '/frontend/public/logo512.png',
+            path: __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -880,13 +899,13 @@ cron.schedule('0 0 */1 * *', async () => {
     try {
         console.log('cron running');
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  
-      // Delete unverified accounts created more than 24 hours ago
-      await User.deleteMany({ verified: false, createdAt: { $lt: twentyFourHoursAgo } });
+
+        // Delete unverified accounts created more than 24 hours ago
+        await User.deleteMany({ verified: false, createdAt: { $lt: twentyFourHoursAgo } });
     } catch (err) {
-      console.error('Error deleting unverified accounts:', err);
+        console.error('Error deleting unverified accounts:', err);
     }
-  });
+});
 
 //404 NOT FOUND
 app.get('*', (req, res) => {
@@ -896,9 +915,16 @@ app.get('*', (req, res) => {
 //Initiate Error handler
 app.use(handleErr);
 
+// Create SSL options
+const options = {
+    key: fs.readFileSync('path_to_private_key.pem'),
+    cert: fs.readFileSync('path_to_ssl_certificate.pem')
+};
+
 //Start server
+const server = https.createServer(options, app);
 connectDB().then(() => {
-    app.listen(process.env.PORT, () => {
-        console.log("Server started on port " + process.env.PORT);
-    })
+    server.listen(8081, () => {
+        console.log('Server is running on port 8081');
+    });
 })
