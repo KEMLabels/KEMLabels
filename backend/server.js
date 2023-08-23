@@ -35,7 +35,7 @@ var resources = coinbase.resources;
 Client.init(coinbaseApiKey);
 
 // Check hosting enviorment
-const isDevelopmentEnv = () => process.env.NODE_ENV === 'dev';
+const isDevelopmentEnv = () => process.env.NODE_ENV === 'development';
 
 //Connect to Mongo and set up MongoDBStore
 const connectDB = async () => {

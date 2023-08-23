@@ -5,7 +5,7 @@ module.exports = (email, subject, content) => ({
   attachments: [
     {
       filename: "Logo.png",
-      path: process.env.NODE_ENV === 'dev'
+      path: process.env.NODE_ENV === 'development'
         ? `${__dirname.slice(0, -8)}/frontend/public/logo512.png`
         : `${__dirname.slice(0, -7)}/public/logo512.png`,
       cid: "logo",
