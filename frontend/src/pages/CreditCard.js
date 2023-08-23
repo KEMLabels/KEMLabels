@@ -30,6 +30,16 @@ export default function CreditCard() {
   const [loadAgainBtnLoading, setLoadAgainBtnLoading] = useState(false);
 
   useEffect(() => {
+    if (
+      !loadCreditSuccess &&
+      !clientSecret &&
+      (!loadedAmount || loadedAmount === 0)
+    ) {
+      navigate("/load-credits");
+    }
+  }, [loadCreditSuccess, loadedAmount, navigate, clientSecret]);
+
+  useEffect(() => {
     if (!isLoggedIn) navigate("/");
     axios
       .get("/getStripePublicKey")
@@ -43,34 +53,34 @@ export default function CreditCard() {
         Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later.");
       });
+  }, [isLoggedIn, navigate]);
 
-    // Create PaymentIntent as soon as the page loads
-    axios.post("/create-payment-intent", {
-      email: email,
-      amount: Number(loadedAmount),
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then((res) => {
-      Log('response: ' + JSON.stringify(res.data));
-      // You can access response.data to get the data returned by the server
-      setClientSecret(res.data.clientSecret);
-      if (
-        !loadCreditSuccess &&
-        !clientSecret &&
-        (!loadedAmount || loadedAmount === 0)
-      ) {
-        navigate("/load-credits");
-      }
-    })
-    .catch((error) => {
-      // Handle errors here
-      console.error('An error occurred:', error);
-    });
-  }, [
-  ]);
+  // Create PaymentIntent on page load
+  useEffect(() => {
+    if (loadedAmount < 1) return;
+    axios
+      .post(
+        "/create-payment-intent",
+        {
+          email: email,
+          amount: Number(loadedAmount),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((res) => {
+        Log("response: " + JSON.stringify(res.data));
+        // You can access response.data to get the data returned by the server
+        setClientSecret(res.data.clientSecret);
+      })
+      .catch((error) => {
+        // Handle errors here
+        console.error("An error occurred:", error);
+      });
+  }, [email, loadedAmount]);
 
   // Only load stripePromise if stripeKey is obtained
   const stripePromise =
