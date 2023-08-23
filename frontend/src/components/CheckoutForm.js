@@ -119,7 +119,7 @@ export default function CheckoutForm({
         elements,
         confirmParams: {
           // Make sure to change this to your payment completion page
-          return_url: "http://localhost:3000/pay/credit-card", // TODO: Change this to the domain
+          return_url: `${process.env.FRONTEND_SERVER}/pay/credit-card`, // TODO: Change this to the domain
           receipt_email: useremail,
         },
       })

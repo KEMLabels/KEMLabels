@@ -44,3 +44,6 @@ export function validatePasswordOnTyping(password, setPasswordValid) {
   };
   setPasswordValid(passwordValid);
 }
+
+// Check hosting enviorment
+export const isDevelopmentEnv = () => process.env.NODE_ENV === "dev";

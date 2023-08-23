@@ -17,7 +17,7 @@ export default function VerifyEmailConfirmation() {
   const [linkErrMsg, setLinkErrMsg] = useState("");
 
   useEffect(() => {
-    const url = `http://localhost:8081/users/${param.id}/verify/${param.token}`;
+    const url = `${process.env.BACKEND_SERVER}/users/${param.id}/verify/${param.token}`;
     axios
       .get(url, { withCredentials: true })
       .then((res) => {
