@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 const bcrypt = require("bcrypt");
 const session = require('express-session');
-const dotenv = require("dotenv");
+require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 const cookieParser = require('cookie-parser');
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
@@ -18,7 +18,6 @@ require('express-async-errors');
 //Configure mongoose, app, and dotenv
 mongoose.set('strictQuery', false);
 app.set('trust proxy', 1);
-dotenv.config();
 
 //Retrieve API keys from env
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -32,6 +31,9 @@ var coinbase = require('coinbase-commerce-node');
 var Client = coinbase.Client;
 var resources = coinbase.resources;
 Client.init(coinbaseApiKey);
+
+// Check hosting enviorment
+const isDevelopmentEnv = () => process.env.NODE_ENV === 'dev';
 
 //Connect to Mongo and set up MongoDBStore
 const connectDB = async () => {
@@ -69,14 +71,13 @@ function customJsonParser(req, res, next) {
 app.use(customJsonParser);
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-const whitelist = 'http://localhost:3000/'
 app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", whitelist);
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_SERVER);
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: process.env.FRONTEND_SERVER,
     methods: ['POST', 'GET', 'PATCH', 'OPTIONS'],
     credentials: true
 }));
@@ -88,8 +89,8 @@ app.use(session({
     cookie: {
         maxAge: 600000,
         httpOnly: true,
-        // secure: true,
-        // sameSite: 'none',
+        secure: !isDevelopmentEnv(),
+        sameSite: isDevelopmentEnv() ? null : 'none',
     },
     store: store,
 }));
@@ -215,7 +216,7 @@ app.post("/payWithCrypto", async (req, res) => {
             metadata: {
                 email: "test@gmail.com"
             },
-            cancel_url: "https://kemlabels.com/load-credits"
+            cancel_url: `${process.env.FRONTEND_SERVER}/load-credits`
         })
         res.json({ redirect: charge.hosted_url });
     } catch (err) {
@@ -301,7 +302,7 @@ app.post("/signup", async (req, res) => {
             userid: new_user._id
         })
         create_token.save()
-        const url = `https://kemlabels.com/users/${new_user._id}/verify/${token}`;
+        const url = `${process.env.FRONTEND_SERVER}/users/${new_user._id}/verify/${token}`;
         await sendSignUpConfirmationEmail(data.email, url);
 
         req.session.user = new_user;
@@ -336,7 +337,7 @@ async function generateTokenHelper(userID, email) {
         userid: userID
     })
     create_token.save()
-    const url = `https://kemlabels.com/users/${userID}/verify/${token}`;
+    const url = `${process.env.FRONTEND_SERVER}/users/${userID}/verify/${token}`;
     console.log(url);
     sendSignUpConfirmationEmail(email, url);
 }
@@ -348,7 +349,7 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
         subject: 'KEMLabels - Confirm Your Email',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -7) + '/public/logo512.png',
+            path: isDevelopmentEnv() ? __dirname.slice(0, -8) + '/frontend/public/logo512.png' : __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -493,7 +494,7 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
         subject: 'KEMLabels - Your Verification Code to Reset Password',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -7) + '/public/logo512.png',
+            path: isDevelopmentEnv() ? __dirname.slice(0, -8) + '/frontend/public/logo512.png' : __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -514,7 +515,7 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
         subject: 'KEMLabels - Your Verification Code to Change Password',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -7) + '/public/logo512.png',
+            path: isDevelopmentEnv() ? __dirname.slice(0, -8) + '/frontend/public/logo512.png' : __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -535,7 +536,7 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
         subject: 'KEMLabels - Your Verification Code to Change Email Address',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -7) + '/public/logo512.png',
+            path: isDevelopmentEnv() ? __dirname.slice(0, -8) + '/frontend/public/logo512.png' : __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -632,7 +633,7 @@ function sendPasswordChangeEmail(emailAddress) {
         subject: 'KEMLabels Security Alert - Your Password Has Been Updated',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -7) + '/public/logo512.png',
+            path: isDevelopmentEnv() ? __dirname.slice(0, -8) + '/frontend/public/logo512.png' : __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -745,7 +746,7 @@ function sendUserNameChangeEmail(emailAddress) {
         subject: 'KEMLabels Security Alert - Your Username Has Been Updated',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -7) + '/public/logo512.png',
+            path: isDevelopmentEnv() ? __dirname.slice(0, -8) + '/frontend/public/logo512.png' : __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -800,7 +801,7 @@ function sendEmailChangeRequestEmail(currentEmail, newEmail, OTPPasscode) {
         subject: 'KEMLabels Security Alert - Email Change Detected on Your Account',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -7) + '/public/logo512.png',
+            path: isDevelopmentEnv() ? __dirname.slice(0, -8) + '/frontend/public/logo512.png' : __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -848,7 +849,7 @@ function sendEmailChangeEmail(emailAddress) {
         subject: 'KEMLabels Security Alert - Your Email Has Been Updated',
         attachments: [{
             filename: 'Logo.png',
-            path: __dirname.slice(0, -7) + '/public/logo512.png',
+            path: isDevelopmentEnv() ? __dirname.slice(0, -8) + '/frontend/public/logo512.png' : __dirname.slice(0, -7) + '/public/logo512.png',
             cid: 'logo'
         }],
         html: `
@@ -915,21 +916,24 @@ app.get('*', (req, res) => {
 //Initiate Error handler
 app.use(handleErr);
 
-// Create SSL options
-// const options = {
-//     key: fs.readFileSync('path_to_private_key.pem'),
-//     cert: fs.readFileSync('path_to_ssl_certificate.pem')
-// };
-
-//Start server
-// const server = https.createServer(options, app);
-// connectDB().then(() => {
-//     server.listen(process.env.PORT, () => {
-//         console.log("Server is running on port " + process.env.PORT);
-//     });
-// });
-connectDB().then(() => {
-    app.listen(process.env.PORT, () => {
-        console.log("Server is running on port " + process.env.PORT);
+// Start server
+if (isDevelopmentEnv()) {
+    connectDB().then(() => {
+        app.listen(process.env.PORT, () => {
+            console.log("Server is running on port " + process.env.PORT);
+        });
     });
-});
+} else {
+    // Create SSL options
+    const options = {
+        key: fs.readFileSync('path_to_private_key.pem'),
+        cert: fs.readFileSync('path_to_ssl_certificate.pem')
+    };
+
+    const server = https.createServer(options, app);
+    connectDB().then(() => {
+        server.listen(process.env.PORT, () => {
+            console.log("Server is running on port " + process.env.PORT);
+        });
+    });
+}
