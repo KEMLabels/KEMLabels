@@ -64,7 +64,6 @@ export default function CheckoutForm({
             // Only update the total credit amount if it has not been updated yet
             const newCreditAmount = Number(creditAmount) + Number(loadedAmount);
             if (newCreditAmount !== creditAmount) {
-              // TODO: Connect Stripe webhook to domain once published
               dispatch(setUserCreditAmount(newCreditAmount));
               dispatch(setUserLoadAmount(0)); // Reset load amount
             }
@@ -120,7 +119,7 @@ export default function CheckoutForm({
         elements,
         confirmParams: {
           // Make sure to change this to your payment completion page
-          return_url: `${process.env.FRONTEND_SERVER}/pay/credit-card`, // TODO: Change this to the domain
+          return_url: `${process.env.FRONTEND_SERVER}/pay/credit-card`,
           receipt_email: useremail,
         },
       })

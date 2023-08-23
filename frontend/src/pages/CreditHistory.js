@@ -25,9 +25,8 @@ export default function CreditHistory() {
   const [totalRows, setTotalRows] = useState(creditHistoryData.length);
 
   useEffect(() => {
-    // if (!isLoggedIn) navigate("/");
+    if (!isLoggedIn) navigate("/");
 
-    // TODO: Add this Axios call to the backend and return Data JSON format
     axios
       .get("/getCreditHistory", {
         withCredentials: true,

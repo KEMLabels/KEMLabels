@@ -98,7 +98,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
         <div className="mobContact">
           <p>Contact us at:</p>
           <div className="contactInfo">
-            {/* TOOD: Update contact info */}
+            {/* TODO: Update contact info */}
             <a href="tel:6041231234">
               <FaPhoneAlt size={16} />
               <span>6041231234</span>
