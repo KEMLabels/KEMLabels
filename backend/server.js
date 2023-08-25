@@ -32,6 +32,7 @@ const stripe = require("stripe")(stripeSecretKey);
 var coinbase = require('coinbase-commerce-node');
 var Client = coinbase.Client;
 var resources = coinbase.resources;
+var Webhook = coinbase.Webhook;
 Client.init(coinbaseApiKey);
 
 // Check hosting enviorment
@@ -189,10 +190,10 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
         User.updateOne({
             "_id": user._id.toString()
         }, {
-                // set amount
-                // paymentIntent.amount is in cents so convert to dollars
-                "credits": Number(userExistingCredits) + Number(paymentIntent.amount / 100)
-            })
+            // set amount
+            // paymentIntent.amount is in cents so convert to dollars
+            "credits": Number(userExistingCredits) + Number(paymentIntent.amount / 100)
+        })
             .then((obj) => {
                 log("User credits updated");
             })
@@ -225,6 +226,41 @@ app.post("/payWithCrypto", async (req, res) => {
         log(err);
     }
 })
+
+app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (req, res) => {
+    try {
+        const event = Webhook.verifyEventBody(
+            req.body,
+            req.headers["x-cc-webook-signature"],
+            "7495f35a-4cb7-4925-825b-94f0036e5983"
+        );
+
+        if(event.type === "charge:confirmed") {
+            log("Payment succeeded!");
+            let user = await User.findOne({ email: event.data.metadata.email })
+            if (!user)
+                throw new Error('Does not exist.');
+            let userExistingCredits = user.credits;
+            User.updateOne({
+                "_id": user._id.toString()
+            }, {
+                // set amount
+                // paymentIntent.amount is in cents so convert to dollars
+                "credits": Number(userExistingCredits) + Number(event.data.local.amount / 100)
+            })
+                .then((obj) => {
+                    log("User credits updated");
+                })
+                .catch((err) => {
+                    log(err);
+                })
+        }
+        res.status(200).end();
+    } catch (err) {
+        log("Failed to verify webook." + err);
+        return;
+    }
+});
 
 //Error handler function
 async function handleErr(err, req, res, next) {
@@ -370,8 +406,8 @@ app.get('/users/:id/verify/:token', async (req, res) => {
         User.updateOne({
             "_id": user._id.toString()
         }, {
-                "verified": true
-            })
+            "verified": true
+        })
             .then((obj) => {
                 log("User has been verified");
             })
@@ -482,14 +518,14 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
     <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
     <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
     const resetPasswordOTPEmail = emailTemplate(emailAddress, 'KEMLabels - Your Verification Code to Reset Password', resetPasswordContent);
-   
+
     const changePasswordContent = `<p>We received a request to change the password associated with your account.</p>
     <p>To confirm your email address, please enter the 4 digit code below.</p>
     <div style="margin: 2rem; text-align: center;"><h1 style="letter-spacing: 5px">${OTPPasscode}</h1></div>
     <p>If you did not initiate this request, you can safely ignore this email or let us know.</p>
     <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
     const changePasswordOTPEmail = emailTemplate(emailAddress, 'KEMLabels - Your Verification Code to Change Password', changePasswordContent);
-   
+
     const changeEmailContent = `<p>We received a request to change the email associated with your account.</p>
     <p>To confirm your new email address, please enter the 4 digit code below.</p>
     <div style="margin: 2rem; text-align: center;"><h1 style="letter-spacing: 5px">${OTPPasscode}</h1></div>
@@ -554,8 +590,8 @@ app.post("/updateUserPass", async (req, res) => {
         User.updateOne({
             "_id": userData._id.toString()
         }, {
-                "password": hashedPassword
-            })
+            "password": hashedPassword
+        })
             .then((obj) => {
                 log("Updated Password");
             })
