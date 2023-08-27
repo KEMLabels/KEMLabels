@@ -401,7 +401,6 @@ body {
 .tableHeaderActions {
   display: flex;
   gap: 1rem;
-  margin-bottom: 2rem;
 }
 
 .tableHeaderActions .tableSearch {
@@ -420,7 +419,7 @@ body {
   width: 30%;
 }
 
-.tableHeaderActions .tableItemsToShow span {
+.tableHeaderActions .tableItemsToShow .itemsToShowLabel {
   font-size: 1.1rem;
   font-weight: 300;
   padding-bottom: 1rem;
@@ -429,6 +428,7 @@ body {
 .tableFooterActions {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding-top: 2rem;
 }
 
@@ -469,7 +469,19 @@ body {
   }
 }
 
+@media screen and (max-width: 992px) {
+  .tableHeaderActions .tableSearch {
+    width: 60%;
+  }
+  .tableHeaderActions .tableItemsToShow {
+    width: 40%;
+  }
+}
+
 @media screen and (max-width: 768px) {
+  .wrapper {
+    padding-top: 10vh;
+  }
   .globalContainer {
     padding: 5rem;
   }
@@ -478,35 +490,60 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     margin-bottom: 1rem;
+    border-color: rgba(46, 48, 53, 0.2);
   }
   .table tbody td {
     font-size: 1rem;
     padding: 0 0.5rem 0.25rem;
     width: 50%;
   }
+  .tableHeaderActions {
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 1.5rem;
+  }
+  .tableHeaderActions .tableItemsToShow,
+  .tableHeaderActions .tableSearch {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 576px) {
+  .wrapper {
+    padding-top: 12vh;
+  }
   .globalContainer {
     padding: 5rem 2.5rem;
   }
   .footer p {
     font-size: 0.9rem;
   }
-
   .fieldContainer .fieldInput {
     font-size: 1rem;
   }
-
   .fieldContainer .passwordIcon {
     font-size: 1.25rem;
   }
-
   .alertMessageContainer {
     padding: 1rem 0.5rem;
   }
-
   .alertMessageContainer p {
     font-size: 0.9rem;
+  }
+  .tableHeaderActions .tableItemsToShow {
+    justify-content: space-around;
+  }
+  .tableFooterActions {
+    justify-content: center;
+    margin: 0 -1rem;
+  }
+  .tableFooterActions div:not(.tablePaginationBtns) {
+    display: none;
+  }
+  .tableHeaderActions .tableItemsToShow .dropdown .dropdownControl {
+    font-size: 1rem;
+  }
+  .tableHeaderActions .tableItemsToShow .itemsToShowLabel {
+    font-size: 1rem;
   }
 }

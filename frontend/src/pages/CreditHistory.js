@@ -26,11 +26,8 @@ export default function CreditHistory() {
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
-
     axios
-      .get("/getCreditHistory", {
-        withCredentials: true,
-      })
+      .get("/getCreditHistory", { withCredentials: true })
       .then((res) => {
         if (res) {
           setCreditHistoryData(res.data);

@@ -149,13 +149,17 @@ export default function Table({ data, columns, totalRows, setTotalRows }) {
         <div className="tableSearch">
           <SearchField
             className="tableSearchField"
-            placeholder="Search for payment type, amount, date, etc."
+            placeholder={
+              isMobileView
+                ? "Search for a category"
+                : "Search for payment type, amount, date, etc."
+            }
             currentValue={filtering}
             onChangeEvent={(e) => setFiltering(e.target.value)}
           />
         </div>
         <div className="tableItemsToShow">
-          <span>Items per page</span>{" "}
+          <span className="itemsToShowLabel">Items per page</span>{" "}
           <Dropdown
             className="dropdown"
             controlClassName="dropdownControl"
