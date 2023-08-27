@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import PageLayout from "../components/PageLayout";
 import "../styles/Global.css";
@@ -68,7 +68,11 @@ export default function LoadCredits() {
             <h1 style={{ textAlign: "center" }}>How do you want to load?</h1>
             <p style={{ opacity: "0.7", textAlign: "center" }}>
               Please enter the amount to load and choose one of the payment
-              options below to get started.
+              options below to get started. If you are looking to refund, please
+              contact us at{" "}
+              <Link className="link" to="mailto:support@kemlabels.com">
+                support@kemlabels.com.
+              </Link>
             </p>
           </div>
 

@@ -103,9 +103,9 @@ export default function HamburgerMenu({ sessionStatus = false }) {
               <FaPhoneAlt size={16} />
               <span>6041231234</span>
             </a>
-            <a href="mailto:kemlabels@gmail.com">
+            <a href="mailto:support@kemlabels.com">
               <FaEnvelope size={16} />
-              <span>kemlabels@gmail.com</span>
+              <span>support@kemlabels.com</span>
             </a>
           </div>
         </div>

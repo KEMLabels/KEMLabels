@@ -76,8 +76,8 @@ export default function TermsAndConditions() {
             6041231234
           </a>{" "}
           or{" "}
-          <a href="mailto:kemlabels@gmail.com" className="link">
-            kemlabels@gmail.com
+          <a href="mailto:support@kemlabels.com" className="link">
+            support@kemlabels.com
           </a>
           .
         </p>
