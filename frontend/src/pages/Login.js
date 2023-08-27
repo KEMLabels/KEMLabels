@@ -16,6 +16,7 @@ import {
   setUserLoadAmount,
   setUserLoggedIn,
   setUserName,
+  setUserVerified,
 } from "../redux/actions/UserAction";
 import Log from "../components/Log";
 
@@ -37,19 +38,25 @@ export default function Login() {
           withCredentials: true,
         })
         .then((res) => {
-          if (res.data.errMsg) navigate("/verify-email");
-          else navigate(res.data.redirect);
+          if (res.data.errMsg) {
+            dispatch(setUserVerified(false));
+            navigate("/verify-email");
+          } else {
+            dispatch(setUserVerified(true));
+            navigate(res.data.redirect);
+          }
         })
         .catch((e) => {
           Log("Error: ", e);
           if (e?.response?.data?.msg === "User is not verified") {
+            dispatch(setUserVerified(false));
             navigate("/verify-email");
           } else {
             setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
           }
         });
     }
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, navigate, dispatch]);
 
   const submit = (e) => {
     e.preventDefault();

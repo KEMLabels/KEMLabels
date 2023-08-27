@@ -16,6 +16,7 @@ import {
   setUserLoadAmount,
   setUserLoggedIn,
   setUserName,
+  setUserVerified,
 } from "../redux/actions/UserAction";
 import {
   validateEmailOnSubmit,
@@ -93,6 +94,7 @@ export default function Signup() {
           dispatch(setUserCreditAmount(0));
           dispatch(setUserLoadAmount(0));
           dispatch(setUserJoinedDate(getCurrDateTimeInISO()));
+          dispatch(setUserVerified(false));
           dispatch(setUserLoggedIn(true));
         }
       })

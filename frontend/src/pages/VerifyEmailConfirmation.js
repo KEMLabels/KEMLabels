@@ -6,10 +6,13 @@ import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 import AlertMessage from "../components/AlertMessage";
 import Log from "../components/Log";
+import { useDispatch } from "react-redux";
+import { setUserVerified } from "../redux/actions/UserAction";
 
 export default function VerifyEmailConfirmation() {
   const param = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [fetching, setIsFetching] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -23,6 +26,7 @@ export default function VerifyEmailConfirmation() {
       .get(url, { withCredentials: true })
       .then((res) => {
         Log(res);
+        dispatch(setUserVerified(true));
         setvalidURL(true);
       })
       .catch((e) => {
@@ -40,7 +44,7 @@ export default function VerifyEmailConfirmation() {
     setTimeout(() => {
       setIsFetching(false);
     }, 500);
-  }, [param]);
+  }, [param, dispatch]);
 
   function renderErrorHeading() {
     switch (linkErrMsg) {

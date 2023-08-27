@@ -19,6 +19,7 @@ export default function CreditCard() {
   const email = useSelector((state) => state.auth.email);
   const loadedAmount = useSelector((state) => state.auth.loadAmount);
   const creditAmount = useSelector((state) => state.auth.creditAmount);
+  const isUserVerified = useSelector((state) => state.auth.isVerified);
 
   const [clientSecret, setClientSecret] = useState("");
   const [stripeKey, setStripeKey] = useState("");
@@ -30,17 +31,8 @@ export default function CreditCard() {
   const [loadAgainBtnLoading, setLoadAgainBtnLoading] = useState(false);
 
   useEffect(() => {
-    if (
-      !loadCreditSuccess &&
-      !clientSecret &&
-      (!loadedAmount || loadedAmount === 0)
-    ) {
-      navigate("/load-credits");
-    }
-  }, [loadCreditSuccess, loadedAmount, navigate, clientSecret]);
-
-  useEffect(() => {
     if (!isLoggedIn) navigate("/");
+    if (!isUserVerified) navigate("/verify-email");
     axios
       .get("/getStripePublicKey")
       .then((res) => {
@@ -53,7 +45,17 @@ export default function CreditCard() {
         Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later.");
       });
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, navigate, isUserVerified]);
+
+  useEffect(() => {
+    if (
+      !loadCreditSuccess &&
+      !clientSecret &&
+      (!loadedAmount || loadedAmount === 0)
+    ) {
+      navigate("/load-credits");
+    }
+  }, [loadCreditSuccess, loadedAmount, navigate, clientSecret]);
 
   // Create PaymentIntent on page load
   useEffect(() => {

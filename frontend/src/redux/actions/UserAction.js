@@ -7,6 +7,7 @@ import {
   SET_USER_LOGGED_IN,
   SET_VERIFY_EMAIL_ATTEMPTS,
   SET_FORGET_PASS_EMAIL_ATTEMPTS,
+  SET_USER_VERIFIED,
   CLEAR_SESSION,
   CLEAR_USER,
 } from "../Types";
@@ -50,6 +51,13 @@ export const setUserLoggedIn = (isLoggedIn) => (dispatch) => {
   dispatch({
     type: SET_USER_LOGGED_IN,
     payload: isLoggedIn,
+  });
+};
+
+export const setUserVerified = (isVerified) => (dispatch) => {
+  dispatch({
+    type: SET_USER_VERIFIED,
+    payload: isVerified,
   });
 };
 

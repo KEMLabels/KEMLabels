@@ -7,6 +7,7 @@ import {
   SET_USER_LOGGED_IN,
   SET_VERIFY_EMAIL_ATTEMPTS,
   SET_FORGET_PASS_EMAIL_ATTEMPTS,
+  SET_USER_VERIFIED,
   CLEAR_SESSION,
   CLEAR_USER,
 } from "../Types";
@@ -18,6 +19,7 @@ export const authInitialState = {
   loadAmount: 0,
   joinedDate: null,
   isLoggedIn: false,
+  isVerified: false,
   verifyEmail: {
     attempts: 0,
     lastAttemptDateTime: "",
@@ -42,6 +44,8 @@ export default function UserReducer(state = authInitialState, action) {
       return { ...state, joinedDate: action.payload };
     case SET_USER_LOGGED_IN:
       return { ...state, isLoggedIn: action.payload };
+    case SET_USER_VERIFIED:
+      return { ...state, isVerified: action.payload };
     case SET_VERIFY_EMAIL_ATTEMPTS:
       return { ...state, verifyEmail: action.payload };
     case SET_FORGET_PASS_EMAIL_ATTEMPTS:

@@ -17,15 +17,17 @@ export default function LoadCredits() {
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isUserVerified = useSelector((state) => state.auth.isVerified);
 
   const [errMsg, setErrMsg] = useState("");
   const [loadAmount, setLoadAmount] = useState("");
   const [loadAmountFieldInvalid, setLoadAmountFieldInvalid] = useState(false);
 
   useEffect(() => {
+    if (!isUserVerified) navigate("/verify-email");
     if (!isLoggedIn) navigate("/");
     dispatch(setUserLoadAmount(0));
-  }, [isLoggedIn, dispatch, navigate]);
+  }, [isLoggedIn, dispatch, navigate, isUserVerified]);
 
   const handleLoadCredits = (e) => {
     e.preventDefault();
