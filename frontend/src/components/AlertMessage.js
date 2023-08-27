@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BiCheckCircle, BiErrorCircle, BiInfoCircle } from "react-icons/bi";
 import "../styles/Global.css";
 
 export default function AlertMessage({ msg, type, iconSize = 24 }) {
+  useEffect(() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" }));
+
   return (
     <div className={`alertMessageContainer ${type}`}>
       {type === "error" && <BiErrorCircle size={iconSize} color="#FF0033" />}
