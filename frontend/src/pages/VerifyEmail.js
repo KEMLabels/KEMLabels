@@ -112,7 +112,11 @@ export default function VerifyEmail() {
             <p style={{ opacity: 0.7 }}>
               You entered <strong>{email}</strong> as the email address for your
               account. Please check your inbox for a verification link to verify
-              your account.
+              your account. Please be aware that your account will be{" "}
+              <strong style={{ color: "#ff0033" }}>
+                set for termination within 24 hours
+              </strong>{" "}
+              if you do not complete our verification process.
             </p>
           </div>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
