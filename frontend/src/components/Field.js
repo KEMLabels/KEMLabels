@@ -122,7 +122,7 @@ function StripeAmountField({
           value={currentValue}
           placeholder={placeholder}
           disabled={disabled}
-          step={0.5}
+          step={1}
           onKeyDown={(e) => {
             const key = e.key;
 
