@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaBars, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
+import { FaBars, FaEnvelope, FaTelegramPlane } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
 import NavLink from "./NavLink";
 import "../styles/Global.css";
@@ -99,9 +99,9 @@ export default function HamburgerMenu({ sessionStatus = false }) {
           <p>Contact us at:</p>
           <div className="contactInfo">
             {/* TODO: Update contact info */}
-            <a href="tel:6041231234">
-              <FaPhoneAlt size={16} />
-              <span>6041231234</span>
+            <a href="https://t.me/kemlabels" target="_blank" rel="noreferrer">
+              <FaTelegramPlane size={16} />
+              <span>@kemlabels</span>
             </a>
             <a href="mailto:support@kemlabels.com">
               <FaEnvelope size={16} />

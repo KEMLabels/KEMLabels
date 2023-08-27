@@ -97,12 +97,17 @@ export default function PrivacyPolicy() {
         <p>
           If you have any questions or concerns regarding this Privacy Policy or
           your data, please contact us at{" "}
-          <a href="tel:6041231234" className="link">
-            6041231234
-          </a>{" "}
-          or{" "}
           <a href="mailto:support@kemlabels.com" className="link">
             support@kemlabels.com
+          </a>{" "}
+          or on Telegram at{" "}
+          <a
+            href="https://t.me/kemlabels"
+            className="link"
+            target="_blank"
+            rel="noreferrer"
+          >
+            @kemlabels
           </a>
           .
         </p>
