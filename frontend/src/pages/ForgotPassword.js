@@ -11,9 +11,8 @@ import Button from "../components/Button";
 import { InputField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
-import { setForgetPassEmailAttempts } from "../redux/actions/UserAction";
 import { validatePasswordOnSubmit } from "../utils/Validation";
-import { getCurrDateTime, validatePasswordOnTyping } from "../utils/Helpers";
+import { validatePasswordOnTyping } from "../utils/Helpers";
 import Log from "../components/Log";
 
 export default function ForgotPassword() {
@@ -21,9 +20,6 @@ export default function ForgotPassword() {
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const verifyForgetPassEmailState = useSelector(
-    (state) => state.auth.verifyForgetPassEmail
-  );
 
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
@@ -44,28 +40,12 @@ export default function ForgotPassword() {
   const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
-    if (
-      verifyForgetPassEmailState &&
-      verifyForgetPassEmailState.lastAttemptDateTime
-    ) {
-      const currentTime = Date.parse(getCurrDateTime());
-      const lastAttemptTime = Date.parse(
-        verifyForgetPassEmailState.lastAttemptDateTime
-      );
-      const timeDifferenceInMinutes = Math.floor(
-        Math.abs(currentTime - lastAttemptTime) / 1000 / 60
-      );
-      // if it has been 3 hours since the last attempt, reset the attempts
-      if (timeDifferenceInMinutes >= 180) {
-        dispatch(setForgetPassEmailAttempts(0, ""));
-      }
-    }
     if (isLoggedIn) {
       navigate("/");
     } else {
       setIsLoading(false);
     }
-  }, [isLoggedIn, verifyForgetPassEmailState, dispatch, navigate]);
+  }, [isLoggedIn, dispatch, navigate]);
 
   const sendVerificationCode = (e) => {
     e.preventDefault();
@@ -105,34 +85,20 @@ export default function ForgotPassword() {
 
   function sendInitialRequest() {
     setResentEmail(true);
-    if (verifyForgetPassEmailState.attempts === 10) {
-      setErrMsg(
-        "You have exceeded the maximum number of attempts. Please try again later."
-      );
-    } else {
-      dispatch(
-        setForgetPassEmailAttempts(
-          verifyForgetPassEmailState.attempts + 1,
-          getCurrDateTime()
-        )
-      );
-      setTimeout(() => {
-        setResentEmail(false);
-      }, 15000);
-      axios
-        .post(
-          "/forgotpassword",
-          { email: email, type: "resetPassword" },
-          { withCredentials: true }
-        )
-        .then((res) => {
-          Log(res.data);
-        })
-        .catch((e) => {
-          Log("Error: ", e);
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-        });
-    }
+    setTimeout(() => setResentEmail(false), 15000);
+    axios
+      .post(
+        "/forgotpassword",
+        { email: email, type: "resetPassword" },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        Log(res.data);
+      })
+      .catch((e) => {
+        Log("Error: ", e);
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      });
   }
 
   function sendResendRequest(e) {
@@ -140,39 +106,27 @@ export default function ForgotPassword() {
     setLoading(true);
     setResentEmail(true);
 
-    if (verifyForgetPassEmailState.attempts === 10) {
-      setLoading(false);
-      setErrMsg(
-        "You have exceeded the maximum number of attempts. Please try again later."
-      );
-    } else {
-      dispatch(
-        setForgetPassEmailAttempts(
-          verifyForgetPassEmailState.attempts + 1,
-          getCurrDateTime()
-        )
-      );
-      setTimeout(() => {
-        setResentEmail(false);
+    axios
+      .post(
+        "/generateNewOTP",
+        { email: email, type: "resetPassword" },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        Log(res.data);
+      })
+      .catch((e) => {
+        Log("Error: ", e);
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      })
+      .finally(() => {
         setLoading(false);
-      }, 15000);
-      axios
-        .post(
-          "/generateNewOTP",
-          { email: email, type: "resetPassword" },
-          { withCredentials: true }
-        )
-        .then((res) => {
-          Log(res.data);
-        })
-        .catch((e) => {
-          Log("Error: ", e);
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+      });
+
+    setTimeout(() => {
+      setResentEmail(false);
+      setLoading(false);
+    }, 15000);
   }
 
   const validateOTP = (e) => {
@@ -373,7 +327,10 @@ export default function ForgotPassword() {
             <PasswordField
               onChangeEvent={(e) => {
                 setPassword(e.target.value.trim());
-                validatePasswordOnTyping(e.target.value.trim(), setPasswordValid);
+                validatePasswordOnTyping(
+                  e.target.value.trim(),
+                  setPasswordValid
+                );
                 setErrMsg("");
               }}
               placeholder="Password"
