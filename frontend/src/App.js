@@ -12,6 +12,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import AccountSettings from "./pages/AccountSettings";
 import CreditHistory from "./pages/CreditHistory";
+import OrderLabel from "./pages/OrderLabel";
 
 export default function App() {
   return (
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="/load-credits" element={<LoadCredits />}></Route>
         <Route path="/pay/credit-card" element={<CreditCard />}></Route>
         <Route path="/credit-history" element={<CreditHistory />}></Route>
+        <Route path="/order-label" element={<OrderLabel />}></Route>
         <Route path="*" element={<Error />}></Route>
       </Routes>
     </BrowserRouter>

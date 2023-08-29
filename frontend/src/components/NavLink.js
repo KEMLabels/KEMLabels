@@ -12,6 +12,7 @@ import {
   FaQuestionCircle,
   FaSignInAlt,
   FaUserPlus,
+  FaFileAlt,
 } from "react-icons/fa";
 import axios from "../api/axios";
 import { clearSession } from "../redux/actions/UserAction";
@@ -22,7 +23,7 @@ export default function NavLink({
   type,
   link,
   text,
-  isNavlink = false,
+  isNavlink = true,
   linkOnClick = false,
 }) {
   const dispatch = useDispatch();
@@ -34,6 +35,8 @@ export default function NavLink({
         return <FaLayerGroup />;
       case "faq":
         return <FaQuestionCircle />;
+      case "order":
+        return <FaFileAlt />;
       case "signin":
         return <FaSignInAlt />;
       case "signup":
