@@ -76,7 +76,11 @@ export default function LoadCredits() {
             </p>
           </div>
 
-          <div className="stripePaymentForm" id="payment-form">
+          <div
+            className="stripePaymentForm"
+            id="payment-form"
+            style={{ padding: 0, boxShadow: "none" }}
+          >
             {errMsg && <AlertMessage msg={errMsg} type="error" />}
             <div
               className="stripeFieldGroup"

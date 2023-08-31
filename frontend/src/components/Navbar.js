@@ -140,6 +140,13 @@ export default function Navbar({ hideNavAndFooter = false }) {
           )}
           {isLoggedIn && (
             <>
+              <NavLink
+                className="navLink"
+                to="/order-label"
+                activeclassname="active"
+              >
+                Order a Label
+              </NavLink>
               <div
                 className="accountIconContainer"
                 ref={accountIconContainerRef}

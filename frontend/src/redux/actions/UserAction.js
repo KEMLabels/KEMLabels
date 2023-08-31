@@ -5,8 +5,6 @@ import {
   SET_USER_LOAD_AMOUNT,
   SET_USER_JOINED_DATE,
   SET_USER_LOGGED_IN,
-  SET_VERIFY_EMAIL_ATTEMPTS,
-  SET_FORGET_PASS_EMAIL_ATTEMPTS,
   SET_USER_VERIFIED,
   CLEAR_SESSION,
   CLEAR_USER,
@@ -60,22 +58,6 @@ export const setUserVerified = (isVerified) => (dispatch) => {
     payload: isVerified,
   });
 };
-
-export const setVerifyEmailAttempts =
-  (attempts, lastAttemptDateTime) => (dispatch) => {
-    dispatch({
-      type: SET_VERIFY_EMAIL_ATTEMPTS,
-      payload: { attempts, lastAttemptDateTime },
-    });
-  };
-
-export const setForgetPassEmailAttempts =
-  (attempts, lastAttemptDateTime) => (dispatch) => {
-    dispatch({
-      type: SET_FORGET_PASS_EMAIL_ATTEMPTS,
-      payload: { attempts, lastAttemptDateTime },
-    });
-  };
 
 export const clearSession = () => (dispatch) => {
   dispatch({

@@ -5,8 +5,6 @@ import axios from "../api/axios";
 import AlertMessage from "../components/AlertMessage";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
-import { setVerifyEmailAttempts } from "../redux/actions/UserAction";
-import { getCurrDateTime } from "../utils/Helpers";
 import Log from "../components/Log";
 
 export default function VerifyEmail() {
@@ -15,7 +13,6 @@ export default function VerifyEmail() {
 
   const email = useSelector((state) => state.auth.email);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const verifyEmailState = useSelector((state) => state.auth.verifyEmail);
 
   const [loading, setLoading] = useState(false);
   const [infoMsg, setInfoMsg] = useState("");
@@ -23,17 +20,6 @@ export default function VerifyEmail() {
   const [resentEmail, setResentEmail] = useState(false);
 
   useEffect(() => {
-    if (verifyEmailState && verifyEmailState.lastAttemptDateTime) {
-      const currentTime = Date.parse(getCurrDateTime());
-      const lastAttemptTime = Date.parse(verifyEmailState.lastAttemptDateTime);
-      const timeDifferenceInMinutes = Math.floor(
-        Math.abs(currentTime - lastAttemptTime) / 1000 / 60
-      );
-      // if it has been 3 hours since the last attempt, reset the attempts
-      if (timeDifferenceInMinutes >= 180) {
-        dispatch(setVerifyEmailAttempts(0, ""));
-      }
-    }
     if (isLoggedIn) {
       axios
         .get("/isUserVerified", { withCredentials: true })
@@ -55,7 +41,7 @@ export default function VerifyEmail() {
           }
         });
     } else navigate("/");
-  }, [isLoggedIn, verifyEmailState, dispatch, navigate]);
+  }, [isLoggedIn, dispatch, navigate]);
 
   const submit = (e) => {
     e.preventDefault();
@@ -63,30 +49,21 @@ export default function VerifyEmail() {
     setErrMsg("Please wait a moment to send another email.");
     setResentEmail(true);
 
-    if (verifyEmailState.attempts === 10) {
+    axios
+      .get("/generateToken", { withCredentials: true })
+      .then((res) => {
+        Log(res);
+      })
+      .catch((e) => {
+        Log("Error: ", e);
+        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+      });
+
+    setTimeout(() => {
+      setResentEmail(false);
       setLoading(false);
-      setErrMsg(
-        "You have exceeded the maximum number of attempts. Please try again later."
-      );
-    } else {
-      dispatch(
-        setVerifyEmailAttempts(verifyEmailState.attempts + 1, getCurrDateTime())
-      );
-      axios
-        .get("/generateToken", { withCredentials: true })
-        .then((res) => {
-          Log(res);
-        })
-        .catch((e) => {
-          Log("Error: ", e);
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
-        });
-      setTimeout(() => {
-        setResentEmail(false);
-        setLoading(false);
-        setErrMsg("");
-      }, 15000);
-    }
+      setErrMsg("");
+    }, 15000);
   };
 
   return (

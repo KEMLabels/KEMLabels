@@ -58,40 +58,40 @@ export default function HamburgerMenu({ sessionStatus = false }) {
           </button>
         </div>
         <div className="mobNavLinksContainer">
-          <NavLink type="howitworks" text="How It Works" link="/#howitworks" />
-          <NavLink type="faq" text="FAQ" link="/#faq" />
+          <NavLink
+            type="howitworks"
+            text="How It Works"
+            link="/#howitworks"
+            isNavlink={false}
+          />
+          <NavLink type="faq" text="FAQ" link="/#faq" isNavlink={false} />
           {!sessionStatus ? (
             <>
-              <NavLink type="signin" text="Sign In" link="/signin" isNavlink />
-              <NavLink
-                type="signup"
-                text="Get Started"
-                link="/signup"
-                isNavlink
-              />
+              <NavLink type="signin" text="Sign In" link="/signin" />
+              <NavLink type="signup" text="Get Started" link="/signup" />
             </>
           ) : (
             <>
+              <NavLink type="order" text="Order a Label" link="/order-label" />
               <hr />
               <NavLink
                 type="account"
                 text="Account Settings"
                 link="/account/change-username"
-                isNavlink
               />
-              <NavLink
-                type="load"
-                text="Load Credits"
-                link="/load-credits"
-                isNavlink
-              />
+              <NavLink type="load" text="Load Credits" link="/load-credits" />
               <NavLink
                 type="history"
                 text="Credit History"
                 link="/credit-history"
-                isNavlink
               />
-              <NavLink type="logout" text="Logout" link="/" linkOnClick />
+              <NavLink
+                type="logout"
+                text="Logout"
+                link="/"
+                isNavlink={false}
+                linkOnClick
+              />
             </>
           )}
         </div>
