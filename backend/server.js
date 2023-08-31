@@ -32,7 +32,6 @@ const stripe = require("stripe")(stripeSecretKey);
 var coinbase = require('coinbase-commerce-node');
 var Client = coinbase.Client;
 var resources = coinbase.resources;
-var Webhook = coinbase.Webhook;
 Client.init(coinbaseApiKey);
 
 // Check hosting enviorment
@@ -63,7 +62,7 @@ const tempOTPS = require('./model/tempOTPs.js');
 //Start app
 app.use('/', express.static(__dirname + '/public'));
 function customJsonParser(req, res, next) {
-    if (req.path === '/webhook' && req.method === 'POST') {
+    if ((req.path === '/webhook' && req.method === 'POST') || (req.path === '/crypto/webhook' && req.method === 'POST')) {
         // If the request is for "/webhook" and it's a POST request, skip the JSON parsing
         next();
     } else {
@@ -229,15 +228,15 @@ app.post("/payWithCrypto", async (req, res) => {
 
 app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (req, res) => {
     try {
-        const event = Webhook.verifyEventBody(
+        const event = coinbase.Webhook.verifyEventBody(
             req.body,
-            req.headers["x-cc-webook-signature"],
+            req.headers['x-cc-webhook-signature'],
             process.env.COINBASE_WEBHOOK_SECRET
         );
 
         if(event.type === "charge:confirmed") {
             log("Payment succeeded!");
-            let user = await User.findOne({ email: event.data.metadata.email })
+            let user = await User.findOne({ email: event.metadata.email })
             if (!user)
                 throw new Error('Does not exist.');
             let userExistingCredits = user.credits;
@@ -246,7 +245,7 @@ app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (re
             }, {
                 // set amount
                 // paymentIntent.amount is in cents so convert to dollars
-                "credits": Number(userExistingCredits) + Number(event.data.local.amount / 100)
+                "credits": Number(userExistingCredits) + Number(event.local.amount)
             })
                 .then((obj) => {
                     log("User credits updated");
