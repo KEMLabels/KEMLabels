@@ -232,7 +232,7 @@ app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (re
         const event = Webhook.verifyEventBody(
             req.body,
             req.headers["x-cc-webook-signature"],
-            "7495f35a-4cb7-4925-825b-94f0036e5983"
+            process.env.COINBASE_WEBHOOK_SECRET
         );
 
         if(event.type === "charge:confirmed") {
