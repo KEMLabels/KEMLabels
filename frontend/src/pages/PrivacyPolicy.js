@@ -19,7 +19,7 @@ export default function PrivacyPolicy() {
           carefully.
         </p>
 
-        <h2>Information We Collect:</h2>
+        <h2>Information We Collect</h2>
         <p>
           We may collect the following types of information when you use our
           services:
@@ -32,7 +32,7 @@ export default function PrivacyPolicy() {
           security.
         </p>
 
-        <h2>How We Use Your Information:</h2>
+        <h2>How We Use Your Information</h2>
         <ul>
           <li>
             Providing Services: We use your personal information to process and
@@ -51,7 +51,7 @@ export default function PrivacyPolicy() {
           </li>
         </ul>
 
-        <h2>Your Choices and Rights:</h2>
+        <h2>Your Choices and Rights</h2>
         <ul>
           <li>
             Account Settings: You can review and update your account information
@@ -69,7 +69,7 @@ export default function PrivacyPolicy() {
           </li>
         </ul>
 
-        <h2>Data Security:</h2>
+        <h2>Data Security</h2>
         <p>
           We employ industry-standard security measures to protect your
           information from unauthorized access, disclosure, alteration, or
@@ -78,14 +78,14 @@ export default function PrivacyPolicy() {
           absolute security.
         </p>
 
-        <h2>Children's Privacy:</h2>
+        <h2>Children's Privacy</h2>
         <p>
           KEMLabels services are not intended for children under the age of 13,
           and we do not knowingly collect personal information from individuals
           in this age group.
         </p>
 
-        <h2>Updates to this Policy:</h2>
+        <h2>Updates to this Policy</h2>
         <p>
           We may update this Privacy Policy from time to time to reflect changes
           in our practices or legal requirements. We will notify you of any
@@ -93,7 +93,7 @@ export default function PrivacyPolicy() {
           other means.
         </p>
 
-        <h2>Contact Us:</h2>
+        <h2>Contact Us</h2>
         <p>
           If you have any questions or concerns regarding this Privacy Policy or
           your data, please contact us at{" "}

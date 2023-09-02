@@ -17,7 +17,7 @@ export default function TermsAndConditions() {
           before using our services.
         </p>
 
-        <h2>Use of Services:</h2>
+        <h2>Use of Services</h2>
         <ul>
           <li>
             Age Requirement: You must be at least 18 years old to use our
@@ -33,7 +33,7 @@ export default function TermsAndConditions() {
           </li>
         </ul>
 
-        <h2>Content:</h2>
+        <h2>Content</h2>
         <ul>
           <li>
             Your Content: By submitting content, you grant KEMLabels permission
@@ -45,13 +45,13 @@ export default function TermsAndConditions() {
           </li>
         </ul>
 
-        <h2>Third-Party Links:</h2>
+        <h2>Third-Party Links</h2>
         <p>
           We are not responsible for third-party websites or services linked
           from our site.
         </p>
 
-        <h2>Liability:</h2>
+        <h2>Liability</h2>
 
         <p>
           We strive to provide accurate and reliable services, but we cannot
@@ -59,16 +59,16 @@ export default function TermsAndConditions() {
           resulting from using our services.
         </p>
 
-        <h2>Indemnification:</h2>
+        <h2>Indemnification</h2>
         <p>
           You agree to hold KEMLabels harmless from any claims or losses due to
           your use of our services.
         </p>
 
-        <h2>Governing Law:</h2>
+        <h2>Governing Law</h2>
         <p>These Terms are governed by the laws of Canada.</p>
 
-        <h2>Contact Us:</h2>
+        <h2>Contact Us</h2>
         <p>
           If you have any questions or concerns regarding these Terms, please
           contact us at{" "}
