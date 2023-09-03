@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/Global.css";
+import "../styles/Field.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
 
@@ -8,6 +8,7 @@ function InputField({
   className = "",
   containerClassName = "",
   name = "",
+  label,
   fieldType = "text",
   title = "",
   initialValue,
@@ -18,9 +19,14 @@ function InputField({
   onChangeEvent,
   customStyle,
   disabled = false,
+  optional = false,
 }) {
   return (
     <div className={`fieldContainer ${containerClassName}`}>
+      <label className={`fieldLabel ${optional ? "optional" : ""}`}>
+        {label}
+        {optional && <span>{"(optional)"}</span>}
+      </label>
       <input
         id={id}
         className={`fieldInput ${className} ${disabled ? "disabled" : ""}`}
@@ -192,6 +198,7 @@ function PasswordField({
   className = "",
   containerClassName = "",
   name = "",
+  label,
   initialValue,
   currentValue,
   placeholder = "",
@@ -200,10 +207,15 @@ function PasswordField({
   onChangeEvent,
   customStyle,
   disabled = false,
+  optional = false,
 }) {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div className={`fieldContainer ${containerClassName}`}>
+      <label className={`fieldLabel ${optional ? "optional" : ""}`}>
+        {label}
+        {optional && <span>{"(optional)"}</span>}
+      </label>
       <input
         id={id}
         className={`fieldInput password ${className} ${
