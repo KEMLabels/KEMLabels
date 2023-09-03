@@ -1,0 +1,48 @@
+.orderLabelContainer {
+  max-width: 1000px;
+}
+
+.orderLabelForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 1.5rem;
+}
+
+.orderLabelForm .formSection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0.5rem 2rem;
+  border: solid 1px #efefef;
+  border-radius: 8px;
+}
+
+.orderLabelForm .formSection .formRow {
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+}
+
+@media screen and (max-width: 992px) {
+  .orderLabelContainer {
+    max-width: 100%;
+    padding: 5rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .orderLabelContainer {
+    padding: 3rem;
+  }
+  .orderLabelContainer .formSection .formRow {
+    flex-wrap: wrap;
+    gap: 0;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .orderLabelContainer {
+    padding: 3rem 1rem;
+  }
+}
