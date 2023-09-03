@@ -133,25 +133,28 @@ export default function Signup() {
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           <form action="POST" className="authFormContainer">
             <InputField
+              label="Username"
               onChangeEvent={(e) => {
                 setInputUserName(e.target.value.trim().toLowerCase());
                 setErrMsg("");
               }}
-              placeholder="Username"
+              placeholder="johndoe"
               minLength={3}
               maxLength={15}
             />
             <InputField
+              label="Email"
               fieldType="email"
               onChangeEvent={(e) => {
                 setInputEmail(e.target.value.trim().toLowerCase());
                 setErrMsg("");
               }}
-              placeholder="Email"
+              placeholder="johndoe@gmail.com"
               minLength={3}
               maxLength={100}
             />
             <PasswordField
+              label="Password"
               onChangeEvent={(e) => {
                 setInputPassword(e.target.value.trim());
                 validatePasswordOnTyping(
@@ -160,7 +163,6 @@ export default function Signup() {
                 );
                 setErrMsg("");
               }}
-              placeholder="Password"
               minLength={8}
               maxLength={50}
             />

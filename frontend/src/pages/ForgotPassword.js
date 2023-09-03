@@ -273,12 +273,13 @@ export default function ForgotPassword() {
         return (
           <>
             <InputField
+              label="Email"
               fieldType="email"
               onChangeEvent={(e) => {
                 setEmail(e.target.value.trim().toLowerCase());
                 setErrMsg("");
               }}
-              placeholder="Email"
+              placeholder="johndoe@gmail.com"
               minLength={3}
               maxLength={100}
             />
@@ -325,6 +326,7 @@ export default function ForgotPassword() {
         return (
           <>
             <PasswordField
+              label="Password"
               onChangeEvent={(e) => {
                 setPassword(e.target.value.trim());
                 validatePasswordOnTyping(
@@ -333,7 +335,6 @@ export default function ForgotPassword() {
                 );
                 setErrMsg("");
               }}
-              placeholder="Password"
               minLength={8}
               maxLength={50}
             />

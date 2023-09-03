@@ -113,21 +113,22 @@ export default function Login() {
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           <form action="POST" className="authFormContainer">
             <InputField
+              label="Email"
               fieldType="email"
               onChangeEvent={(e) => {
                 setInputEmail(e.target.value.trim().toLowerCase());
                 setErrMsg("");
               }}
-              placeholder="Email"
+              placeholder="johndoe@gmail.com"
               minLength={3}
               maxLength={100}
             />
             <PasswordField
+              label="Password"
               onChangeEvent={(e) => {
                 setInputPassword(e.target.value.trim());
                 setErrMsg("");
               }}
-              placeholder="Password"
               minLength={8}
               maxLength={50}
             />
