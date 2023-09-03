@@ -37,6 +37,7 @@
   font-size: 1.1rem;
   font-weight: 300;
   color: black;
+  background: transparent;
   padding: 15px;
   width: 100%;
   border: none;
@@ -55,6 +56,10 @@
 
 .fieldContainer .fieldInput.password {
   padding-right: 2.5rem;
+}
+
+.fieldContainer .fieldInput.shortField {
+  width: 40%;
 }
 
 .fieldContainer .fieldInput:focus {
@@ -76,11 +81,26 @@
   cursor: pointer;
 }
 
+@media screen and (max-width: 768px) {
+  .fieldContainer {
+    margin-bottom: 1rem;
+  }
+  .fieldContainer .fieldInput.shortField {
+    width: 40%;
+  }
+}
+
 @media screen and (max-width: 576px) {
+  .fieldContainer {
+    margin-bottom: 1rem;
+  }
   .fieldContainer .fieldInput {
     font-size: 1rem;
   }
   .fieldContainer .passwordIcon {
     font-size: 1.25rem;
+  }
+  .fieldContainer .fieldInput.shortField {
+    width: 100%;
   }
 }

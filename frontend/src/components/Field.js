@@ -18,6 +18,7 @@ function InputField({
   maxLength,
   onChangeEvent,
   customStyle,
+  shortField = false,
   disabled = false,
   optional = false,
 }) {
@@ -29,7 +30,9 @@ function InputField({
       </label>
       <input
         id={id}
-        className={`fieldInput ${className} ${disabled ? "disabled" : ""}`}
+        className={`fieldInput ${className} ${disabled ? "disabled" : ""} ${
+          shortField ? "shortField" : ""
+        }`}
         type={fieldType}
         name={name}
         title={title}

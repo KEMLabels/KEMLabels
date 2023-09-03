@@ -180,6 +180,7 @@ export default function OrderLabel() {
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "suite")}
                 minLength={1}
                 maxLength={15}
+                shortField
                 optional
               />
             </div>
@@ -197,6 +198,7 @@ export default function OrderLabel() {
                 placeholder="A1B 2C3"
                 minLength={6}
                 maxLength={6}
+                shortField
               />
             </div>
             <div className="formRow">
@@ -269,6 +271,7 @@ export default function OrderLabel() {
                 onChangeEvent={(e) => saveInput(e, "receiverInfo", "suite")}
                 minLength={1}
                 maxLength={15}
+                shortField
                 optional
               />
             </div>
@@ -286,6 +289,7 @@ export default function OrderLabel() {
                 placeholder="A1B 2C3"
                 minLength={6}
                 maxLength={6}
+                shortField
               />
             </div>
             <div className="formRow">
