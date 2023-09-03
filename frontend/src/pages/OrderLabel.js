@@ -13,7 +13,7 @@ export default function OrderLabel() {
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
-  const senderAndReceiverInfo = {
+  const senderAndRecipientInfo = {
     firstName: "",
     lastName: "",
     companyName: "",
@@ -28,16 +28,16 @@ export default function OrderLabel() {
   const [formValues, setFormValues] = useState({
     courier: "",
     classType: "",
-    itemWeight: 0,
     packageInfo: {
+      weight: 0,
       length: 0,
       width: 0,
       height: 0,
       description: "",
       referneceNumber: "",
     },
-    senderInfo: { ...senderAndReceiverInfo },
-    receiverInfo: { ...senderAndReceiverInfo },
+    senderInfo: { ...senderAndRecipientInfo },
+    recipientInfo: { ...senderAndRecipientInfo },
   });
   const [error, setError] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -51,8 +51,8 @@ export default function OrderLabel() {
     e.preventDefault();
     if (section === "senderInfo") {
       setError((array) => array.filter((e) => e.label !== "sender"));
-    } else if (section === "receiverInfo") {
-      setError((array) => array.filter((e) => e.label !== "receiver"));
+    } else if (section === "recipientInfo") {
+      setError((array) => array.filter((e) => e.label !== "recipient"));
     }
     setFormValues((prevValues) => {
       if (section) {
@@ -78,17 +78,26 @@ export default function OrderLabel() {
   const submit = (e) => {
     e.preventDefault();
     setLoading(true);
-    const {
-      courier,
-      classType,
-      itemWeight,
-      packageInfo,
-      senderInfo,
-      receiverInfo,
-    } = formValues;
+    const { courier, classType, packageInfo, senderInfo, recipientInfo } =
+      formValues;
     const isSenderInfoEmpty = isSectionEmpty(senderInfo);
-    const isReceiverInfoEmpty = isSectionEmpty(receiverInfo);
+    const isRecipientInfoEmpty = isSectionEmpty(recipientInfo);
+    const isPackageInfoEmpty = isSectionEmpty(packageInfo);
     const errors = [];
+
+    // if (courier === "" || classType === "") {
+    //   errors.push({
+    //     label: "package",
+    //     msg: "Please select a courier and a class type.",
+    //   });
+    // }
+
+    if (isPackageInfoEmpty) {
+      errors.push({
+        label: "package",
+        msg: "Please fill out all required fields in this section.",
+      });
+    }
 
     if (isSenderInfoEmpty) {
       errors.push({
@@ -96,9 +105,9 @@ export default function OrderLabel() {
         msg: "Please fill out all required fields in this section.",
       });
     }
-    if (isReceiverInfoEmpty) {
+    if (isRecipientInfoEmpty) {
       errors.push({
-        label: "receiver",
+        label: "recipient",
         msg: "Please fill out all required fields in this section.",
       });
     }
@@ -218,24 +227,26 @@ export default function OrderLabel() {
               />
             </div>
           </div>
-          <div id="receiverSection" className="formSection">
-            <h2>Receiver Address</h2>
+          <div id="recipientSection" className="formSection">
+            <h2>Recipient Address</h2>
             {error
-              .filter((error) => error.label === "receiver")
+              .filter((error) => error.label === "recipient")
               .map((error, i) => (
                 <AlertMessage key={i} msg={error.msg} type="error" />
               ))}
             <div className="formRow">
               <InputField
                 label="First name"
-                onChangeEvent={(e) => saveInput(e, "receiverInfo", "firstName")}
+                onChangeEvent={(e) =>
+                  saveInput(e, "recipientInfo", "firstName")
+                }
                 placeholder="John"
                 minLength={1}
                 maxLength={50}
               />
               <InputField
                 label="Last name"
-                onChangeEvent={(e) => saveInput(e, "receiverInfo", "lastName")}
+                onChangeEvent={(e) => saveInput(e, "recipientInfo", "lastName")}
                 placeholder="Doe"
                 minLength={1}
                 maxLength={50}
@@ -245,14 +256,14 @@ export default function OrderLabel() {
               <InputField
                 label="Company name"
                 onChangeEvent={(e) =>
-                  saveInput(e, "receiverInfo", "companyName")
+                  saveInput(e, "recipientInfo", "companyName")
                 }
                 maxLength={50}
                 optional
               />
               <InputField
                 label="Phone number"
-                onChangeEvent={(e) => saveInput(e, "receiverInfo", "phone")}
+                onChangeEvent={(e) => saveInput(e, "recipientInfo", "phone")}
                 placeholder="(XXX) XXX-XXXX"
                 minLength={10}
                 maxLength={10}
@@ -261,14 +272,14 @@ export default function OrderLabel() {
             <div className="formRow">
               <InputField
                 label="Street"
-                onChangeEvent={(e) => saveInput(e, "receiverInfo", "street")}
+                onChangeEvent={(e) => saveInput(e, "recipientInfo", "street")}
                 placeholder="Start typing your address..."
                 minLength={1}
                 maxLength={50}
               />
               <InputField
                 label="Suite / Apt / Unit"
-                onChangeEvent={(e) => saveInput(e, "receiverInfo", "suite")}
+                onChangeEvent={(e) => saveInput(e, "recipientInfo", "suite")}
                 minLength={1}
                 maxLength={15}
                 shortField
@@ -278,14 +289,14 @@ export default function OrderLabel() {
             <div className="formRow">
               <InputField
                 label="City"
-                onChangeEvent={(e) => saveInput(e, "receiverInfo", "city")}
+                onChangeEvent={(e) => saveInput(e, "recipientInfo", "city")}
                 placeholder="Vancouver"
                 minLength={1}
                 maxLength={50}
               />
               <InputField
                 label="Zip / Postal code"
-                onChangeEvent={(e) => saveInput(e, "receiverInfo", "zip")}
+                onChangeEvent={(e) => saveInput(e, "recipientInfo", "zip")}
                 placeholder="A1B 2C3"
                 minLength={6}
                 maxLength={6}
@@ -295,14 +306,14 @@ export default function OrderLabel() {
             <div className="formRow">
               <InputField
                 label="Province / State"
-                onChangeEvent={(e) => saveInput(e, "receiverInfo", "state")}
+                onChangeEvent={(e) => saveInput(e, "recipientInfo", "state")}
                 placeholder="British Columbia"
                 minLength={1}
                 maxLength={50}
               />
               <InputField
                 label="Country"
-                onChangeEvent={(e) => saveInput(e, "receiverInfo", "country")}
+                onChangeEvent={(e) => saveInput(e, "recipientInfo", "country")}
                 placeholder="Canada"
                 minLength={1}
                 maxLength={50}
