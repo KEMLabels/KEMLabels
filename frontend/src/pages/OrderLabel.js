@@ -4,6 +4,7 @@ import "../styles/Global.css";
 import "../styles/OrderLabel.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { BsArrowUp } from "react-icons/bs";
 import { InputField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
@@ -41,10 +42,17 @@ export default function OrderLabel() {
   });
   const [error, setError] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showFloatingBtn, setShowFloatingBtn] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
   }, [isLoggedIn, navigate]);
+
+  useEffect(() => {
+    const scrollHandler = () => setShowFloatingBtn(window.scrollY > 100);
+    window.addEventListener("scroll", scrollHandler);
+    return () => window.removeEventListener("scroll", scrollHandler);
+  }, []);
 
   // Save input value on change
   const saveInput = (e, section = "", field = "") => {
@@ -329,6 +337,14 @@ export default function OrderLabel() {
             />
           </div>
         </form>
+        <div>
+          <Button
+            className={`floatingBtn ${showFloatingBtn ? "" : "hidden"}`}
+            title="Scroll to top"
+            onClickEvent={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            children={<BsArrowUp size={24} />}
+          />
+        </div>
       </div>
     </PageLayout>
   );

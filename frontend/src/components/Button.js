@@ -5,6 +5,7 @@ import { FaSpinner } from "react-icons/fa";
 export default function Button({
   btnType = "button",
   className = "",
+  title = "",
   fill = "solid",
   onClickEvent,
   loading = false,
@@ -19,13 +20,18 @@ export default function Button({
       className={`kemLabelsBtn ${className} ${
         fill === "solid" ? "solid" : "outline"
       }`}
+      title={title}
       style={{ ...customStyle }}
       disabled={disabled}
       onClick={(e) => {
         if (onClickEvent) onClickEvent(e);
       }}
     >
-      {loading ? <FaSpinner size="16" className="buttonSpinner"/> : (children || text)}
+      {loading ? (
+        <FaSpinner size="16" className="buttonSpinner" />
+      ) : (
+        children || text
+      )}
     </button>
   );
 }
