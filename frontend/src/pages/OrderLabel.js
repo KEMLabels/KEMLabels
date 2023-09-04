@@ -130,10 +130,10 @@ export default function OrderLabel() {
   };
 
   return (
-    <PageLayout title="Order a Label">
+    <PageLayout title="Order Label">
       <div className="globalContainer orderLabelContainer">
         <div className="headingContainer" style={{ textAlign: "center" }}>
-          <h1>Order a label</h1>
+          <h1>Order label</h1>
           <p>
             Please complete all mandatory fields to proceed with placing your
             order.
@@ -145,7 +145,69 @@ export default function OrderLabel() {
             ))}
         </div>
         <form action="POST" className="orderLabelForm">
-          {/* <h2>Shipping label information</h2> */}
+          <div id="packageSection" className="formSection">
+            <h2>Package Details</h2>
+            {error
+              .filter((error) => error.label === "package")
+              .map((error, i) => (
+                <AlertMessage
+                  key={i}
+                  msg={error.msg}
+                  type="error"
+                  divId="packageSection"
+                />
+              ))}
+            <div className="formRow">
+              <InputField
+                label="Weight (lbs)"
+                onChangeEvent={(e) => saveInput(e, "packageInfo", "weight")}
+                minLength={1}
+                maxLength={3}
+                shortField
+              />
+              <InputField
+                label="Length (in)"
+                onChangeEvent={(e) => saveInput(e, "packageInfo", "length")}
+                minLength={1}
+                maxLength={3}
+                shortField
+              />
+            </div>
+            <div className="formRow">
+              <InputField
+                label="Width (in)"
+                onChangeEvent={(e) => saveInput(e, "packageInfo", "width")}
+                minLength={1}
+                maxLength={3}
+                shortField
+              />
+              <InputField
+                label="Height (in)"
+                onChangeEvent={(e) => saveInput(e, "packageInfo", "height")}
+                minLength={1}
+                maxLength={3}
+                shortField
+              />
+            </div>
+            <div className="formRow">
+              <InputField
+                label="Reference number"
+                onChangeEvent={(e) => saveInput(e, "packageInfo", "referneceNumber")}
+                minLength={1}
+                maxLength={20}
+              />
+            </div>
+            <div className="formRow">
+              <InputField
+                fieldType="textarea"
+                label="Description"
+                onChangeEvent={(e) => saveInput(e, "packageInfo", "description")}
+                minLength={1}
+                maxLength={100}
+                optional
+              />
+            </div>
+          </div>
           <div id="senderSection" className="formSection">
             <h2>Sender Address</h2>
             {error
