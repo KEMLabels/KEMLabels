@@ -2,10 +2,18 @@ import React, { useEffect } from "react";
 import { BiCheckCircle, BiErrorCircle, BiInfoCircle } from "react-icons/bi";
 import "../styles/Global.css";
 
-export default function AlertMessage({ msg, type, iconSize = 24 }) {
+export default function AlertMessage({ msg, type, iconSize = 24, divId = "" }) {
   useEffect(() => {
-    if (msg) window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-  }, [msg]);
+    function getDistanceFromTop() {
+      console.log(msg, divId)
+      if (!divId) return 0;
+      const targetDiv = document.getElementById(divId).getBoundingClientRect();
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      console.log(targetDiv.top + scrollTop - 120)
+      return targetDiv.top + scrollTop - 120;
+    }
+    if (msg) window.scrollTo({ top: getDistanceFromTop(), behavior: "smooth" });
+  }, [msg, divId]);
 
   return (
     <div className={`alertMessageContainer ${type}`}>

@@ -154,8 +154,12 @@ export default function CheckoutForm({
   if (isPageLoading) return;
   return (
     <form className="stripePaymentForm" id="payment-form">
-      {errMsg && <AlertMessage msg={errMsg} type="error" />}
-      {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
+      {errMsg && (
+        <AlertMessage msg={errMsg} type="error" divId="payment-form" />
+      )}
+      {infoMsg && (
+        <AlertMessage msg={infoMsg} type="info" divId="payment-form" />
+      )}
       <div className="stripeFieldGroup">
         <StripeInputField
           containerClassName="emailField"

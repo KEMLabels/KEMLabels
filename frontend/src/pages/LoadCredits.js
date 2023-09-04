@@ -81,7 +81,9 @@ export default function LoadCredits() {
             id="payment-form"
             style={{ padding: 0, boxShadow: "none" }}
           >
-            {errMsg && <AlertMessage msg={errMsg} type="error" />}
+            {errMsg && (
+              <AlertMessage msg={errMsg} type="error" divId="payment-form" />
+            )}
             <div
               className="stripeFieldGroup"
               style={{ justifyContent: "center", marginBottom: "1.5rem" }}

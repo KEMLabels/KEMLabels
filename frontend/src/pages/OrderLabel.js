@@ -151,7 +151,12 @@ export default function OrderLabel() {
             {error
               .filter((error) => error.label === "sender")
               .map((error, i) => (
-                <AlertMessage key={i} msg={error.msg} type="error" />
+                <AlertMessage
+                  key={i}
+                  msg={error.msg}
+                  type="error"
+                  divId="senderSection"
+                />
               ))}
             <div className="formRow">
               <InputField
@@ -240,7 +245,12 @@ export default function OrderLabel() {
             {error
               .filter((error) => error.label === "recipient")
               .map((error, i) => (
-                <AlertMessage key={i} msg={error.msg} type="error" />
+                <AlertMessage
+                  key={i}
+                  msg={error.msg}
+                  type="error"
+                  divId="recipientSection"
+                />
               ))}
             <div className="formRow">
               <InputField

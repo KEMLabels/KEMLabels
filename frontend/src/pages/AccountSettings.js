@@ -755,11 +755,15 @@ export default function AccountSettings({ currentPage = "username" }) {
               Change password
             </NavLink>
           </div>
-          <div className="settingsContent">
+          <div id="settings" className="settingsContent">
             {renderHeading()}
-            {errMsg && <AlertMessage msg={errMsg} type="error" />}
-            {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
-            {successMsg && <AlertMessage msg={successMsg} type="success" />}
+            {errMsg && <AlertMessage msg={errMsg} type="error" id="settings" />}
+            {infoMsg && (
+              <AlertMessage msg={infoMsg} type="info" id="settings" />
+            )}
+            {successMsg && (
+              <AlertMessage msg={successMsg} type="success" id="settings" />
+            )}
             {renderField()}
           </div>
         </div>
