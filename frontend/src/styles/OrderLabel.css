@@ -1,7 +1,3 @@
-.orderLabelContainer {
-  max-width: 1000px;
-}
-
 .orderLabelForm {
   display: flex;
   flex-direction: column;
