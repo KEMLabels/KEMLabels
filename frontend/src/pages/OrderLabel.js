@@ -146,7 +146,7 @@ export default function OrderLabel() {
         </div>
         <form action="POST" className="orderLabelForm">
           <div id="packageSection" className="formSection">
-            <h2>Package Details</h2>
+            <h2>Package details</h2>
             {error
               .filter((error) => error.label === "package")
               .map((error, i) => (
@@ -209,7 +209,7 @@ export default function OrderLabel() {
             </div>
           </div>
           <div id="senderSection" className="formSection">
-            <h2>Sender Address</h2>
+            <h2>Sender address</h2>
             {error
               .filter((error) => error.label === "sender")
               .map((error, i) => (
@@ -303,7 +303,7 @@ export default function OrderLabel() {
             </div>
           </div>
           <div id="recipientSection" className="formSection">
-            <h2>Recipient Address</h2>
+            <h2>Recipient address</h2>
             {error
               .filter((error) => error.label === "recipient")
               .map((error, i) => (
