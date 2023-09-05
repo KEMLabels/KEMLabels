@@ -11,7 +11,7 @@
   padding: 1rem 2rem;
   border: solid 2px #cdcdcd;
   gap: 1rem;
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   -webkit-transition: all ease-in-out 0.1s;
   -moz-transition: all ease-in-out 0.1s;
