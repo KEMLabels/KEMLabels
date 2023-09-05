@@ -53,7 +53,7 @@ export default function ForgotPassword() {
 
     if (email === "") {
       setLoading(false);
-      setErrMsg("Please fill out all required fields.");
+      setErrMsg("Please fill out all fields.");
       return;
     }
     axios

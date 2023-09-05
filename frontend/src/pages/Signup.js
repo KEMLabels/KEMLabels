@@ -55,7 +55,7 @@ export default function Signup() {
   function validateFields() {
     // empty field validation
     if (inputUserName === "" || inputEmail === "" || inputPassword === "") {
-      setErrMsg("Please fill out all required fields.");
+      setErrMsg("Please fill out all fields.");
       return false;
     }
 

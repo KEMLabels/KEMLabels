@@ -111,7 +111,7 @@ export default function AccountSettings({ currentPage = "username" }) {
     setLoading(true);
 
     if (inputUserName === "") {
-      setErrMsg("Please fill out the required field.");
+      setErrMsg("Please fill out the field.");
       setLoading(false);
       return;
     }
@@ -179,7 +179,7 @@ export default function AccountSettings({ currentPage = "username" }) {
     setLoading(true);
 
     if (inputEmail === "" || confirmInputEmail === "") {
-      setErrMsg("Please fill out all required fields.");
+      setErrMsg("Please fill out all fields.");
       setLoading(false);
       return;
     }
@@ -355,7 +355,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       inputPassword === "" ||
       confirmInputPassword === ""
     ) {
-      setErrMsg("Please fill out all required fields.");
+      setErrMsg("Please fill out all fields.");
       setLoading(false);
       return;
     }

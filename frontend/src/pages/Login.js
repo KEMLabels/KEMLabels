@@ -63,7 +63,7 @@ export default function Login() {
     setLoading(true);
     if (inputEmail === "" || inputPassword === "") {
       setLoading(false);
-      setErrMsg("Please fill out all required fields.");
+      setErrMsg("Please fill out all fields.");
       return;
     }
     axios

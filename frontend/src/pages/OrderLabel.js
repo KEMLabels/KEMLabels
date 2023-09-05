@@ -103,20 +103,20 @@ export default function OrderLabel() {
     if (isPackageInfoEmpty) {
       errors.push({
         label: "package",
-        msg: "Please fill out all required fields in this section.",
+        msg: "Please fill out all mandatory fields in this section.",
       });
     }
 
     if (isSenderInfoEmpty) {
       errors.push({
         label: "sender",
-        msg: "Please fill out all required fields in this section.",
+        msg: "Please fill out all mandatory fields in this section.",
       });
     }
     if (isRecipientInfoEmpty) {
       errors.push({
         label: "recipient",
-        msg: "Please fill out all required fields in this section.",
+        msg: "Please fill out all mandatory fields in this section.",
       });
     }
 
