@@ -160,6 +160,7 @@ export default function OrderLabel() {
             <div className="formRow">
               <InputField
                 label="Weight (lbs)"
+                helpText="Maximum weight is 150 lbs."
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "weight")}
                 minLength={1}
                 maxLength={3}
@@ -171,6 +172,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={3}
                 shortField
+                fixTextAlignment
               />
             </div>
             <div className="formRow">
@@ -201,6 +203,7 @@ export default function OrderLabel() {
               <InputField
                 fieldType="textarea"
                 label="Description"
+                helpText="Any relavent package information."
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "description")}
                 minLength={1}
                 maxLength={100}
@@ -241,10 +244,12 @@ export default function OrderLabel() {
                 label="Company name"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "companyName")}
                 maxLength={50}
+                fixTextAlignment
                 optional
               />
               <InputField
                 label="Phone number"
+                helpText="(XXX) XXX-XXXX."
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "phone")}
                 placeholder="(XXX) XXX-XXXX"
                 minLength={10}
@@ -279,7 +284,6 @@ export default function OrderLabel() {
               <InputField
                 label="Zip / Postal code"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "zip")}
-                placeholder="A1B 2C3"
                 minLength={6}
                 maxLength={6}
                 shortField
@@ -339,10 +343,12 @@ export default function OrderLabel() {
                   saveInput(e, "recipientInfo", "companyName")
                 }
                 maxLength={50}
+                fixTextAlignment
                 optional
               />
               <InputField
                 label="Phone number"
+                helpText="(XXX) XXX-XXXX."
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "phone")}
                 placeholder="(XXX) XXX-XXXX"
                 minLength={10}
@@ -377,7 +383,6 @@ export default function OrderLabel() {
               <InputField
                 label="Zip / Postal code"
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "zip")}
-                placeholder="A1B 2C3"
                 minLength={6}
                 maxLength={6}
                 shortField

@@ -9,6 +9,8 @@ function InputField({
   containerClassName = "",
   name = "",
   label,
+  helpText,
+  fixTextAlignment = false,
   fieldType = "text",
   title = "",
   initialValue,
@@ -24,10 +26,15 @@ function InputField({
 }) {
   return (
     <div className={`fieldContainer ${containerClassName}`}>
-      <label className={`fieldLabel ${optional ? "optional" : ""}`}>
-        {label}
-        {optional && <span>{"(optional)"}</span>}
-      </label>
+      <div
+        className={`fieldTextGroup ${fixTextAlignment ? "textAlignment" : ""}`}
+      >
+        <label className={`fieldLabel ${optional ? "optional" : ""}`}>
+          {label}
+          {optional && <span>{"(optional)"}</span>}
+        </label>
+        {helpText && <span className="helpText">{helpText}</span>}
+      </div>
       <input
         id={id}
         className={`fieldInput ${className} ${disabled ? "disabled" : ""} ${
@@ -215,10 +222,12 @@ function PasswordField({
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div className={`fieldContainer ${containerClassName}`}>
-      <label className={`fieldLabel ${optional ? "optional" : ""}`}>
-        {label}
-        {optional && <span>{"(optional)"}</span>}
-      </label>
+      <div className="fieldTextGroup">
+        <label className={`fieldLabel ${optional ? "optional" : ""}`}>
+          {label}
+          {optional && <span>{"(optional)"}</span>}
+        </label>
+      </div>
       <input
         id={id}
         className={`fieldInput password ${className} ${
