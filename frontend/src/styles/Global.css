@@ -267,15 +267,18 @@ body {
 }
 
 .dropdown .dropdownControl {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 300;
   color: black;
-  padding: 4px 52px 16px 10px;
-  border-color: rgba(46, 48, 53, 0.2);
-  border-width: 0 0 1px 0;
-  border-radius: 0;
+  padding: 0.75rem 52px 0.75rem 10px;
+  border: solid 1px rgba(46, 48, 53, 0.2);
+  border-radius: 4px;
   transition: all 0.3s ease-in-out;
   cursor: pointer;
+}
+
+.dropdown .dropdownControl .dropdownArrow {
+  top: 43%;
 }
 
 .dropdown .dropdownControl:hover {
@@ -369,12 +372,13 @@ body {
   justify-content: flex-end;
   gap: 1rem;
   width: 30%;
+  margin-bottom: 1.5rem;
 }
 
 .tableHeaderActions .tableItemsToShow .itemsToShowLabel {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 300;
-  padding-bottom: 1rem;
+  margin-top: -2px;
 }
 
 .tableFooterActions {
@@ -450,13 +454,7 @@ body {
     width: 50%;
   }
   .tableHeaderActions {
-    flex-wrap: wrap;
-    gap: 0;
-    margin-bottom: 1.5rem;
-  }
-  .tableHeaderActions .tableItemsToShow,
-  .tableHeaderActions .tableSearch {
-    width: 100%;
+    gap: 0.5rem;
   }
 }
 
@@ -476,6 +474,15 @@ body {
   .alertMessageContainer p {
     font-size: 0.9rem;
   }
+  .tableHeaderActions {
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 1.5rem;
+  }
+  .tableHeaderActions .tableItemsToShow,
+  .tableHeaderActions .tableSearch {
+    width: 100%;
+  }
   .tableHeaderActions .tableItemsToShow {
     justify-content: space-around;
   }
@@ -494,5 +501,11 @@ body {
   }
   .globalContainer h2 {
     font-size: 1.3rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .wrapper {
+    padding-top: 9vh;
   }
 }

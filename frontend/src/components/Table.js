@@ -162,6 +162,7 @@ export default function Table({ data, columns, totalRows, setTotalRows }) {
           <span className="itemsToShowLabel">Items per page</span>{" "}
           <Dropdown
             className="dropdown"
+            arrowClassName="dropdownArrow"
             controlClassName="dropdownControl"
             menuClassName="dropdownMenu"
             options={dropdownItemOptions}
