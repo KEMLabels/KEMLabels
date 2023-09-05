@@ -38,6 +38,9 @@
 }
 
 @media screen and (max-width: 576px) {
+  .orderLabelForm .formSection {
+    padding: 0.5rem 1rem;
+  }
   .orderLabelContainer {
     padding: 3rem 1rem;
   }
