@@ -46,11 +46,11 @@ export default function HamburgerMenu({ sessionStatus = false }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            gap: "1rem",
           }}
         >
           <Link to="/" className="logo">
-            {/* TODO: Change this to logo img later */}
-            <h1>KEMLabels</h1>
+            <img src="/logo.svg" alt="KEMLabels logo" />
           </Link>
 
           <button className="iconButton" onClick={closeHamburgerMenu}>

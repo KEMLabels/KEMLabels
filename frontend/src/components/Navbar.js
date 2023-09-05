@@ -101,8 +101,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
         <HamburgerMenu sessionStatus={isLoggedIn} />
         <div style={{ display: "flex", alignItems: "center" }}>
           <Link to="/" className="logo">
-            {/* TODO: Change this to logo img later */}
-            <h1>KEMLabels</h1>
+            <img src="/logo.svg" alt="KEMLabels logo" />
           </Link>
         </div>
         <div className="navLinksContainer">
