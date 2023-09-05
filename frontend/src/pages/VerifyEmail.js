@@ -89,7 +89,7 @@ export default function VerifyEmail() {
             <p style={{ opacity: 0.7 }}>
               You entered <strong>{email}</strong> as the email address for your
               account. Please check your inbox for a verification link to verify
-              your account. Please be aware that your account will be{" "}
+              your account. Please be aware that your account may be{" "}
               <strong style={{ color: "#ff0033" }}>
                 set for termination within 24 hours
               </strong>{" "}
