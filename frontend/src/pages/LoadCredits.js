@@ -42,7 +42,10 @@ export default function LoadCredits() {
   };
 
   return (
-    <PageLayout title="Load Credits">
+    <PageLayout
+      title="Load Credits"
+      description="Top Up Your Account Balance - Securely add credits to your account with credit/debit cards through Stripe or cryptocurrency through Coinbase. Flexible payment options for your convenience at KEMLabels"
+    >
       <div
         id="loadCredits"
         className="authContainer"

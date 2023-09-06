@@ -683,7 +683,10 @@ export default function AccountSettings({ currentPage = "username" }) {
   }
 
   return (
-    <PageLayout title="Account Settings">
+    <PageLayout
+      title="Account Settings"
+      description="Manage Your Account Settings - Easily update your username, email, or password. Keep your account information up-to-date and secure with KEMLabels."
+    >
       <div className="settingsContainer">
         <h1>Account settings</h1>
         <Dropdown

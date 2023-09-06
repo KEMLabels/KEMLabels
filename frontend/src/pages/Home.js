@@ -7,7 +7,10 @@ import FaqJson from "../content/faq";
 
 export default function Home() {
   return (
-    <PageLayout isLandingPage>
+    <PageLayout
+      isLandingPage
+      description="Welcome to KEMLabels - Your Trusted Shipping Label Solution. Streamline your shipping process with our easy-to-use platform. Order labels, track your credit history, and manage your account effortlessly. Start shipping smarter with KEMLabels."
+    >
       <div id="home" className="hero">
         <div className="heroColumn">
           <h1>Shipping Made Simple</h1>

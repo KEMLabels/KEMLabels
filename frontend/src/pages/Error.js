@@ -8,7 +8,10 @@ export default function Error() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <PageLayout title={"Page Not Found"}>
+    <PageLayout
+      title="Page Not Found"
+      description="Oops! Something went wrong. We apologize for the inconvenience. Please return to the home page or contact our support team for assistance."
+    >
       <div
         className="authContainer"
         style={{

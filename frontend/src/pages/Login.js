@@ -96,7 +96,11 @@ export default function Login() {
   };
 
   return (
-    <PageLayout title="Login" hideNavAndFooter>
+    <PageLayout
+      title="Login"
+      description="Login to Your KEMLabels Account - Access your account securely. Manage your account, order a shipping label, track your credit hisotry, and more with ease. Welcome back to KEMLabels!"
+      hideNavAndFooter
+    >
       <div className="authContainer">
         <div className="authColumn">
           <div className="backToHome">

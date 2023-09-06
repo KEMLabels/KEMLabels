@@ -4,7 +4,10 @@ import "../styles/Global.css";
 
 export default function PrivacyPolicy() {
   return (
-    <PageLayout title="Privacy Policy">
+    <PageLayout
+      title="Privacy Policy"
+      description="Your Privacy Matters - Explore KEMLabels' commitment to safeguarding your personal information. Learn how we collect, use, and protect your data in our Privacy Policy."
+    >
       <div className="globalContainer">
         <div className="headingContainer">
           <h1>Privacy Policy</h1>

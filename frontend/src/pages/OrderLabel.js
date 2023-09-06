@@ -130,7 +130,10 @@ export default function OrderLabel() {
   };
 
   return (
-    <PageLayout title="Order Label">
+    <PageLayout
+      title="Order Label"
+      description="Order Shipping Labels Online - Quickly generate shipping labels by providing address and package details. Get your label sent to your email for easy printing and shipping. Streamline your shipping process with KEMLabels."
+    >
       <div className="globalContainer orderLabelContainer">
         <div className="headingContainer" style={{ textAlign: "center" }}>
           <h1>Order label</h1>
@@ -194,7 +197,9 @@ export default function OrderLabel() {
             <div className="formRow">
               <InputField
                 label="Reference number"
-                onChangeEvent={(e) => saveInput(e, "packageInfo", "referneceNumber")}
+                onChangeEvent={(e) =>
+                  saveInput(e, "packageInfo", "referneceNumber")
+                }
                 minLength={1}
                 maxLength={20}
               />
@@ -204,7 +209,9 @@ export default function OrderLabel() {
                 fieldType="textarea"
                 label="Description"
                 helpText="Any relavent package information."
-                onChangeEvent={(e) => saveInput(e, "packageInfo", "description")}
+                onChangeEvent={(e) =>
+                  saveInput(e, "packageInfo", "description")
+                }
                 minLength={1}
                 maxLength={100}
                 optional

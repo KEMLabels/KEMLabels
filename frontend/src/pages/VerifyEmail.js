@@ -67,7 +67,10 @@ export default function VerifyEmail() {
   };
 
   return (
-    <PageLayout title="Verify Email">
+    <PageLayout
+      title="Verify Your Email"
+      description="Verify Your Email Address - Complete your registration with KEMLabels by verifying your email. Click the link sent to your inbox to get started. Welcome to KEMLabels!"
+    >
       <div
         className="authContainer"
         style={{

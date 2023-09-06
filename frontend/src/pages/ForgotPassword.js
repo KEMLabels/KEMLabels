@@ -374,7 +374,10 @@ export default function ForgotPassword() {
 
   if (isLoading) return;
   return (
-    <PageLayout title="Forgot Password">
+    <PageLayout
+      title="Forgot Password"
+      description="Forgot Your Password? - No worries! You can reset it securely with KEMLabels. Enter your email address, and we'll send you instructions on how to setup a new password."
+    >
       <div
         className="authContainer"
         style={{

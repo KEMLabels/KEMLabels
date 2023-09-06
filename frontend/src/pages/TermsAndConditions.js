@@ -4,7 +4,10 @@ import "../styles/Global.css";
 
 export default function TermsAndConditions() {
   return (
-    <PageLayout title="Terms and Conditions">
+    <PageLayout
+      title="Terms and Conditions"
+      description="Review KEMLabels' Terms and Conditions - Understand our guidelines for using our services and website. Your agreement to these terms is essential when using KEMLabels."
+    >
       <div className="globalContainer">
         <div className="headingContainer">
           <h1>Terms and Conditions</h1>

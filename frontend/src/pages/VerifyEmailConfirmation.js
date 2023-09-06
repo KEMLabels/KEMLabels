@@ -93,7 +93,14 @@ export default function VerifyEmailConfirmation() {
   }
 
   return (
-    <PageLayout title={validURL ? "Email Verified" : `Email ${linkErrMsg}`}>
+    <PageLayout
+      title={validURL ? "Email Verified" : `Email ${linkErrMsg}`}
+      description={
+        validURL
+          ? "Email Verified - Congratulations! Your email has been successfully verified. You can now access all the features and services of KEMLabels. Thank you for joining us!"
+          : "Email Verification Failed - We're sorry, but the verification link you clicked is either invalid or has expired. Please request a new verification email or contact our support team for assistance."
+      }
+    >
       <div
         className="authContainer"
         style={{

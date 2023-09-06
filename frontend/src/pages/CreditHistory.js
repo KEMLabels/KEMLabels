@@ -99,7 +99,10 @@ export default function CreditHistory() {
 
   if (isFetching) return null;
   return (
-    <PageLayout title="Credit History">
+    <PageLayout
+      title="Credit History"
+      description="Review Your Credit History - Gain insights into your credit transactions and balances. Stay informed with your financial activity at KEMLabels."
+    >
       <div className="container">
         <div className="header">
           <h1>Credit history {`(${totalRows})`}</h1>

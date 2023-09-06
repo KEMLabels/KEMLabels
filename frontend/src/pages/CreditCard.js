@@ -97,7 +97,10 @@ export default function CreditCard() {
   };
 
   return (
-    <PageLayout title="Load by Card">
+    <PageLayout
+      title="Load by Card"
+      description="Load Credits to Your Account Securely - Top up your account balance with a credit or debit card using Stripe. Start shipping hassle-free with KEMLabels."
+    >
       <div
         className="authContainer"
         style={{

@@ -117,7 +117,11 @@ export default function Signup() {
   };
 
   return (
-    <PageLayout title="Sign Up" hideNavAndFooter>
+    <PageLayout
+      title="Sign Up"
+      description="Sign Up with KEMLabels - Join our community of shippers and start your joruney. Create an account to order shipping labels, track your credit history, and more. Get started with KEMLabels today!"
+      hideNavAndFooter
+    >
       <div className="authContainer">
         <div className="authColumn">
           <div className="backToHome">
