@@ -381,7 +381,7 @@ async function generateTokenHelper(userID, email) {
 
 async function sendSignUpConfirmationEmail(emailAddress, url) {
     const content = `<p>Thank you for signing up with us!</p>
-    <p>Please use the following link to confirm your email address: <a href="${url}" target="_blank">${url}</a></p>
+    <p>Please use the following <a href="${url}" target="_blank" style="color:#0066ff!important;text-decoration:none">link here</a> to confirm your email address.</p>
     <p>If you did not sign up for KEMLabels, you can safely ignore this email.</p>
     <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
     const signUpConfirmationEmail = emailTemplate(emailAddress, 'KEMLabels - Confirm Your Email', content);
