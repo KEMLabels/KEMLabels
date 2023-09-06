@@ -13,8 +13,16 @@ export default function Home() {
     >
       <div id="home" className="hero">
         <div className="heroColumn">
-          <h1>Shipping Made Simple</h1>
-          <p>Fast, Reliable Shipping Delivered to Your Doorstep!</p>
+          <h1>
+            Label Your Success,
+            <br />
+            Ship with Confidence
+          </h1>
+          <p>
+            Streamline your shipping process with our easy-to-use platform.
+            Order labels, track your credit history, and manage your account
+            effortlessly.
+          </p>
         </div>
         <div className="heroColumn">
           <img

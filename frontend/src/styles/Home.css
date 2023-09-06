@@ -19,7 +19,7 @@
 }
 
 .heroColumn h1 {
-  font-size: 3.5rem;
+  font-size: 2.75rem;
   font-weight: 600;
   color: white;
   margin-bottom: 1.5rem;
@@ -175,7 +175,7 @@
 
 @media screen and (max-width: 992px) {
   .heroColumn h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .accordion {
@@ -185,19 +185,23 @@
 
 @media screen and (max-width: 768px) {
   .hero {
+    flex-direction: column;
+    justify-content: center;
     padding: 7rem 3rem 3rem;
   }
 
   .heroColumn {
     padding: 0.5rem;
-  }
-
-  .heroColumn h1 {
-    font-size: 2rem;
+    width: 100%;
   }
 
   .heroColumn p {
     font-size: 1rem;
+  }
+
+  .heroColumn img {
+    margin: auto;
+    max-width: 400px;
   }
 
   .homeSecContainer {
@@ -246,14 +250,8 @@
 
 @media screen and (max-width: 576px) {
   .hero {
-    flex-direction: column;
-    justify-content: center;
     min-height: 100vh;
-    padding: 7rem 1.25rem 3rem;
-  }
-
-  .heroColumn {
-    width: 100%;
+    padding: 10rem 1.25rem 3rem;
   }
 
   .heroColumn:first-child {
@@ -261,11 +259,15 @@
   }
 
   .heroColumn h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .heroColumn p {
     font-size: 1.2rem;
+  }
+
+  .heroColumn img {
+    max-width: 300px;
   }
 
   .homeSecContainer {
@@ -309,5 +311,15 @@
 
   .accordionHeading svg {
     width: 1.25rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .heroColumn h1 {
+    font-size: 1.6rem;
+  }
+
+  .heroColumn p {
+    font-size: 1rem;
   }
 }
