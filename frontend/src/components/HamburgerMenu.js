@@ -50,7 +50,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
           }}
         >
           <Link to="/" className="logo">
-            <img src="/logo.svg" alt="KEMLabels logo" />
+            <img src="/logo/logo.svg" alt="KEMLabels logo" />
           </Link>
 
           <button className="iconButton" onClick={closeHamburgerMenu}>
