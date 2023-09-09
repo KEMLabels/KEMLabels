@@ -5,8 +5,8 @@
   background-repeat: no-repeat;
   background-size: 100%;
   padding: 7rem 5rem 3rem 5rem;
-  min-height: auto;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
   display: flex;
   align-items: center;
 }
