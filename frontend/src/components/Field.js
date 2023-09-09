@@ -18,6 +18,8 @@ function InputField({
   placeholder = "",
   minLength,
   maxLength,
+  prefix = "",
+  postfix = "",
   onChangeEvent,
   customStyle,
   shortField = false,
@@ -35,25 +37,29 @@ function InputField({
         </label>
         {helpText && <span className="helpText">{helpText}</span>}
       </div>
-      <input
-        id={id}
-        className={`fieldInput ${className} ${disabled ? "disabled" : ""} ${
-          shortField ? "shortField" : ""
-        }`}
-        type={fieldType}
-        name={name}
-        title={title}
-        style={{ ...customStyle }}
-        defaultValue={initialValue}
-        value={currentValue}
-        placeholder={placeholder}
-        disabled={disabled}
-        minLength={minLength || null}
-        maxLength={maxLength || null}
-        onChange={(e) => {
-          if (onChangeEvent) onChangeEvent(e);
-        }}
-      />
+      <div className="fieldInputGroup">
+        {prefix && <span className="inputPrefix">{prefix}</span>}
+        <input
+          id={id}
+          className={`fieldInput ${className} ${disabled ? "disabled" : ""} ${
+            shortField ? "shortField" : ""
+          } ${prefix ? "prefix" : ""} ${postfix ? "postfix" : ""}`}
+          type={fieldType}
+          name={name}
+          title={title}
+          style={{ ...customStyle }}
+          defaultValue={initialValue}
+          value={currentValue}
+          placeholder={placeholder}
+          disabled={disabled}
+          minLength={minLength || null}
+          maxLength={maxLength || null}
+          onChange={(e) => {
+            if (onChangeEvent) onChangeEvent(e);
+          }}
+        />
+        {postfix && <span className="inputPostfix">{postfix}</span>}
+      </div>
     </div>
   );
 }
@@ -228,33 +234,35 @@ function PasswordField({
           {optional && <span>{"(optional)"}</span>}
         </label>
       </div>
-      <input
-        id={id}
-        className={`fieldInput password ${className} ${
-          disabled ? "disabled" : ""
-        }`}
-        type={showPassword ? "text" : "password"}
-        name={name}
-        title="Minimum 8 characters"
-        style={{ ...customStyle }}
-        defaultValue={initialValue}
-        value={currentValue}
-        placeholder={placeholder}
-        disabled={disabled}
-        minLength={minLength || null}
-        maxLength={maxLength || null}
-        onChange={(e) => {
-          if (onChangeEvent) onChangeEvent(e);
-        }}
-      />
-      <div
-        className="passwordIcon"
-        title={showPassword ? "Hide password" : "Show password"}
-        onClick={() => {
-          setShowPassword(!showPassword);
-        }}
-      >
-        {showPassword ? <FaEyeSlash /> : <FaEye />}
+      <div className="fieldInputGroup">
+        <input
+          id={id}
+          className={`fieldInput password ${className} ${
+            disabled ? "disabled" : ""
+          }`}
+          type={showPassword ? "text" : "password"}
+          name={name}
+          title="Minimum 8 characters"
+          style={{ ...customStyle }}
+          defaultValue={initialValue}
+          value={currentValue}
+          placeholder={placeholder}
+          disabled={disabled}
+          minLength={minLength || null}
+          maxLength={maxLength || null}
+          onChange={(e) => {
+            if (onChangeEvent) onChangeEvent(e);
+          }}
+        />
+        <div
+          className="passwordIcon"
+          title={showPassword ? "Hide password" : "Show password"}
+          onClick={() => {
+            setShowPassword(!showPassword);
+          }}
+        >
+          {showPassword ? <FaEyeSlash /> : <FaEye />}
+        </div>
       </div>
     </div>
   );
@@ -278,20 +286,22 @@ function SearchField({
       <div className="searchIcon">
         <MdSearch />
       </div>
-      <input
-        id={id}
-        className={`fieldInput searchField ${className}`}
-        type={fieldType}
-        name={name}
-        title={title}
-        style={{ ...customStyle }}
-        defaultValue={initialValue}
-        value={currentValue}
-        placeholder={placeholder}
-        onChange={(e) => {
-          if (onChangeEvent) onChangeEvent(e);
-        }}
-      />
+      <div className="fieldInputGroup">
+        <input
+          id={id}
+          className={`fieldInput searchField ${className}`}
+          type={fieldType}
+          name={name}
+          title={title}
+          style={{ ...customStyle }}
+          defaultValue={initialValue}
+          value={currentValue}
+          placeholder={placeholder}
+          onChange={(e) => {
+            if (onChangeEvent) onChangeEvent(e);
+          }}
+        />
+      </div>
     </div>
   );
 }
