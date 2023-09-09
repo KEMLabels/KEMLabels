@@ -17,7 +17,7 @@ export default function CreditHistory() {
   const isUserVerified = useSelector((state) => state.auth.isVerified);
 
   const [errMsg, setErrMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
+  const [infoMsg, setInfoMsg] = useState("");
   const [isFetching, setIsFetching] = useState(true);
   const [timeoutId, setTimeoutId] = useState(null);
   const [creditHistoryData, setCreditHistoryData] = useState([]);
@@ -67,11 +67,11 @@ export default function CreditHistory() {
           onClick={(e) => {
             e.preventDefault();
             if (timeoutId) clearTimeout(timeoutId); // Clear the previous timeout
-            setSuccessMsg(
+            setInfoMsg(
               "Payment Reference ID was copied to clipboard succesfully."
             );
             navigator.clipboard.writeText(data.getValue());
-            const cellTimeoutId = setTimeout(() => setSuccessMsg(""), 3000);
+            const cellTimeoutId = setTimeout(() => setInfoMsg(""), 3000);
             setTimeoutId(cellTimeoutId);
           }}
         >
@@ -107,7 +107,7 @@ export default function CreditHistory() {
         <div className="header">
           <h1>Credit history {`(${totalRows})`}</h1>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
-          {successMsg && <AlertMessage msg={successMsg} type="success" />}
+          {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
         </div>
         <div className="tableContainer">
           {creditHistoryData.length > 0 ? (
