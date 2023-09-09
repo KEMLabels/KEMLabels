@@ -167,7 +167,7 @@
   }
 
   .backToHome {
-    display: none;
+    padding-bottom: 0.5rem;
   }
 
   .authHeader h1 {

@@ -127,7 +127,7 @@ export default function Signup() {
           <div className="backToHome">
             <Link to="/" className="link">
               <GoArrowLeft size={18} style={{ marginTop: "2px" }} />
-              <p>Return to Home</p>
+              <p>Back to Home</p>
             </Link>
           </div>
           <div className="authHeader">
