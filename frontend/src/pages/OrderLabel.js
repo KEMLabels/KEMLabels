@@ -5,7 +5,7 @@ import "../styles/OrderLabel.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { BsArrowUp } from "react-icons/bs";
-import { InputField } from "../components/Field";
+import { DefaultField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
 
@@ -161,7 +161,7 @@ export default function OrderLabel() {
                 />
               ))}
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="Weight"
                 helpText="Maximum weight is 150 lbs."
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "weight")}
@@ -170,7 +170,7 @@ export default function OrderLabel() {
                 postfix="lbs"
                 shortField
               />
-              <InputField
+              <DefaultField
                 label="Length"
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "length")}
                 minLength={1}
@@ -181,7 +181,7 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="Width"
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "width")}
                 minLength={1}
@@ -189,7 +189,7 @@ export default function OrderLabel() {
                 postfix="in"
                 shortField
               />
-              <InputField
+              <DefaultField
                 label="Height"
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "height")}
                 minLength={1}
@@ -199,7 +199,7 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="Reference number"
                 helpText="Can be your invoice number found on your order details."
                 onChangeEvent={(e) =>
@@ -211,7 +211,7 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 fieldType="textarea"
                 label="Description"
                 helpText="Any relavent package information."
@@ -237,14 +237,14 @@ export default function OrderLabel() {
                 />
               ))}
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="First name"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "firstName")}
                 placeholder="John"
                 minLength={1}
                 maxLength={50}
               />
-              <InputField
+              <DefaultField
                 label="Last name"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "lastName")}
                 placeholder="Doe"
@@ -253,14 +253,14 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="Company name"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "companyName")}
                 maxLength={50}
                 fixTextAlignment
                 optional
               />
-              <InputField
+              <DefaultField
                 label="Phone number"
                 helpText="(XXX) XXX-XXXX."
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "phone")}
@@ -270,14 +270,14 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="Street"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "street")}
                 placeholder="Start typing your address..."
                 minLength={1}
                 maxLength={50}
               />
-              <InputField
+              <DefaultField
                 label="Suite / Apt / Unit"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "suite")}
                 minLength={1}
@@ -287,14 +287,14 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="City"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "city")}
                 placeholder="Vancouver"
                 minLength={1}
                 maxLength={50}
               />
-              <InputField
+              <DefaultField
                 label="Zip / Postal code"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "zip")}
                 minLength={6}
@@ -303,14 +303,14 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="Province / State"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "state")}
                 placeholder="British Columbia"
                 minLength={1}
                 maxLength={50}
               />
-              <InputField
+              <DefaultField
                 label="Country"
                 onChangeEvent={(e) => saveInput(e, "senderInfo", "country")}
                 placeholder="Canada"
@@ -332,7 +332,7 @@ export default function OrderLabel() {
                 />
               ))}
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="First name"
                 onChangeEvent={(e) =>
                   saveInput(e, "recipientInfo", "firstName")
@@ -341,7 +341,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
               />
-              <InputField
+              <DefaultField
                 label="Last name"
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "lastName")}
                 placeholder="Doe"
@@ -350,7 +350,7 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="Company name"
                 onChangeEvent={(e) =>
                   saveInput(e, "recipientInfo", "companyName")
@@ -359,7 +359,7 @@ export default function OrderLabel() {
                 fixTextAlignment
                 optional
               />
-              <InputField
+              <DefaultField
                 label="Phone number"
                 helpText="(XXX) XXX-XXXX."
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "phone")}
@@ -369,14 +369,14 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="Street"
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "street")}
                 placeholder="Start typing your address..."
                 minLength={1}
                 maxLength={50}
               />
-              <InputField
+              <DefaultField
                 label="Suite / Apt / Unit"
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "suite")}
                 minLength={1}
@@ -386,14 +386,14 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="City"
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "city")}
                 placeholder="Vancouver"
                 minLength={1}
                 maxLength={50}
               />
-              <InputField
+              <DefaultField
                 label="Zip / Postal code"
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "zip")}
                 minLength={6}
@@ -402,14 +402,14 @@ export default function OrderLabel() {
               />
             </div>
             <div className="formRow">
-              <InputField
+              <DefaultField
                 label="Province / State"
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "state")}
                 placeholder="British Columbia"
                 minLength={1}
                 maxLength={50}
               />
-              <InputField
+              <DefaultField
                 label="Country"
                 onChangeEvent={(e) => saveInput(e, "recipientInfo", "country")}
                 placeholder="Canada"

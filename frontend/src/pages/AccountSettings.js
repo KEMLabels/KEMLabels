@@ -9,7 +9,7 @@ import "react-dropdown/style.css";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 import { NavLink, useNavigate } from "react-router-dom";
-import { InputField, PasswordField } from "../components/Field";
+import { DefaultField, PasswordField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import {
   validateEmailOnSubmit,
@@ -456,7 +456,7 @@ export default function AccountSettings({ currentPage = "username" }) {
           <form action="POST" className="settingsFieldContainer">
             {!showOTPField ? (
               <>
-                <InputField
+                <DefaultField
                   label="New email"
                   fieldType="email"
                   containerClassName="settingsField"
@@ -468,7 +468,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   minLength={3}
                   maxLength={100}
                 />
-                <InputField
+                <DefaultField
                   label="Confirm new email"
                   fieldType="email"
                   containerClassName="settingsField"
@@ -658,7 +658,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       case "username":
         return (
           <form action="POST" className="settingsFieldContainer">
-            <InputField
+            <DefaultField
               label="New username"
               onChangeEvent={(e) => {
                 setInputUserName(e.target.value.trim().toLowerCase());

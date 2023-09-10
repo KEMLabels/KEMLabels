@@ -3,7 +3,7 @@ import "../styles/Field.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
 
-function InputField({
+function DefaultField({
   id,
   className = "",
   containerClassName = "",
@@ -307,7 +307,7 @@ function SearchField({
 }
 
 export {
-  InputField,
+  DefaultField,
   PasswordField,
   StripeAmountField,
   StripeInputField,

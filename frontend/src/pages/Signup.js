@@ -6,7 +6,7 @@ import axios from "../api/axios";
 import "../styles/Global.css";
 import "../styles/Auth.css";
 import Button from "../components/Button";
-import { InputField, PasswordField } from "../components/Field";
+import { DefaultField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
 import {
@@ -138,7 +138,7 @@ export default function Signup() {
           </div>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           <form action="POST" className="authFormContainer">
-            <InputField
+            <DefaultField
               label="Username"
               onChangeEvent={(e) => {
                 setInputUserName(e.target.value.trim().toLowerCase());
@@ -148,7 +148,7 @@ export default function Signup() {
               minLength={3}
               maxLength={15}
             />
-            <InputField
+            <DefaultField
               label="Email"
               fieldType="email"
               onChangeEvent={(e) => {

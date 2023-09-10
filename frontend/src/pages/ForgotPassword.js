@@ -8,7 +8,7 @@ import axios from "../api/axios";
 import "../styles/Global.css";
 import "../styles/Auth.css";
 import Button from "../components/Button";
-import { InputField, PasswordField } from "../components/Field";
+import { DefaultField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
 import { validatePasswordOnSubmit } from "../utils/Validation";
@@ -272,7 +272,7 @@ export default function ForgotPassword() {
       case "verifyEmail":
         return (
           <>
-            <InputField
+            <DefaultField
               label="Email"
               fieldType="email"
               onChangeEvent={(e) => {
