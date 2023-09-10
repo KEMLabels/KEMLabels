@@ -8,11 +8,14 @@ import { BsArrowUp } from "react-icons/bs";
 import { DefaultField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
+import axios from "../api/axios";
+import Log from "../components/Log";
 
 export default function OrderLabel() {
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const email = useSelector((state) => state.auth.email);
 
   const senderAndRecipientInfo = {
     firstName: "",
@@ -41,6 +44,7 @@ export default function OrderLabel() {
     recipientInfo: { ...senderAndRecipientInfo },
   });
   const [error, setError] = useState([]);
+  const [successMsg, setSuccessMsg] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
 
@@ -127,6 +131,32 @@ export default function OrderLabel() {
     }
 
     // TODO: axios call here
+    axios
+      .post("/OrderLabel", { email: email, withCredentials: true })
+      .then((res) => {
+        if (res.data.errMsg) {
+          setError({
+            label: "container",
+            msg: res.data.errMsg,
+          });
+        } else {
+          setSuccessMsg(true);
+          setError([]);
+          setTimeout(() => {
+            navigate("/order-success");
+          }, 3000);
+        }
+      })
+      .catch((e) => {
+        Log("Error: ", e);
+        setError({
+          label: "container",
+          msg: "An unexpected error occured. Please try again later.", // Axios default error
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (

@@ -87,8 +87,9 @@ export default function Login() {
         Log("Error: ", e);
         if (e?.response?.data?.msg === "Incorrect email or password.") {
           setErrMsg(e.response.data.msg);
-        } else
+        } else {
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        }
       })
       .finally(() => {
         setLoading(false);
