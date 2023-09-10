@@ -173,7 +173,6 @@ export default function CheckoutForm({
         />
         <StripeAmountField
           containerClassName="loadAmountField"
-          fieldType="number"
           label="Load amount"
           currentValue={loadedAmount}
           prefix="$"

@@ -9,7 +9,7 @@ import { FaBitcoin, FaRegCreditCard } from "react-icons/fa";
 import { setUserLoadAmount } from "../redux/actions/UserAction";
 import axios from "../api/axios";
 import AlertMessage from "../components/AlertMessage";
-import { StripeAmountField } from "../components/Field";
+import { AmountField } from "../components/Field";
 import Log from "../components/Log";
 
 export default function LoadCredits() {
@@ -21,7 +21,6 @@ export default function LoadCredits() {
 
   const [errMsg, setErrMsg] = useState("");
   const [loadAmount, setLoadAmount] = useState("");
-  const [loadAmountFieldInvalid, setLoadAmountFieldInvalid] = useState(false);
 
   useEffect(() => {
     if (!isUserVerified) navigate("/verify-email");
@@ -34,7 +33,6 @@ export default function LoadCredits() {
     if (!loadAmount || loadAmount < 1) {
       dispatch(setUserLoadAmount(0));
       setErrMsg("Please enter an amount that is greater than $1.00.");
-      setLoadAmountFieldInvalid(true);
       return false;
     }
     dispatch(setUserLoadAmount(loadAmount));
@@ -89,9 +87,8 @@ export default function LoadCredits() {
               className="stripeFieldGroup"
               style={{ justifyContent: "center", marginBottom: "1.5rem" }}
             >
-              <StripeAmountField
+              <AmountField
                 containerClassName="loadAmountField"
-                fieldType="number"
                 label="Load amount"
                 placeholder="0"
                 currentValue={loadAmount}
@@ -99,12 +96,8 @@ export default function LoadCredits() {
                 postfix="USD"
                 onChangeEvent={(e) => {
                   setErrMsg("");
-                  setLoadAmountFieldInvalid(false);
                   setLoadAmount(e.target.value);
                 }}
-                customStyle={
-                  loadAmountFieldInvalid ? { border: "2px solid #df1b41" } : {}
-                }
               />
             </div>
             <div className="paymentOptionCardGroup">

@@ -1,4 +1,4 @@
-const regex = {
+export const regex = {
   username: /^[a-zA-Z0-9_.-]+$/,
   email: /^([a-z0-9_.+-]+)@([\da-z.-]+)\.([a-z.]{2,6})$/,
   password: {
@@ -9,6 +9,8 @@ const regex = {
   passwordCombined:
     /^(?=.*[0-9])(?=.*[!@#$%^&*()\-_=+{}[\]|\\;:'",.<>/?`~])(?=.*[A-Z])(?=.*[a-z]).*$/,
   pagination: /^[1-9]\d*$/,
+  amountExactMatch: /^[0-9.]$/,
+  amount: /^[0-9.]/,
 };
 
 export function lengthRangeCheck(value, min, max) {

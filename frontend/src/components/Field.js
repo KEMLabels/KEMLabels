@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../styles/Field.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
+import { regex } from "../utils/Validation";
 
 function DefaultField({
   id,
@@ -10,7 +11,6 @@ function DefaultField({
   name = "",
   label,
   helpText,
-  fixTextAlignment = false,
   fieldType = "text",
   title = "",
   initialValue,
@@ -22,6 +22,7 @@ function DefaultField({
   postfix = "",
   onChangeEvent,
   customStyle,
+  fixTextAlignment = false,
   shortField = false,
   disabled = false,
   optional = false,
@@ -54,8 +55,122 @@ function DefaultField({
           disabled={disabled}
           minLength={minLength || null}
           maxLength={maxLength || null}
+          onChange={(e) => (onChangeEvent ? onChangeEvent(e) : null)}
+        />
+        {postfix && <span className="inputPostfix">{postfix}</span>}
+      </div>
+    </div>
+  );
+}
+
+function AmountField({
+  id,
+  className = "",
+  containerClassName = "",
+  name = "",
+  label,
+  helpText,
+  fieldType = "number",
+  title = "",
+  initialValue,
+  currentValue,
+  placeholder = "",
+  prefix = "",
+  postfix = "",
+  step = 1,
+  integerDigits = 6,
+  decimalDigits = 2,
+  onChangeEvent,
+  customStyle,
+  fixTextAlignment = false,
+  shortField = false,
+  disabled = false,
+  optional = false,
+}) {
+  return (
+    <div className={`fieldContainer ${containerClassName}`}>
+      <div
+        className={`fieldTextGroup ${fixTextAlignment ? "textAlignment" : ""}`}
+      >
+        <label className={`fieldLabel ${optional ? "optional" : ""}`}>
+          {label}
+          {optional && <span>{"(optional)"}</span>}
+        </label>
+        {helpText && <span className="helpText">{helpText}</span>}
+      </div>
+      <div className={`fieldInputGroup ${shortField ? "shortField" : ""}`}>
+        {prefix && <span className="inputPrefix">{prefix}</span>}
+        <input
+          id={id}
+          className={`fieldInput ${className} ${disabled ? "disabled" : ""}  ${
+            prefix ? "prefix" : ""
+          } ${postfix ? "postfix" : ""}`}
+          type={fieldType}
+          name={name}
+          title={title}
+          style={{ ...customStyle }}
+          defaultValue={initialValue}
+          value={currentValue}
+          placeholder={placeholder}
+          disabled={disabled}
+          step={step}
+          onKeyDown={(e) => {
+            // Allow certain keys: digits, dot, backspace, delete, arrow keys, and tab
+            const { key, ctrlKey, metaKey } = e;
+            if (
+              regex.amountExactMatch.test(key) ||
+              key === "Backspace" ||
+              key === "Delete" ||
+              key.startsWith("Arrow") ||
+              key === "Tab" ||
+              ((ctrlKey || metaKey) && key === "a")
+            ) {
+              return;
+            }
+            // Prevent the event for all other keys
+            e.preventDefault();
+          }}
+          onBlur={() => {
+            let inputValue = currentValue;
+            if (inputValue) {
+              if (!inputValue.includes(".")) {
+                inputValue = parseFloat(inputValue).toFixed(decimalDigits);
+              } else {
+                // If there's a decimal point, check the number of decimal places
+                const [integerPart, decimalPart] = inputValue.split(".");
+                if (decimalPart.length < decimalDigits) {
+                  inputValue = `${integerPart}.${decimalPart.padEnd(
+                    decimalDigits,
+                    "0"
+                  )}`;
+                }
+              }
+            }
+            onChangeEvent({ target: { value: inputValue } });
+          }}
           onChange={(e) => {
-            if (onChangeEvent) onChangeEvent(e);
+            if (onChangeEvent) {
+              let inputValue = e.target.value.replace(`${regex.amount}/g`, "");
+              if (inputValue) {
+                let [integerPart, decimalPart] = inputValue.split(".");
+
+                // Limit to 6 or specified digits in [integerDigits] before decimal
+                if (integerPart && integerPart.length > integerDigits) {
+                  integerPart = integerPart.slice(0, integerDigits);
+                }
+
+                // Limit to 2 or specified decimal places in [decimalDigits]
+                if (decimalPart && decimalPart.length > decimalDigits) {
+                  decimalPart = decimalPart.slice(0, decimalDigits);
+                }
+
+                // Combine integer and decimal parts
+                inputValue = decimalPart
+                  ? `${integerPart}.${decimalPart}`
+                  : integerPart;
+              }
+              onChangeEvent({ target: { value: inputValue } });
+            }
           }}
         />
         {postfix && <span className="inputPostfix">{postfix}</span>}
@@ -99,9 +214,7 @@ function StripeInputField({
         disabled={disabled}
         minLength={minLength || null}
         maxLength={maxLength || null}
-        onChange={(e) => {
-          if (onChangeEvent) onChangeEvent(e);
-        }}
+        onChange={(e) => (onChangeEvent ? onChangeEvent(e) : null)}
       />
     </div>
   );
@@ -120,6 +233,9 @@ function StripeAmountField({
   placeholder = "",
   prefix = "",
   postfix = "",
+  step = 1,
+  integerDigits = 6,
+  decimalDigits = 2,
   onChangeEvent,
   customStyle,
   disabled = false,
@@ -137,29 +253,25 @@ function StripeAmountField({
           type={fieldType}
           name={name}
           title={title}
-          style={{
-            ...customStyle,
-          }}
+          style={{ ...customStyle }}
           defaultValue={initialValue}
           value={currentValue}
           placeholder={placeholder}
           disabled={disabled}
-          step={1}
+          step={step}
           onKeyDown={(e) => {
-            const key = e.key;
-
             // Allow certain keys: digits, dot, backspace, delete, arrow keys, and tab
+            const { key, ctrlKey, metaKey } = e;
             if (
-              /^[0-9.]$/.test(key) ||
+              regex.amountExactMatch.test(key) ||
               key === "Backspace" ||
               key === "Delete" ||
               key.startsWith("Arrow") ||
               key === "Tab" ||
-              ((e.ctrlKey || e.metaKey) && key === "a")
+              ((ctrlKey || metaKey) && key === "a")
             ) {
               return;
             }
-
             // Prevent the event for all other keys
             e.preventDefault();
           }}
@@ -167,12 +279,15 @@ function StripeAmountField({
             let inputValue = currentValue;
             if (inputValue) {
               if (!inputValue.includes(".")) {
-                inputValue = parseFloat(inputValue).toFixed(2);
+                inputValue = parseFloat(inputValue).toFixed(decimalDigits);
               } else {
                 // If there's a decimal point, check the number of decimal places
                 const [integerPart, decimalPart] = inputValue.split(".");
-                if (decimalPart.length < 2) {
-                  inputValue = `${integerPart}.${decimalPart.padEnd(2, "0")}`;
+                if (decimalPart.length < decimalDigits) {
+                  inputValue = `${integerPart}.${decimalPart.padEnd(
+                    decimalDigits,
+                    "0"
+                  )}`;
                 }
               }
             }
@@ -180,18 +295,18 @@ function StripeAmountField({
           }}
           onChange={(e) => {
             if (onChangeEvent) {
-              let inputValue = e.target.value.replace(/[^0-9.]/g, "");
+              let inputValue = e.target.value.replace(`${regex.amount}/g`, "");
               if (inputValue) {
                 let [integerPart, decimalPart] = inputValue.split(".");
 
-                // Limit to 6 digits before decimal
-                if (integerPart && integerPart.length > 6) {
-                  integerPart = integerPart.slice(0, 6);
+                // Limit to 6 or specified digits in [integerDigits] before decimal
+                if (integerPart && integerPart.length > integerDigits) {
+                  integerPart = integerPart.slice(0, integerDigits);
                 }
 
-                // Limit to 2 decimal places
-                if (decimalPart && decimalPart.length > 2) {
-                  decimalPart = decimalPart.slice(0, 2);
+                // Limit to 2 or specified decimal places in [decimalDigits]
+                if (decimalPart && decimalPart.length > decimalDigits) {
+                  decimalPart = decimalPart.slice(0, decimalDigits);
                 }
 
                 // Combine integer and decimal parts
@@ -250,9 +365,7 @@ function PasswordField({
           disabled={disabled}
           minLength={minLength || null}
           maxLength={maxLength || null}
-          onChange={(e) => {
-            if (onChangeEvent) onChangeEvent(e);
-          }}
+          onChange={(e) => (onChangeEvent ? onChangeEvent(e) : null)}
         />
         <div
           className="passwordIcon"
@@ -297,9 +410,7 @@ function SearchField({
           defaultValue={initialValue}
           value={currentValue}
           placeholder={placeholder}
-          onChange={(e) => {
-            if (onChangeEvent) onChangeEvent(e);
-          }}
+          onChange={(e) => (onChangeEvent ? onChangeEvent(e) : null)}
         />
       </div>
     </div>
@@ -308,6 +419,7 @@ function SearchField({
 
 export {
   DefaultField,
+  AmountField,
   PasswordField,
   StripeAmountField,
   StripeInputField,
