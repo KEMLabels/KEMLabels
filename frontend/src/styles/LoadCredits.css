@@ -9,7 +9,7 @@
   justify-content: center;
   align-items: center;
   padding: 1rem 2rem;
-  border: solid 2px #cdcdcd;
+  border: solid 1px #cdcdcd;
   gap: 1rem;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -36,7 +36,7 @@
 
 .paymentOptionCardGroup .paymentOptionCard p {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 400;
   color: #6a6a6a;
 }
 
