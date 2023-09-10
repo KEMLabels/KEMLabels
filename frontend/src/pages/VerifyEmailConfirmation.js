@@ -51,10 +51,12 @@ export default function VerifyEmailConfirmation() {
       case "Link Invalid":
         return (
           <>
-            <h1 style={{ textAlign: "center" }}>Your email link is invalid!</h1>{" "}
-            <p style={{ opacity: "0.7", textAlign: "center" }}>
-              We're sorry, but your email link doesn't seem right. Please login
-              and{" "}
+            <h1>Your email link is invalid!</h1>{" "}
+            <p>
+              <span>
+                We're sorry, but your email link doesn't seem right. Please
+                login and{" "}
+              </span>
               <Link to="/verify-email" className="link">
                 request a new link here.
               </Link>
@@ -64,11 +66,11 @@ export default function VerifyEmailConfirmation() {
       case "Link Expired":
         return (
           <>
-            <h1 style={{ textAlign: "center" }}>
-              Your email link has expired!
-            </h1>{" "}
-            <p style={{ opacity: "0.7", textAlign: "center" }}>
-              We're sorry, but your email link has expired. Please login and{" "}
+            <h1>Your email link has expired!</h1>{" "}
+            <p>
+              <span>
+                We're sorry, but your email link has expired. Please login and{" "}
+              </span>
               <Link to="/verify-email" className="link">
                 request a new link here.
               </Link>
@@ -78,11 +80,11 @@ export default function VerifyEmailConfirmation() {
       default:
         return (
           <>
-            <h1 style={{ textAlign: "center" }}>
-              Uh oh! Something went wrong.
-            </h1>{" "}
-            <p style={{ opacity: "0.7", textAlign: "center" }}>
-              We're sorry but something went wrong on our server. Please try{" "}
+            <h1>Uh oh! Something went wrong.</h1>{" "}
+            <p>
+              <span>
+                We're sorry but something went wrong on our server. Please try{" "}
+              </span>
               <Link to="/verify-email" className="link">
                 requesting a new link here.
               </Link>
@@ -111,7 +113,7 @@ export default function VerifyEmailConfirmation() {
       >
         {fetching ? null : (
           <div className="authColumn">
-            <div className="authHeader">
+            <div className="authHeader center">
               <div
                 style={{
                   display: "flex",
@@ -127,12 +129,12 @@ export default function VerifyEmailConfirmation() {
               </div>
               {validURL ? (
                 <>
-                  <h1 style={{ textAlign: "center" }}>
-                    Your email has been verified!
-                  </h1>
-                  <p style={{ opacity: "0.7", textAlign: "center" }}>
-                    Thank you for confirming your email address! You're all set
-                    to begin your purchase.
+                  <h1>Your email has been verified!</h1>
+                  <p>
+                    <span>
+                      Thank you for confirming your email address! You're all
+                      set to begin your purchase.
+                    </span>
                   </p>
                 </>
               ) : (

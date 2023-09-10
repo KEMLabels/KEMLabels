@@ -81,26 +81,21 @@ export default function VerifyEmail() {
       >
         <div className="authColumn">
           <div className="authHeader">
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <img
-                src="/media/emailVerify.jpg"
-                alt="Verify email illustration"
-                width="70%"
-              />
-            </div>
+            <img src="/media/emailVerify.jpg" alt="Verify email illustration" />
             <h1>Verify your email address</h1>
-            <p style={{ opacity: 1 }}>
-              <span style={{ opacity: 0.7 }}>
-                You entered <strong>{email}</strong> as the email address for
-                your account. Please check your inbox for a verification link to
-                verify your account. Please be aware that your account may be{" "}
+            <p>
+              <span>You entered </span>
+              <strong>{email}</strong>
+              <span>
+                {" "}
+                as the email address for your account. Please check your inbox
+                for a verification link to verify your account. Please be aware
+                that your account may be{" "}
               </span>
               <strong style={{ color: "#ff0033" }}>
                 set for termination within 24 hours
               </strong>{" "}
-              <span style={{ opacity: 0.7 }}>
-                if you do not complete our verification process.
-              </span>
+              <span>if you do not complete our verification process.</span>
             </p>
           </div>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}

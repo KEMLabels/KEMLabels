@@ -59,20 +59,18 @@ export default function LoadCredits() {
           className="authColumn"
           style={{ width: "100%", maxWidth: "700px" }}
         >
-          <div className="authHeader">
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <img
-                src="/media/paymentoption.jpg"
-                alt="Payment option illustration"
-                width="100%"
-                style={{ maxWidth: "400px" }}
-              />
-            </div>
-            <h1 style={{ textAlign: "center" }}>How do you want to load?</h1>
-            <p style={{ opacity: "0.7", textAlign: "center" }}>
-              Please enter the amount to load and choose one of the payment
-              options below to get started. If you are looking to refund, please
-              contact us at{" "}
+          <div className="authHeader center">
+            <img
+              src="/media/paymentoption.jpg"
+              alt="Payment option illustration"
+            />
+            <h1>How do you want to load?</h1>
+            <p>
+              <span>
+                Please enter the amount to load and choose one of the payment
+                options below to get started. If you are looking to refund,
+                please contact us at{" "}
+              </span>
               <Link className="link" to="mailto:support@kemlabels.com">
                 support@kemlabels.com.
               </Link>

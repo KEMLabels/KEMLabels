@@ -111,7 +111,9 @@ export default function Login() {
           </div>
           <div className="authHeader">
             <h1>Login</h1>
-            <p>Welcome back! Please enter your details.</p>
+            <p>
+              <span>Welcome back! Please enter your details.</span>
+            </p>
           </div>
 
           {errMsg && <AlertMessage msg={errMsg} type="error" />}

@@ -21,21 +21,18 @@ export default function Error() {
         }}
       >
         <div className="authColumn">
-          <div className="authHeader">
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <img
-                src="/media/error.jpg"
-                alt="Man confused on directions illustration"
-                width="100%"
-              />
-            </div>
-            <div className="errorContainer">
-              <h1>Oops! Page not found.</h1>
-              <p style={{ opacity: 0.7 }}>
+          <div className="authHeader center">
+            <img
+              src="/media/error.jpg"
+              alt="Man confused on directions illustration"
+            />
+            <h1>Oops! Page not found.</h1>
+            <p>
+              <span>
                 Something went wrong. The page you requested for could not be
                 found or does not exist.
-              </p>
-            </div>
+              </span>
+            </p>
           </div>
           <Button
             btnType="button"

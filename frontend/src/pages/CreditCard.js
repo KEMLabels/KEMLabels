@@ -113,18 +113,22 @@ export default function CreditCard() {
           className="authColumn"
           style={{ width: "100%", maxWidth: "700px" }}
         >
-          <div className="authHeader" style={{ textAlign: "center" }}>
+          <div className="authHeader center">
             {!loadCreditSuccess ? (
               <>
                 <h1>Credit card setup</h1>
-                <p>Please enter your card information below.</p>
+                <p>
+                  <span>Please enter your card information below.</span>
+                </p>
               </>
             ) : (
               <>
                 <h1>Credits loaded successfully!</h1>
                 <p>
-                  Thank you for your payment, we have sent an automated payment
-                  receipt to your registered email.
+                  <span>
+                    Thank you for your payment, we have sent an automated
+                    payment receipt to your registered email.
+                  </span>
                 </p>
               </>
             )}

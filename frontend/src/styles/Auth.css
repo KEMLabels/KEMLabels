@@ -19,29 +19,31 @@
   padding-bottom: 2rem;
 }
 
+.authHeader.center {
+  text-align: center;
+}
+
 .authHeader h1 {
   font-size: 2.5rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .authHeader p {
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 2rem;
-  opacity: 0.5;
 }
 
-.errorContainer {
-  text-align: center;
+.authHeader p span {
+  opacity: 0.7;
 }
 
-.errorContainer h1 {
-  font-size: 3rem;
-}
-
-.errorContainer p {
-  font-size: 1.2rem;
+.authHeader img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  object-position: center center;
 }
 
 .authFormContainer {
@@ -52,7 +54,7 @@
 }
 
 .authFormContainer button {
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .backToHome {
@@ -174,16 +176,8 @@
     font-size: 2rem;
   }
 
-  .errorContainer p {
-    font-size: 1rem;
-  }
-
   .authFormContainer a.linkAlt {
     margin-bottom: 1.5rem;
-  }
-
-  .authFormContainer button {
-    margin-top: 2rem;
   }
 
   .otpContainer .otpInputContainer {

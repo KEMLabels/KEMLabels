@@ -132,7 +132,9 @@ export default function Signup() {
           </div>
           <div className="authHeader">
             <h1>Create an account</h1>
-            <p>Let's get started with a free account.</p>
+            <p>
+              <span>Let's get started with a free account.</span>
+            </p>
           </div>
           {errMsg && <AlertMessage msg={errMsg} type="error" />}
           <form action="POST" className="authFormContainer">
