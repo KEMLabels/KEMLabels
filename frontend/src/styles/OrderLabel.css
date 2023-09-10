@@ -20,6 +20,12 @@
   gap: 2rem;
 }
 
+.orderLabelForm .btnContainer {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+}
+
 @media screen and (max-width: 992px) {
   .orderLabelContainer {
     max-width: 100%;
@@ -43,5 +49,11 @@
   }
   .orderLabelContainer {
     padding: 3rem 1rem;
+  }
+  .orderLabelForm .btnContainer {
+    flex-wrap: wrap;
+  }
+  .orderLabelForm .btnContainer .kemLabelsBtn {
+    width: 100%;
   }
 }

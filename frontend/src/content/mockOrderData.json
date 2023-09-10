@@ -1,0 +1,36 @@
+{
+  "courier": "UPS",
+  "classType": "UPS Ground",
+  "packageInfo": {
+    "weight": 85.98,
+    "length": 32.1,
+    "width": 24.8,
+    "height": 12.5,
+    "description": "This is a test package.",
+    "referenceNumber": "1234567890"
+  },
+  "senderInfo": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "companyName": "KEMLabels",
+    "phone": "1234567890",
+    "street": "1234 Test Street",
+    "suite": "123",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "zip": "V1V1V1",
+    "country": "Canada"
+  },
+  "recipientInfo": {
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "companyName": "KEMLabels",
+    "phone": "1234567890",
+    "street": "1234 Test Street",
+    "suite": "123",
+    "city": "Vancouver",
+    "state": "British Columbia",
+    "zip": "V1V1V1",
+    "country": "Canada"
+  }
+}

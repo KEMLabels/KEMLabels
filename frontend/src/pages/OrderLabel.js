@@ -10,6 +10,8 @@ import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
 import axios from "../api/axios";
 import Log from "../components/Log";
+import mockData from "../content/mockOrderData";
+import { isDevelopmentEnv } from "../utils/Helpers";
 
 export default function OrderLabel() {
   const navigate = useNavigate();
@@ -135,13 +137,15 @@ export default function OrderLabel() {
       .post("/OrderLabel", { email: email, withCredentials: true })
       .then((res) => {
         if (res.data.errMsg) {
-          setError({
-            label: "container",
-            msg: res.data.errMsg,
-          });
+          setError([
+            {
+              label: "container",
+              msg: res.data.errMsg,
+            },
+          ]);
         } else {
-          setSuccessMsg(true);
           setError([]);
+          setSuccessMsg("Your order has been placed. Redirecting...");
           setTimeout(() => {
             navigate("/order-success");
           }, 3000);
@@ -149,10 +153,12 @@ export default function OrderLabel() {
       })
       .catch((e) => {
         Log("Error: ", e);
-        setError({
-          label: "container",
-          msg: "An unexpected error occured. Please try again later.", // Axios default error
-        });
+        setError([
+          {
+            label: "container",
+            msg: "An unexpected error occured. Please try again later.", // Axios default error
+          },
+        ]);
       })
       .finally(() => {
         setLoading(false);
@@ -176,6 +182,7 @@ export default function OrderLabel() {
             .map((error, i) => (
               <AlertMessage key={i} msg={error.msg} type="error" />
             ))}
+          {successMsg && <AlertMessage msg={successMsg} type="success" />}
         </div>
         <form action="POST" className="orderLabelForm">
           <div id="packageSection" className="formSection">
@@ -198,6 +205,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={3}
                 name="weight"
+                currentValue={formValues?.packageInfo?.weight}
                 postfix="lbs"
                 shortField
               />
@@ -207,6 +215,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={3}
                 name="length"
+                currentValue={formValues?.packageInfo?.length}
                 postfix="in"
                 shortField
                 fixTextAlignment
@@ -219,6 +228,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={3}
                 name="width"
+                currentValue={formValues?.packageInfo?.width}
                 postfix="in"
                 shortField
               />
@@ -228,6 +238,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={3}
                 name="height"
+                currentValue={formValues?.packageInfo?.height}
                 postfix="in"
                 shortField
               />
@@ -240,6 +251,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={20}
                 name="referenceNumber"
+                currentValue={formValues?.packageInfo?.referenceNumber}
                 optional
               />
             </div>
@@ -252,6 +264,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={100}
                 name="description"
+                currentValue={formValues?.packageInfo?.description}
                 optional
               />
             </div>
@@ -276,6 +289,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="firstName"
+                currentValue={formValues?.senderInfo?.firstName}
               />
               <DefaultField
                 label="Last name"
@@ -284,6 +298,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="lastName"
+                currentValue={formValues?.senderInfo?.lastName}
               />
             </div>
             <div className="formRow">
@@ -292,6 +307,7 @@ export default function OrderLabel() {
                 onChangeEvent={(e) => saveInput(e, "senderInfo")}
                 maxLength={50}
                 name="companyName"
+                currentValue={formValues?.senderInfo?.companyName}
                 fixTextAlignment
                 optional
               />
@@ -303,6 +319,7 @@ export default function OrderLabel() {
                 minLength={10}
                 maxLength={10}
                 name="phone"
+                currentValue={formValues?.senderInfo?.phone}
               />
             </div>
             <div className="formRow">
@@ -313,6 +330,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="street"
+                currentValue={formValues?.senderInfo?.street}
               />
               <DefaultField
                 label="Suite / Apt / Unit"
@@ -320,6 +338,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={15}
                 name="suite"
+                currentValue={formValues?.senderInfo?.suite}
                 shortField
                 optional
               />
@@ -332,6 +351,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="city"
+                currentValue={formValues?.senderInfo?.city}
               />
               <DefaultField
                 label="Zip / Postal code"
@@ -339,6 +359,7 @@ export default function OrderLabel() {
                 minLength={6}
                 maxLength={6}
                 name="zip"
+                currentValue={formValues?.senderInfo?.zip}
                 shortField
               />
             </div>
@@ -350,6 +371,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="state"
+                currentValue={formValues?.senderInfo?.state}
               />
               <DefaultField
                 label="Country"
@@ -358,6 +380,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="country"
+                currentValue={formValues?.senderInfo?.country}
               />
             </div>
           </div>
@@ -381,6 +404,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="firstName"
+                currentValue={formValues?.recipientInfo?.firstName}
               />
               <DefaultField
                 label="Last name"
@@ -389,6 +413,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="lastName"
+                currentValue={formValues?.recipientInfo?.lastName}
               />
             </div>
             <div className="formRow">
@@ -397,6 +422,7 @@ export default function OrderLabel() {
                 onChangeEvent={(e) => saveInput(e, "recipientInfo")}
                 maxLength={50}
                 name="companyName"
+                currentValue={formValues?.recipientInfo?.companyName}
                 fixTextAlignment
                 optional
               />
@@ -408,6 +434,7 @@ export default function OrderLabel() {
                 minLength={10}
                 maxLength={10}
                 name="phone"
+                currentValue={formValues?.recipientInfo?.phone}
               />
             </div>
             <div className="formRow">
@@ -418,6 +445,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="street"
+                currentValue={formValues?.recipientInfo?.street}
               />
               <DefaultField
                 label="Suite / Apt / Unit"
@@ -425,6 +453,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={15}
                 name="suite"
+                currentValue={formValues?.recipientInfo?.suite}
                 shortField
                 optional
               />
@@ -437,6 +466,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="city"
+                currentValue={formValues?.recipientInfo?.city}
               />
               <DefaultField
                 label="Zip / Postal code"
@@ -444,6 +474,7 @@ export default function OrderLabel() {
                 minLength={6}
                 maxLength={6}
                 name="zip"
+                currentValue={formValues?.recipientInfo?.zip}
                 shortField
               />
             </div>
@@ -455,6 +486,7 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="state"
+                currentValue={formValues?.recipientInfo?.state}
               />
               <DefaultField
                 label="Country"
@@ -463,16 +495,24 @@ export default function OrderLabel() {
                 minLength={1}
                 maxLength={50}
                 name="country"
+                currentValue={formValues?.recipientInfo?.country}
               />
             </div>
           </div>
-          <div>
+          <div className="btnContainer">
             <Button
               btnType="submit"
               loading={loading}
               onClickEvent={submit}
               text="Submit order"
             />
+            {isDevelopmentEnv() && (
+              <Button
+                fill="outline"
+                text="Autofill"
+                onClickEvent={() => setFormValues(mockData)}
+              />
+            )}
           </div>
         </form>
         <div>
