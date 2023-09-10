@@ -115,7 +115,7 @@
   padding-right: 2.5rem;
 }
 
-.fieldContainer .fieldInputGroup .fieldInput.shortField {
+.fieldContainer .fieldInputGroup.shortField {
   width: 40%;
 }
 
@@ -139,11 +139,17 @@
   cursor: pointer;
 }
 
+@media screen and (max-width: 992px) {
+  .fieldContainer .fieldInputGroup.shortField {
+    width: 60%;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .fieldContainer {
     margin-bottom: 1rem;
   }
-  .fieldContainer .fieldInputGroup .fieldInput.shortField {
+  .fieldContainer .fieldInputGroup.shortField {
     width: 40%;
   }
   .fieldContainer .fieldTextGroup.textAlignment {
@@ -163,7 +169,7 @@
     font-size: 1.25rem;
     margin-left: -2rem;
   }
-  .fieldContainer .fieldInputGroup .fieldInput.shortField {
+  .fieldContainer .fieldInputGroup.shortField {
     width: 100%;
   }
   .fieldContainer .fieldInputGroup .inputPrefix,

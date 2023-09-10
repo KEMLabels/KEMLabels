@@ -162,46 +162,52 @@ export default function OrderLabel() {
               ))}
             <div className="formRow">
               <InputField
-                label="Weight (lbs)"
+                label="Weight"
                 helpText="Maximum weight is 150 lbs."
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "weight")}
                 minLength={1}
                 maxLength={3}
+                postfix="lbs"
                 shortField
               />
               <InputField
-                label="Length (in)"
+                label="Length"
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "length")}
                 minLength={1}
                 maxLength={3}
+                postfix="in"
                 shortField
                 fixTextAlignment
               />
             </div>
             <div className="formRow">
               <InputField
-                label="Width (in)"
+                label="Width"
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "width")}
                 minLength={1}
                 maxLength={3}
+                postfix="in"
                 shortField
               />
               <InputField
-                label="Height (in)"
+                label="Height"
                 onChangeEvent={(e) => saveInput(e, "packageInfo", "height")}
                 minLength={1}
                 maxLength={3}
+                postfix="in"
                 shortField
               />
             </div>
             <div className="formRow">
               <InputField
                 label="Reference number"
+                helpText="Can be your invoice number found on your order details."
                 onChangeEvent={(e) =>
                   saveInput(e, "packageInfo", "referneceNumber")
                 }
                 minLength={1}
                 maxLength={20}
+                optional
               />
             </div>
             <div className="formRow">

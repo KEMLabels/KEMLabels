@@ -37,13 +37,13 @@ function InputField({
         </label>
         {helpText && <span className="helpText">{helpText}</span>}
       </div>
-      <div className="fieldInputGroup">
+      <div className={`fieldInputGroup ${shortField ? "shortField" : ""}`}>
         {prefix && <span className="inputPrefix">{prefix}</span>}
         <input
           id={id}
-          className={`fieldInput ${className} ${disabled ? "disabled" : ""} ${
-            shortField ? "shortField" : ""
-          } ${prefix ? "prefix" : ""} ${postfix ? "postfix" : ""}`}
+          className={`fieldInput ${className} ${disabled ? "disabled" : ""}  ${
+            prefix ? "prefix" : ""
+          } ${postfix ? "postfix" : ""}`}
           type={fieldType}
           name={name}
           title={title}
