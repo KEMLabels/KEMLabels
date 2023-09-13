@@ -18,37 +18,34 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/signin" element={<Login />}></Route>
-        <Route path="/signup" element={<Signup />}></Route>
-        <Route path="/privacy-policy" element={<PrivacyPolicy />}></Route>
-        <Route
-          path="/terms-and-conditions"
-          element={<TermsAndConditions />}
-        ></Route>
-        <Route path="/forgot-password" element={<ForgotPassword />}></Route>
+        <Route path="/" element={<Home />} />
+        <Route path="/signin" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
           path="/users/:id/verify/:token"
           element={<VerifyEmailConfirmation />}
-        ></Route>
-        <Route path="/verify-email" element={<VerifyEmail />}></Route>
+        />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route
           path="/account/change-username"
           element={<AccountSettings currentPage="username" />}
-        ></Route>
+        />
         <Route
           path="/account/change-email"
           element={<AccountSettings currentPage="email" />}
-        ></Route>
+        />
         <Route
           path="/account/change-password"
           element={<AccountSettings currentPage="password" />}
-        ></Route>
-        <Route path="/load-credits" element={<LoadCredits />}></Route>
-        <Route path="/pay/credit-card" element={<CreditCard />}></Route>
-        <Route path="/credit-history" element={<CreditHistory />}></Route>
-        <Route path="/order-label" element={<OrderLabel />}></Route>
-        <Route path="*" element={<Error />}></Route>
+        />
+        <Route path="/load-credits" element={<LoadCredits />} />
+        <Route path="/pay/credit-card" element={<CreditCard />} />
+        <Route path="/credit-history" element={<CreditHistory />} />
+        <Route path="/order-label" element={<OrderLabel />} />
+        <Route path="*" element={<Error />} />
       </Routes>
     </BrowserRouter>
   );
