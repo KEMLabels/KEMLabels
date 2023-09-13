@@ -1,3 +1,10 @@
+.orderLabelContainer .headingContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .orderLabelForm {
   display: flex;
   flex-direction: column;

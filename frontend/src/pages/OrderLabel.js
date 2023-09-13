@@ -35,10 +35,10 @@ export default function OrderLabel() {
     courier: "",
     classType: "",
     packageInfo: {
-      weight: 0,
-      length: 0,
-      width: 0,
-      height: 0,
+      weight: null,
+      length: null,
+      width: null,
+      height: null,
       description: "",
       referenceNumber: "",
     },
@@ -67,7 +67,10 @@ export default function OrderLabel() {
       setError((array) => array.filter((e) => e.label !== "sender"));
     } else if (section === "recipientInfo") {
       setError((array) => array.filter((e) => e.label !== "recipient"));
+    } else if (section === "packageInfo") {
+      setError((array) => array.filter((e) => e.label !== "package"));
     }
+
     setFormValues((prevValues) => {
       if (section) {
         return {
@@ -171,7 +174,7 @@ export default function OrderLabel() {
       description="Order Shipping Labels Online - Quickly generate shipping labels by providing address and package details. Get your label sent to your email for easy printing and shipping. Streamline your shipping process with KEMLabels."
     >
       <div className="globalContainer orderLabelContainer">
-        <div className="headingContainer" style={{ textAlign: "center" }}>
+        <div className="headingContainer">
           <h1>Order label</h1>
           <p>
             Please complete all mandatory fields to proceed with placing your
