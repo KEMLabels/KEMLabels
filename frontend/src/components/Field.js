@@ -91,6 +91,7 @@ function AmountField({
   step = 1,
   integerDigits = 6,
   decimalDigits = 2,
+  error, // Error message
   onChangeEvent,
   customStyle,
   fixTextAlignment = false,
@@ -98,6 +99,17 @@ function AmountField({
   disabled = false,
   optional = false,
 }) {
+  const inputClassNames = [
+    "fieldInput",
+    className,
+    disabled && "disabled",
+    prefix && "prefix",
+    postfix && "postfix",
+    error && "invalid",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div className={`fieldContainer ${containerClassName}`}>
       <div
@@ -113,9 +125,7 @@ function AmountField({
         {prefix && <span className="inputPrefix">{prefix}</span>}
         <input
           id={id}
-          className={`fieldInput ${className} ${disabled ? "disabled" : ""}  ${
-            prefix ? "prefix" : ""
-          } ${postfix ? "postfix" : ""}`}
+          className={inputClassNames}
           type={fieldType}
           name={name}
           title={title}
@@ -186,6 +196,7 @@ function AmountField({
         />
         {postfix && <span className="inputPostfix">{postfix}</span>}
       </div>
+      {error && <span className="fieldErrorMsg">{error}</span>}
     </div>
   );
 }
@@ -346,12 +357,22 @@ function PasswordField({
   placeholder = "",
   minLength,
   maxLength,
+  error, // Error message
   onChangeEvent,
   customStyle,
   disabled = false,
   optional = false,
 }) {
   const [showPassword, setShowPassword] = useState(false);
+  const inputClassNames = [
+    "fieldInput password",
+    className,
+    disabled && "disabled",
+    error && "invalid",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div className={`fieldContainer ${containerClassName}`}>
       <div className="fieldTextGroup">
@@ -363,9 +384,7 @@ function PasswordField({
       <div className="fieldInputGroup">
         <input
           id={id}
-          className={`fieldInput password ${className} ${
-            disabled ? "disabled" : ""
-          }`}
+          className={inputClassNames}
           type={showPassword ? "text" : "password"}
           name={name}
           title="Minimum 8 characters"
@@ -388,6 +407,7 @@ function PasswordField({
           {showPassword ? <FaEyeSlash /> : <FaEye />}
         </div>
       </div>
+      {error && <span className="fieldErrorMsg">{error}</span>}
     </div>
   );
 }

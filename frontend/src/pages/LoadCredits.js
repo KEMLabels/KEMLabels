@@ -8,7 +8,6 @@ import "../styles/Stripe.css";
 import { FaBitcoin, FaRegCreditCard } from "react-icons/fa";
 import { setUserLoadAmount } from "../redux/actions/UserAction";
 import axios from "../api/axios";
-import AlertMessage from "../components/AlertMessage";
 import { AmountField } from "../components/Field";
 import Log from "../components/Log";
 
@@ -19,7 +18,7 @@ export default function LoadCredits() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const isUserVerified = useSelector((state) => state.auth.isVerified);
 
-  const [errMsg, setErrMsg] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [loadAmount, setLoadAmount] = useState("");
 
   useEffect(() => {
@@ -30,9 +29,12 @@ export default function LoadCredits() {
 
   const handleLoadCredits = (e) => {
     e.preventDefault();
+    setFieldErrors({});
     if (!loadAmount || loadAmount < 1) {
       dispatch(setUserLoadAmount(0));
-      setErrMsg("Please enter an amount that is greater than $1.00.");
+      setFieldErrors({
+        loadAmount: "Please enter an amount that is greater than $1.00.",
+      });
       return false;
     }
     dispatch(setUserLoadAmount(loadAmount));
@@ -77,12 +79,8 @@ export default function LoadCredits() {
 
           <div
             className="stripePaymentForm"
-            id="payment-form"
             style={{ padding: 0, boxShadow: "none" }}
           >
-            {errMsg && (
-              <AlertMessage msg={errMsg} type="error" divId="payment-form" />
-            )}
             <div
               className="stripeFieldGroup"
               style={{ justifyContent: "center", marginBottom: "1.5rem" }}
@@ -95,9 +93,9 @@ export default function LoadCredits() {
                 prefix="$"
                 postfix="USD"
                 onChangeEvent={(e) => {
-                  setErrMsg("");
                   setLoadAmount(e.target.value);
                 }}
+                error={fieldErrors?.loadAmount}
               />
             </div>
             <div className="paymentOptionCardGroup">

@@ -30,6 +30,7 @@ export default function AccountSettings({ currentPage = "username" }) {
   const email = useSelector((state) => state.auth.email);
 
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [errMsg, setErrMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -109,6 +110,7 @@ export default function AccountSettings({ currentPage = "username" }) {
   function updateUsernameCall(e) {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
 
     if (inputUserName === "") {
       setErrMsg("Please fill out the field.");
@@ -116,7 +118,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       return;
     }
 
-    if (!validateUsernameOnSubmit(inputUserName, setErrMsg)) {
+    if (!validateUsernameOnSubmit(inputUserName, setFieldErrors)) {
       setLoading(false);
       return;
     }
@@ -129,12 +131,9 @@ export default function AccountSettings({ currentPage = "username" }) {
       )
       .then((res) => {
         Log(res);
-        if (res.data.errMsg) setErrMsg(res.data.errMsg);
-        else {
-          dispatch(setUserName(inputUserName));
-          navigate("/account/change-username");
-          setSuccessMsg("Username updated successfully.");
-        }
+        dispatch(setUserName(inputUserName));
+        navigate("/account/change-username");
+        setSuccessMsg("Username updated successfully.");
       })
       .catch((e) => {
         Log("Error: ", e);
@@ -142,9 +141,12 @@ export default function AccountSettings({ currentPage = "username" }) {
           e?.response?.data?.msg ===
             "This username is already associated with an account." ||
           e?.response?.data?.msg ===
-            "You cannot change your username to the same one you currently have." ||
-          e?.response?.data?.msg.startsWith("You must wait")
+            "You cannot change your username to the same one you currently have."
         ) {
+          setFieldErrors({
+            username: e.response.data.msg,
+          });
+        } else if (e?.response?.data?.msg.startsWith("You must wait")) {
           setErrMsg(e.response.data.msg);
         } else {
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
@@ -164,9 +166,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         { newEmail: confirmInputEmail },
         { withCredentials: true }
       )
-      .then((res) => {
-        Log(res);
-      })
+      .then((res) => Log(res))
       .catch((e) => {
         Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
@@ -177,6 +177,7 @@ export default function AccountSettings({ currentPage = "username" }) {
   function sendEmailVerificationCode(e) {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
 
     if (inputEmail === "" || confirmInputEmail === "") {
       setErrMsg("Please fill out all fields.");
@@ -184,10 +185,14 @@ export default function AccountSettings({ currentPage = "username" }) {
       return;
     }
 
-    if (
-      !validateEmailOnSubmit(inputEmail, setErrMsg) ||
-      !validateEmailOnSubmit(confirmInputEmail, setErrMsg)
-    ) {
+    const emailValid = validateEmailOnSubmit(inputEmail, setFieldErrors);
+    const confirmEmailValid = validateEmailOnSubmit(
+      confirmInputEmail,
+      setFieldErrors,
+      "confirmEmail"
+    );
+
+    if (!emailValid || !confirmEmailValid) {
       setLoading(false);
       return;
     }
@@ -225,7 +230,7 @@ export default function AccountSettings({ currentPage = "username" }) {
           e?.response?.data?.msg ===
             "This email is already associated with an account."
         ) {
-          setErrMsg(e.response.data.msg);
+          setFieldErrors({ newEmail: e.response.data.msg });
         } else {
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         }
@@ -242,6 +247,7 @@ export default function AccountSettings({ currentPage = "username" }) {
     e.preventDefault();
     setLoading(true);
     clearMessages();
+    setFieldErrors({});
 
     axios
       .post(
@@ -336,9 +342,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         { email: email, password: confirmInputPassword },
         { withCredentials: true }
       )
-      .then((res) => {
-        Log(res);
-      })
+      .then((res) => Log(res))
       .catch((e) => {
         Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
@@ -349,6 +353,7 @@ export default function AccountSettings({ currentPage = "username" }) {
   function sendPasswordVerificationCode(e) {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
 
     if (
       currentInputPassword === "" ||
@@ -360,7 +365,9 @@ export default function AccountSettings({ currentPage = "username" }) {
       return;
     }
 
-    if (!validatePasswordOnSubmit(inputPassword, setErrMsg)) {
+    if (
+      !validatePasswordOnSubmit(inputPassword, setFieldErrors, "newPassword")
+    ) {
       setLoading(false);
       return;
     }
@@ -375,7 +382,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       .post(
         "/sendPasswordChangeConfirmation",
         {
-          eneteredPassword: currentInputPassword,
+          enteredPassword: currentInputPassword,
           newPassword: confirmInputPassword,
         },
         { withCredentials: true }
@@ -397,18 +404,19 @@ export default function AccountSettings({ currentPage = "username" }) {
         Log("Error: ", e);
         if (
           e?.response?.data?.msg ===
-            "Looks like you have entered the same password that you are using now. Please enter a differernt password." ||
-          e?.response?.data?.msg ===
-            "Hmm... your current password is incorrect. Please try again."
+          "Hmm... your current password is incorrect. Please try again."
         ) {
-          setErrMsg(e.response.data.msg);
+          setFieldErrors({ password: e.response.data.msg });
+        } else if (
+          e?.response?.data?.msg ===
+          "Looks like you have entered the same password that you are using now. Please enter a differernt password."
+        ) {
+          setFieldErrors({ newPassword: e.response.data.msg });
         } else {
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         }
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }
   //#endregion
 
@@ -467,6 +475,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   placeholder="johndoe@gmail.com"
                   minLength={3}
                   maxLength={100}
+                  error={fieldErrors?.email}
                 />
                 <DefaultField
                   label="Confirm new email"
@@ -479,6 +488,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   placeholder="johndoe@gmail.com"
                   minLength={3}
                   maxLength={100}
+                  error={fieldErrors?.confirmEmail}
                 />
               </>
             ) : (
@@ -545,6 +555,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   }}
                   minLength={8}
                   maxLength={50}
+                  error={fieldErrors?.password}
                 />
                 <PasswordField
                   label="New password"
@@ -559,6 +570,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   }}
                   minLength={8}
                   maxLength={50}
+                  error={fieldErrors?.newPassword}
                 />
                 <PasswordField
                   label="Confirm new password"
@@ -569,6 +581,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                   }}
                   minLength={8}
                   maxLength={50}
+                  error={fieldErrors?.confirmNewPassword}
                 />
                 <div
                   className="passwordRequirements"
@@ -668,6 +681,7 @@ export default function AccountSettings({ currentPage = "username" }) {
               placeholder="johndoe"
               minLength={3}
               maxLength={15}
+              error={fieldErrors?.username}
             />
             <Button
               btnType="submit"
@@ -700,12 +714,14 @@ export default function AccountSettings({ currentPage = "username" }) {
                 setInputUserName("");
                 resetPasswordFields();
                 clearMessages();
+                setFieldErrors({});
                 navigate("/account/change-email");
                 break;
               case "Change password":
                 setInputUserName("");
                 resetEmailFields();
                 clearMessages();
+                setFieldErrors({});
                 navigate("/account/change-password");
                 break;
               default:
@@ -713,6 +729,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 resetEmailFields();
                 resetPasswordFields();
                 clearMessages();
+                setFieldErrors({});
                 navigate("/account/change-username");
                 break;
             }
@@ -731,6 +748,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 resetEmailFields();
                 resetPasswordFields();
                 clearMessages();
+                setFieldErrors({});
               }}
             >
               Change username
@@ -742,6 +760,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 setInputUserName("");
                 resetPasswordFields();
                 clearMessages();
+                setFieldErrors({});
               }}
             >
               Change email
@@ -753,6 +772,7 @@ export default function AccountSettings({ currentPage = "username" }) {
                 setInputUserName("");
                 resetEmailFields();
                 clearMessages();
+                setFieldErrors({});
               }}
             >
               Change password

@@ -804,10 +804,10 @@ function sendEmailChangeEmail(emailAddress) {
 //Password Change
 app.post("/sendPasswordChangeConfirmation", async (req, res) => {
     try {
-        const { eneteredPassword, newPassword } = req.body;
+        const { enteredPassword, newPassword } = req.body;
         const currentPassword = req.session.user.password;
 
-        const comparePassword = await bcrypt.compare(eneteredPassword, currentPassword);
+        const comparePassword = await bcrypt.compare(enteredPassword, currentPassword);
         if (!comparePassword) throw new Error("Hmm... your current password is incorrect. Please try again.");
 
         const comparePassWithNewPass = await bcrypt.compare(newPassword, currentPassword);

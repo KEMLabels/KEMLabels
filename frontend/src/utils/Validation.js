@@ -17,30 +17,35 @@ export function lengthRangeCheck(value, min, max) {
   return value.length >= min && value.length <= max;
 }
 
-export function validateUsernameOnSubmit(username, setErrMsg) {
+export function validateUsernameOnSubmit(username, setFieldErrors) {
   if (!lengthRangeCheck(username, 3, 15)) {
-    return setErrMsg(
-      "Please ensure your username is between 3 and 15 characters."
-    );
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      username: "Please ensure your username is between 3 and 15 characters.",
+    }));
   }
   if (!regex.username.test(username)) {
-    return setErrMsg(
-      "Please ensure your username consists of only alphabets, numbers, dashes, underscores, and periods."
-    );
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      username:
+        "Please ensure your username consists of only alphabets, numbers, dashes, underscores, and periods.",
+    }));
   }
   return true;
 }
 
-export function validateEmailOnSubmit(email, setErrMsg) {
+export function validateEmailOnSubmit(email, setFieldErrors, fieldName = "email") {
   if (!lengthRangeCheck(email, 3, 100)) {
-    return setErrMsg(
-      "Please ensure your email is between 3 and 100 characters."
-    );
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      [fieldName]: "Please ensure your email is between 3 and 100 characters.",
+    }));
   }
   if (!regex.email.test(email))
-    return setErrMsg(
-      "The email you entered doesn't look right. Please try again."
-    );
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      [fieldName]: "The email you entered doesn't look right. Please try again.",
+    }));
   return true;
 }
 
@@ -56,16 +61,19 @@ export function validatePasswordSpecialChar(password) {
   return regex.password.specialChar.test(password);
 }
 
-export function validatePasswordOnSubmit(password, setErrMsg) {
+export function validatePasswordOnSubmit(password, setFieldErrors, fieldName = "password") {
   if (!lengthRangeCheck(password, 8, 50)) {
-    return setErrMsg(
-      "Please ensure your password is be between 8 and 50 characters."
-    );
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      [fieldName]: "Please ensure your password is between 8 and 50 characters.",
+    }));
   }
   if (!regex.passwordCombined.test(password)) {
-    return setErrMsg(
-      "Please ensure your password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
-    );
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      [fieldName]:
+        "Please ensure your password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+    }));
   }
   return true;
 }

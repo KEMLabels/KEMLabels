@@ -22,6 +22,7 @@ export default function ForgotPassword() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
@@ -50,6 +51,7 @@ export default function ForgotPassword() {
   const sendVerificationCode = (e) => {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
 
     if (email === "") {
       setLoading(false);
@@ -60,13 +62,10 @@ export default function ForgotPassword() {
       .post("/emailExists", { email }, { withCredentials: true })
       .then((res) => {
         Log(res.data);
-        if (res.data.errMsg) setErrMsg(res.data.errMsg);
-        else {
-          sendInitialRequest();
-          document.getElementById("resetPasswordForm").reset();
-          setResetPasswordStep("verifyOTP");
-          setInfoMsg("An email has been sent. Please check your inbox.");
-        }
+        sendInitialRequest();
+        document.getElementById("resetPasswordForm").reset();
+        setResetPasswordStep("verifyOTP");
+        setInfoMsg("An email has been sent. Please check your inbox.");
       })
       .catch((e) => {
         Log("Error: ", e);
@@ -74,13 +73,11 @@ export default function ForgotPassword() {
           e?.response?.data?.msg ===
           "Hmm... this email is not associated with an account. Please try again."
         ) {
-          setErrMsg(e.response.data.msg);
+          setFieldErrors({ email: e.response.data.msg });
         } else
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   };
 
   function sendInitialRequest() {
@@ -92,9 +89,7 @@ export default function ForgotPassword() {
         { email: email, type: "resetPassword" },
         { withCredentials: true }
       )
-      .then((res) => {
-        Log(res.data);
-      })
+      .then((res) => Log(res.data))
       .catch((e) => {
         Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
@@ -112,16 +107,12 @@ export default function ForgotPassword() {
         { email: email, type: "resetPassword" },
         { withCredentials: true }
       )
-      .then((res) => {
-        Log(res.data);
-      })
+      .then((res) => Log(res))
       .catch((e) => {
         Log("Error: ", e);
         setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
 
     setTimeout(() => {
       setResentEmail(false);
@@ -157,17 +148,16 @@ export default function ForgotPassword() {
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         }
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   };
 
   const changeUserPassword = (e) => {
     e.preventDefault();
     setLoading(true);
     setSuccessMsg("");
+    setFieldErrors({});
 
-    if (!validatePasswordOnSubmit(password, setErrMsg)) {
+    if (!validatePasswordOnSubmit(password, setFieldErrors)) {
       setLoading(false);
       return false;
     }
@@ -176,17 +166,14 @@ export default function ForgotPassword() {
       .post("/updateUserPass", { email, password }, { withCredentials: true })
       .then((res) => {
         Log(res);
-        if (res.data.errMsg) setErrMsg(res.data.errMsg);
-        else {
-          setRedirecting(true);
-          setSuccessMsg(
-            "Password updated successfully! Redirecting you to the login page..."
-          );
-          setTimeout(() => {
-            setSuccessMsg("");
-            navigate(res.data.redirect);
-          }, 3000);
-        }
+        setRedirecting(true);
+        setSuccessMsg(
+          "Password updated successfully! Redirecting you to the login page..."
+        );
+        setTimeout(() => {
+          setSuccessMsg("");
+          navigate(res.data.redirect);
+        }, 3000);
       })
       .catch((e) => {
         Log("Error: ", e);
@@ -282,6 +269,7 @@ export default function ForgotPassword() {
               placeholder="johndoe@gmail.com"
               minLength={3}
               maxLength={100}
+              error={fieldErrors?.email}
             />
             <Button
               btnType="submit"
@@ -337,6 +325,7 @@ export default function ForgotPassword() {
               }}
               minLength={8}
               maxLength={50}
+              error={fieldErrors?.password}
             />
             <div className="passwordRequirements">
               <p>Password must include:</p>

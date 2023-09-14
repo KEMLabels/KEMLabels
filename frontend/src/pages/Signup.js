@@ -37,6 +37,7 @@ export default function Signup() {
 
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [inputUserName, setInputUserName] = useState("");
   const [inputEmail, setInputEmail] = useState("");
   const [inputPassword, setInputPassword] = useState("");
@@ -60,19 +61,24 @@ export default function Signup() {
     }
 
     // username, email, password validation
-    if (
-      !validateUsernameOnSubmit(inputUserName, setErrMsg) ||
-      !validateEmailOnSubmit(inputEmail, setErrMsg) ||
-      !validatePasswordOnSubmit(inputPassword, setErrMsg)
-    ) {
-      return false;
-    }
+    const usernameValid = validateUsernameOnSubmit(
+      inputUserName,
+      setFieldErrors
+    );
+    const emailValid = validateEmailOnSubmit(inputEmail, setFieldErrors);
+    const passwordValid = validatePasswordOnSubmit(
+      inputPassword,
+      setFieldErrors
+    );
+
+    if (!usernameValid || !emailValid || !passwordValid) return false;
     return true;
   }
 
   const submit = (e) => {
     e.preventDefault();
     setLoading(true);
+    setFieldErrors({});
 
     if (!validateFields()) {
       setLoading(false);
@@ -87,26 +93,29 @@ export default function Signup() {
       )
       .then((res) => {
         Log(res);
-        if (res.data.errMsg) setErrMsg(res.data.errMsg);
-        else {
-          dispatch(setUserName(inputUserName));
-          dispatch(setUserEmail(inputEmail));
-          dispatch(setUserCreditAmount(0));
-          dispatch(setUserLoadAmount(0));
-          dispatch(setUserJoinedDate(getCurrDateTimeInISO()));
-          dispatch(setUserVerified(false));
-          dispatch(setUserLoggedIn(true));
-        }
+        dispatch(setUserName(inputUserName));
+        dispatch(setUserEmail(inputEmail));
+        dispatch(setUserCreditAmount(0));
+        dispatch(setUserLoadAmount(0));
+        dispatch(setUserJoinedDate(getCurrDateTimeInISO()));
+        dispatch(setUserVerified(false));
+        dispatch(setUserLoggedIn(true));
       })
       .catch((e) => {
+        const resp = e?.response?.data?.msg;
         Log("Error: ", e);
-        if (
-          e?.response?.data?.msg ===
-            "This username is already associated with an account." ||
-          e?.response?.data?.msg ===
-            "This email is already associated with an account."
+        if (resp === "This username is already associated with an account.") {
+          setFieldErrors((currentErrors) => ({
+            ...currentErrors,
+            username: e.response.data.msg,
+          }));
+        } else if (
+          resp === "This email is already associated with an account."
         ) {
-          setErrMsg(e.response.data.msg);
+          setFieldErrors((currentErrors) => ({
+            ...currentErrors,
+            email: e.response.data.msg,
+          }));
         } else {
           setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
         }
@@ -147,6 +156,7 @@ export default function Signup() {
               placeholder="johndoe"
               minLength={3}
               maxLength={15}
+              error={fieldErrors?.username}
             />
             <DefaultField
               label="Email"
@@ -158,6 +168,7 @@ export default function Signup() {
               placeholder="johndoe@gmail.com"
               minLength={3}
               maxLength={100}
+              error={fieldErrors?.email}
             />
             <PasswordField
               label="Password"
@@ -171,6 +182,7 @@ export default function Signup() {
               }}
               minLength={8}
               maxLength={50}
+              error={fieldErrors?.password}
             />
             <div className="passwordRequirements">
               <p>Password must include:</p>
