@@ -45,7 +45,7 @@ export default function OrderLabel() {
     senderInfo: { ...senderAndRecipientInfo },
     recipientInfo: { ...senderAndRecipientInfo },
   });
-  const [error, setError] = useState([]);
+  const [sectionErrors, setSectionErrors] = useState({});
   const [successMsg, setSuccessMsg] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
@@ -63,13 +63,13 @@ export default function OrderLabel() {
   // Save input value on change
   const saveInput = (e, section = "") => {
     e.preventDefault();
-    if (section === "senderInfo") {
-      setError((array) => array.filter((e) => e.label !== "sender"));
-    } else if (section === "recipientInfo") {
-      setError((array) => array.filter((e) => e.label !== "recipient"));
-    } else if (section === "packageInfo") {
-      setError((array) => array.filter((e) => e.label !== "package"));
-    }
+
+    // Clear error message if user starts typing
+    const errorCopy = { ...sectionErrors };
+    if (section === "packageInfo") delete errorCopy["package"];
+    else if (section === "recipientInfo") delete errorCopy["recipient"];
+    else if (section === "senderInfo") delete errorCopy["sender"];
+    setSectionErrors(errorCopy);
 
     setFormValues((prevValues) => {
       if (section) {
@@ -97,41 +97,27 @@ export default function OrderLabel() {
     setLoading(true);
     const { courier, classType, packageInfo, senderInfo, recipientInfo } =
       formValues;
-    const isSenderInfoEmpty = isSectionEmpty(senderInfo);
-    const isRecipientInfoEmpty = isSectionEmpty(recipientInfo);
-    const isPackageInfoEmpty = isSectionEmpty(packageInfo);
-    const errors = [];
+    const sections = {
+      package: packageInfo,
+      sender: senderInfo,
+      recipient: recipientInfo,
+    };
+    const errors = {};
 
     // if (courier === "" || classType === "") {
-    //   errors.push({
-    //     label: "package",
-    //     msg: "Please select a courier and a class type.",
-    //   });
+    //   errors.package = "Please select a courier and a class type.";
     // }
 
-    if (isPackageInfoEmpty) {
-      errors.push({
-        label: "package",
-        msg: "Please fill out all mandatory fields in this section.",
-      });
-    }
+    Object.keys(sections).forEach((sectionName) => {
+      if (isSectionEmpty(sections[sectionName])) {
+        errors[sectionName] =
+          "Please fill out all mandatory fields in this section.";
+      }
+    });
 
-    if (isSenderInfoEmpty) {
-      errors.push({
-        label: "sender",
-        msg: "Please fill out all mandatory fields in this section.",
-      });
-    }
-    if (isRecipientInfoEmpty) {
-      errors.push({
-        label: "recipient",
-        msg: "Please fill out all mandatory fields in this section.",
-      });
-    }
-
-    if (errors.length > 0) {
+    if (errors) {
       setLoading(false);
-      setError(errors);
+      setSectionErrors(errors);
       return;
     }
 
@@ -140,14 +126,9 @@ export default function OrderLabel() {
       .post("/OrderLabel", { email: email, withCredentials: true })
       .then((res) => {
         if (res.data.errMsg) {
-          setError([
-            {
-              label: "container",
-              msg: res.data.errMsg,
-            },
-          ]);
+          setSectionErrors({ container: res.data.errMsg });
         } else {
-          setError([]);
+          setSectionErrors({});
           setSuccessMsg("Your order has been placed. Redirecting...");
           setTimeout(() => {
             navigate("/order-success");
@@ -156,12 +137,9 @@ export default function OrderLabel() {
       })
       .catch((e) => {
         Log("Error: ", e);
-        setError([
-          {
-            label: "container",
-            msg: "An unexpected error occured. Please try again later.", // Axios default error
-          },
-        ]);
+        setSectionErrors({
+          container: "An unexpected error occured. Please try again later.",
+        }); // Axios default error
       })
       .finally(() => {
         setLoading(false);
@@ -180,26 +158,21 @@ export default function OrderLabel() {
             Please complete all mandatory fields to proceed with placing your
             order.
           </p>
-          {error
-            .filter((error) => error.label === "container")
-            .map((error, i) => (
-              <AlertMessage key={i} msg={error.msg} type="error" />
-            ))}
+          {sectionErrors?.container && (
+            <AlertMessage msg={sectionErrors.container} type="error" />
+          )}
           {successMsg && <AlertMessage msg={successMsg} type="success" />}
         </div>
         <form action="POST" className="orderLabelForm">
           <div id="packageSection" className="formSection">
             <h2>Package details</h2>
-            {error
-              .filter((error) => error.label === "package")
-              .map((error, i) => (
-                <AlertMessage
-                  key={i}
-                  msg={error.msg}
-                  type="error"
-                  divId="packageSection"
-                />
-              ))}
+            {sectionErrors?.package && (
+              <AlertMessage
+                msg={sectionErrors.package}
+                type="error"
+                divId="packageSection"
+              />
+            )}
             <div className="formRow">
               <DefaultField
                 label="Weight"
@@ -274,16 +247,13 @@ export default function OrderLabel() {
           </div>
           <div id="senderSection" className="formSection">
             <h2>Sender address</h2>
-            {error
-              .filter((error) => error.label === "sender")
-              .map((error, i) => (
-                <AlertMessage
-                  key={i}
-                  msg={error.msg}
-                  type="error"
-                  divId="senderSection"
-                />
-              ))}
+            {sectionErrors?.sender && (
+              <AlertMessage
+                msg={sectionErrors.sender}
+                type="error"
+                divId="senderSection"
+              />
+            )}
             <div className="formRow">
               <DefaultField
                 label="First name"
@@ -389,16 +359,13 @@ export default function OrderLabel() {
           </div>
           <div id="recipientSection" className="formSection">
             <h2>Recipient address</h2>
-            {error
-              .filter((error) => error.label === "recipient")
-              .map((error, i) => (
-                <AlertMessage
-                  key={i}
-                  msg={error.msg}
-                  type="error"
-                  divId="recipientSection"
-                />
-              ))}
+            {sectionErrors?.recipient && (
+              <AlertMessage
+                msg={sectionErrors.recipient}
+                type="error"
+                divId="recipientSection"
+              />
+            )}
             <div className="formRow">
               <DefaultField
                 label="First name"
