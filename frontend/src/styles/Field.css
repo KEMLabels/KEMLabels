@@ -131,12 +131,23 @@
   color: #c0c0c0;
 }
 
+.fieldContainer .fieldInputGroup .fieldInput.invalid {
+  border-color: var(--errorColor);
+}
+
 .fieldContainer .passwordIcon {
   display: flex;
   font-size: 1.5rem;
   color: black;
   margin-left: -2.5rem;
   cursor: pointer;
+}
+
+.fieldContainer .fieldErrorMsg {
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--errorColor);
+  width: 100%;
 }
 
 @media screen and (max-width: 992px) {

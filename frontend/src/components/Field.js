@@ -20,6 +20,7 @@ function DefaultField({
   maxLength,
   prefix = "",
   postfix = "",
+  error, // Error message
   onChangeEvent,
   customStyle,
   fixTextAlignment = false,
@@ -27,6 +28,17 @@ function DefaultField({
   disabled = false,
   optional = false,
 }) {
+  const inputClassNames = [
+    "fieldInput",
+    className,
+    disabled && "disabled",
+    prefix && "prefix",
+    postfix && "postfix",
+    error && "invalid",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div className={`fieldContainer ${containerClassName}`}>
       <div
@@ -42,9 +54,7 @@ function DefaultField({
         {prefix && <span className="inputPrefix">{prefix}</span>}
         <input
           id={id}
-          className={`fieldInput ${className} ${disabled ? "disabled" : ""}  ${
-            prefix ? "prefix" : ""
-          } ${postfix ? "postfix" : ""}`}
+          className={inputClassNames}
           type={fieldType}
           name={name}
           title={title}
@@ -59,6 +69,7 @@ function DefaultField({
         />
         {postfix && <span className="inputPostfix">{postfix}</span>}
       </div>
+      {error && <span className="fieldErrorMsg">{error}</span>}
     </div>
   );
 }
