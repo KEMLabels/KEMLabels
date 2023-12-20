@@ -1,0 +1,24 @@
+.radioContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.radioContainer input {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.radioContainer input:checked ~ label {
+  font-weight: 600;
+}
+
+.radioContainer label {
+  font-size: 1rem;
+  font-weight: 300;
+  cursor: pointer;
+}

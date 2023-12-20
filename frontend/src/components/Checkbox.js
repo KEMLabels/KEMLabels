@@ -1,4 +1,3 @@
-import React from "react";
 import "../styles/Checkbox.css";
 
 export default function Checkbox({ label, isSelected, onCheckboxChange }) {

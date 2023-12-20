@@ -119,6 +119,10 @@
   width: 40%;
 }
 
+.fieldContainer .fieldInputGroup.orderRadioInputGroup {
+  gap: 1rem;
+}
+
 .fieldContainer .fieldInputGroup .fieldInput:focus {
   border-color: var(--infoColor);
 }

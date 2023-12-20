@@ -448,6 +448,27 @@ function SearchField({
   );
 }
 
+function RadioField({
+  label,
+  radioButtons,
+  fieldInputGroupClassName = "",
+  error, // Error message
+}) {
+  return (
+    <div className="fieldContainer">
+      <div className="fieldTextGroup">
+        <label className="fieldLabel">
+          {label}
+        </label>
+      </div>
+      <div className={`fieldInputGroup ${fieldInputGroupClassName}`}>
+        {radioButtons}
+      </div>
+      {error && <span className="fieldErrorMsg">{error}</span>}
+    </div>
+  )
+}
+
 export {
   DefaultField,
   AmountField,
@@ -455,4 +476,5 @@ export {
   StripeAmountField,
   StripeInputField,
   SearchField,
+  RadioField,
 };
