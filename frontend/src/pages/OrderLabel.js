@@ -35,7 +35,7 @@ export default function OrderLabel() {
     zip: "",
     country: "",
   };
-  const [formValues, setFormValues] = useState({
+  const initialFormValues = {
     courier: "",
     classType: "",
     packageInfo: {
@@ -48,7 +48,8 @@ export default function OrderLabel() {
     },
     senderInfo: { ...senderAndRecipientInfo, ...savedSenderInfo },
     recipientInfo: { ...senderAndRecipientInfo },
-  });
+  };
+  const [formValues, setFormValues] = useState(initialFormValues);
   const [sectionErrors, setSectionErrors] = useState({});
   const [successMsg, setSuccessMsg] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -508,6 +509,11 @@ export default function OrderLabel() {
               loading={loading}
               onClickEvent={submit}
               text="Submit order"
+            />
+            <Button
+              fill="outline"
+              onClickEvent={() => setFormValues(initialFormValues)}
+              text="Clear form"
             />
             {isDevelopmentEnv() && (
               <Button
