@@ -33,10 +33,28 @@
   gap: 2rem;
 }
 
-.orderLabelForm .btnContainer {
+.orderLabelForm .orderFooter {
   display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
   width: 100%;
+}
+
+.orderLabelForm .orderFooter .btnContainer {
+  display: flex;
   gap: 1rem;
+}
+
+.orderLabelForm .orderFooter .orderTotal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.orderLabelForm .orderFooter .orderTotal p {
+  font-size: 1.1rem;
+  font-weight: 300;
+  margin-bottom: 0;
 }
 
 @media screen and (max-width: 992px) {
@@ -63,10 +81,15 @@
   .orderLabelContainer {
     padding: 3rem 1rem;
   }
-  .orderLabelForm .btnContainer {
-    flex-wrap: wrap;
+  .orderLabelForm .orderFooter {
+    flex-direction: column;
+    gap: 2rem;
   }
-  .orderLabelForm .btnContainer .kemLabelsBtn {
+  .orderLabelForm .orderFooter .btnContainer {
+    flex-wrap: wrap;
+    flex-direction: column-reverse;
+  }
+  .orderLabelForm .orderFooter .btnContainer .kemLabelsBtn {
     width: 100%;
   }
 }

@@ -22,6 +22,7 @@ export default function OrderLabel() {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const email = useSelector((state) => state.user.email);
   const savedSenderInfo = useSelector((state) => state.user.senderInfo);
+  const creditAmount = useSelector((state) => state.user.creditAmount);
 
   const senderAndRecipientInfo = {
     firstName: "",
@@ -55,6 +56,7 @@ export default function OrderLabel() {
   const [loading, setLoading] = useState(false);
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
   const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
+  const [totalAmount, setTotalAmount] = useState(25);
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -110,6 +112,13 @@ export default function OrderLabel() {
 
   const submit = (e) => {
     e.preventDefault();
+
+    // Check if user has enough credits, if not, display error message
+    if (creditAmount - totalAmount < 0) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     setLoading(true);
     const { courier, classType, packageInfo, senderInfo, recipientInfo } =
       formValues;
@@ -174,6 +183,12 @@ export default function OrderLabel() {
             Please complete all mandatory fields to proceed with placing your
             order.
           </p>
+          {creditAmount - totalAmount < 0 && (
+            <AlertMessage
+              msg="You have insufficient funds to purchase. Please load your credits first to proceed with your purchase."
+              type="error"
+            />
+          )}
           {sectionErrors?.container && (
             <AlertMessage msg={sectionErrors.container} type="error" />
           )}
@@ -503,25 +518,34 @@ export default function OrderLabel() {
               />
             </div>
           </div>
-          <div className="btnContainer">
-            <Button
-              btnType="submit"
-              loading={loading}
-              onClickEvent={submit}
-              text="Submit order"
-            />
-            <Button
-              fill="outline"
-              onClickEvent={() => setFormValues(initialFormValues)}
-              text="Clear form"
-            />
-            {isDevelopmentEnv() && (
+          <div className="orderFooter">
+            <div className="orderTotal">
+              <p>
+                {/* TODO: Hardcoded total */}
+                Total: <strong>${totalAmount.toFixed(2)}</strong> ($25.00 per
+                label)
+              </p>
+            </div>
+            <div className="btnContainer">
+              {isDevelopmentEnv() && (
+                <Button
+                  fill="outline"
+                  text="Autofill"
+                  onClickEvent={() => setFormValues(mockData)}
+                />
+              )}
               <Button
                 fill="outline"
-                text="Autofill"
-                onClickEvent={() => setFormValues(mockData)}
+                onClickEvent={() => setFormValues(initialFormValues)}
+                text="Clear form"
               />
-            )}
+              <Button
+                btnType="submit"
+                loading={loading}
+                onClickEvent={submit}
+                text="Submit order"
+              />
+            </div>
           </div>
         </form>
         <div>
