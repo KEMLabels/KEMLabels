@@ -6,11 +6,12 @@ import {
   SET_USER_JOINED_DATE,
   SET_USER_LOGGED_IN,
   SET_USER_VERIFIED,
+  SET_SENDER_INFO,
   CLEAR_SESSION,
   CLEAR_USER,
 } from "../Types";
 
-export const authInitialState = {
+export const initialState = {
   email: null,
   username: null,
   creditAmount: 0,
@@ -18,9 +19,10 @@ export const authInitialState = {
   joinedDate: null,
   isLoggedIn: false,
   isVerified: false,
+  senderInfo: null,
 };
 
-export default function UserReducer(state = authInitialState, action) {
+export default function UserReducer(state = initialState, action) {
   switch (action.type) {
     case SET_USER_EMAIL:
       return { ...state, email: action.payload };
@@ -36,10 +38,12 @@ export default function UserReducer(state = authInitialState, action) {
       return { ...state, isLoggedIn: action.payload };
     case SET_USER_VERIFIED:
       return { ...state, isVerified: action.payload };
+    case SET_SENDER_INFO:
+      return { ...state, senderInfo: action.payload };
     case CLEAR_SESSION:
       return { ...state, isLoggedIn: false, email: null };
     case CLEAR_USER:
-      return authInitialState;
+      return initialState;
     default:
       return state;
   }

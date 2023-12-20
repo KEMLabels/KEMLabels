@@ -6,6 +6,7 @@ import {
   SET_USER_JOINED_DATE,
   SET_USER_LOGGED_IN,
   SET_USER_VERIFIED,
+  SET_SENDER_INFO,
   CLEAR_SESSION,
   CLEAR_USER,
 } from "../Types";
@@ -58,6 +59,13 @@ export const setUserVerified = (isVerified) => (dispatch) => {
     payload: isVerified,
   });
 };
+
+export const setSenderInfo = (setSenderInfo) => (dispatch) => {
+  dispatch({
+    type: SET_SENDER_INFO,
+    payload: setSenderInfo,
+  });
+}
 
 export const clearSession = () => (dispatch) => {
   dispatch({
