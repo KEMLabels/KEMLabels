@@ -1,5 +1,5 @@
 :root {
-  --containerPadding: 20rem;
+  --containerPadding: 10rem;
   --tableContainerWidth: calc(100vw - var(--containerPadding));
 }
 
@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 5rem 10rem 2rem;
+  padding: 5rem 5rem 2rem;
   margin-left: auto;
   margin-right: auto;
   min-height: 83vh;
@@ -113,15 +113,6 @@
 .container .tableContainer .table thead th:nth-child(6),
 .container .tableContainer .table tbody td:nth-child(6) {
   width: calc(var(--tableContainerWidth) * 0.15);
-}
-
-@media screen and (max-width: 1200px) {
-  :root {
-    --containerPadding: 10rem;
-  }
-  .container {
-    padding: 5rem 5rem 2rem;
-  }
 }
 
 @media screen and (max-width: 992px) {
