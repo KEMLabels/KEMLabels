@@ -839,7 +839,7 @@ cron.schedule('0 0 */1 * *', async () => {
         // Delete unverified accounts created more than 24 hours ago
         await User.deleteMany({ verified: false, createdAt: { $lt: twentyFourHoursAgo } });
     } catch (err) {
-        console.error('Error deleting unverified accounts:', err);
+        log('Error deleting unverified accounts:', err);
     }
 });
 

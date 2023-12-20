@@ -80,7 +80,7 @@ export default function CreditCard() {
       })
       .catch((error) => {
         // Handle errors here
-        console.error("An error occurred:", error);
+        Log("An error occurred:", error);
       });
   }, [email, loadedAmount]);
 
