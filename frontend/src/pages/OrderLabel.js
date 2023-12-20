@@ -5,10 +5,11 @@ import "../styles/OrderLabel.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { BsArrowUp } from "react-icons/bs";
-import { DefaultField } from "../components/Field";
+import { DefaultField, RadioField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
 import Checkbox from "../components/Checkbox";
+import Radio from "../components/Radio";
 import axios from "../api/axios";
 import Log from "../components/Log";
 import mockData from "../content/mockOrderData";
@@ -37,7 +38,7 @@ export default function OrderLabel() {
     country: "",
   };
   const initialFormValues = {
-    courier: "",
+    courier: "UPS",
     classType: "",
     packageInfo: {
       weight: "",
@@ -195,6 +196,49 @@ export default function OrderLabel() {
           {successMsg && <AlertMessage msg={successMsg} type="success" />}
         </div>
         <form action="POST" className="orderLabelForm">
+          <div id="courierSection" className="formSection">
+            <div className="sectionHeader">
+              <h2>Courier and class</h2>
+            </div>
+            {sectionErrors?.courier && (
+              <AlertMessage
+                msg={sectionErrors.courier}
+                type="error"
+                divId="courierSection"
+              />
+            )}
+            <div className="formRow">
+              <RadioField
+                label="Courier Type"
+                fieldInputGroupClassName="orderRadioInputGroup"
+                radioButtons={
+                  <>
+                    <Radio
+                      label="UPS"
+                      isSelected={formValues.courier === "UPS"}
+                      onRadioChange={() =>
+                        setFormValues({
+                          ...formValues,
+                          courier: "UPS",
+                        })
+                      }
+                    />
+                    <Radio
+                      label="Canada Post"
+                      isSelected={formValues.courier === "Canada Post"}
+                      onRadioChange={() =>
+                        setFormValues({
+                          ...formValues,
+                          courier: "Canada Post",
+                        })
+                      }
+                    />
+                  </>
+                }
+              />
+            </div>
+          </div>
+
           <div id="packageSection" className="formSection">
             <div className="sectionHeader">
               <h2>Package details</h2>
@@ -278,6 +322,7 @@ export default function OrderLabel() {
               />
             </div>
           </div>
+
           <div id="senderSection" className="formSection">
             <div className="sectionHeader">
               <h2>Sender address</h2>
@@ -404,6 +449,7 @@ export default function OrderLabel() {
               />
             </div>
           </div>
+
           <div id="recipientSection" className="formSection">
             <div className="sectionHeader">
               <h2>Recipient address</h2>
