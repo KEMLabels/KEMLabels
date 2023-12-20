@@ -3,21 +3,25 @@ import PageLayout from "../components/PageLayout";
 import "../styles/Global.css";
 import "../styles/OrderLabel.css";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { BsArrowUp } from "react-icons/bs";
 import { DefaultField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
+import Checkbox from "../components/Checkbox";
 import axios from "../api/axios";
 import Log from "../components/Log";
 import mockData from "../content/mockOrderData";
 import { isDevelopmentEnv } from "../utils/Helpers";
+import { setSenderInfo } from "../redux/actions/UserAction";
 
 export default function OrderLabel() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const email = useSelector((state) => state.auth.email);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const email = useSelector((state) => state.user.email);
+  const savedSenderInfo = useSelector((state) => state.user.senderInfo);
 
   const senderAndRecipientInfo = {
     firstName: "",
@@ -42,13 +46,14 @@ export default function OrderLabel() {
       description: "",
       referenceNumber: "",
     },
-    senderInfo: { ...senderAndRecipientInfo },
+    senderInfo: { ...senderAndRecipientInfo, ...savedSenderInfo },
     recipientInfo: { ...senderAndRecipientInfo },
   });
   const [sectionErrors, setSectionErrors] = useState({});
   const [successMsg, setSuccessMsg] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
+  const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -86,6 +91,16 @@ export default function OrderLabel() {
         [section]: e.target.value.trim(),
       };
     });
+
+    // Update sender info in redux store if user checks the checkbox
+    if (senderInfoChecked && section === "senderInfo") {
+      dispatch(
+        setSenderInfo({
+          ...savedSenderInfo,
+          [e.target.name]: e.target.value.trim(),
+        })
+      );
+    }
   };
 
   const isSectionEmpty = (section) => {
@@ -121,7 +136,7 @@ export default function OrderLabel() {
       return;
     }
 
-    // TODO: axios call here
+    // TODO: @Kian axios call here, also SAVE SENDER INFO as a Object to user in DB
     axios
       .post("/OrderLabel", { email: email, withCredentials: true })
       .then((res) => {
@@ -165,7 +180,9 @@ export default function OrderLabel() {
         </div>
         <form action="POST" className="orderLabelForm">
           <div id="packageSection" className="formSection">
-            <h2>Package details</h2>
+            <div className="sectionHeader">
+              <h2>Package details</h2>
+            </div>
             {sectionErrors?.package && (
               <AlertMessage
                 msg={sectionErrors.package}
@@ -246,7 +263,21 @@ export default function OrderLabel() {
             </div>
           </div>
           <div id="senderSection" className="formSection">
-            <h2>Sender address</h2>
+            <div className="sectionHeader">
+              <h2>Sender address</h2>
+              <Checkbox
+                label="Save"
+                isSelected={senderInfoChecked}
+                onCheckboxChange={() => {
+                  setSenderInfoChecked(!senderInfoChecked);
+                  dispatch(
+                    setSenderInfo(
+                      senderInfoChecked ? null : formValues.senderInfo
+                    )
+                  );
+                }}
+              />
+            </div>
             {sectionErrors?.sender && (
               <AlertMessage
                 msg={sectionErrors.sender}
@@ -358,7 +389,9 @@ export default function OrderLabel() {
             </div>
           </div>
           <div id="recipientSection" className="formSection">
-            <h2>Recipient address</h2>
+            <div className="sectionHeader">
+              <h2>Recipient address</h2>
+            </div>
             {sectionErrors?.recipient && (
               <AlertMessage
                 msg={sectionErrors.recipient}
