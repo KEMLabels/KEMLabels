@@ -15,11 +15,11 @@ import Log from "../components/Log";
 export default function CreditCard() {
   const navigate = useNavigate();
 
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const email = useSelector((state) => state.auth.email);
-  const loadedAmount = useSelector((state) => state.auth.loadAmount);
-  const creditAmount = useSelector((state) => state.auth.creditAmount);
-  const isUserVerified = useSelector((state) => state.auth.isVerified);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const email = useSelector((state) => state.user.email);
+  const loadedAmount = useSelector((state) => state.user.loadAmount);
+  const creditAmount = useSelector((state) => state.user.creditAmount);
+  const isUserVerified = useSelector((state) => state.user.isVerified);
 
   const [clientSecret, setClientSecret] = useState("");
   const [stripeKey, setStripeKey] = useState("");

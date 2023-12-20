@@ -11,8 +11,8 @@ export default function VerifyEmail() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const email = useSelector((state) => state.auth.email);
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const email = useSelector((state) => state.user.email);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   const [loading, setLoading] = useState(false);
   const [infoMsg, setInfoMsg] = useState("");

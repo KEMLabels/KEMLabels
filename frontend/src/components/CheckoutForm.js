@@ -25,8 +25,8 @@ export default function CheckoutForm({
   const elements = useElements();
   const dispatch = useDispatch();
 
-  const creditAmount = useSelector((state) => state.auth.creditAmount);
-  const loadedAmount = useSelector((state) => state.auth.loadAmount);
+  const creditAmount = useSelector((state) => state.user.creditAmount);
+  const loadedAmount = useSelector((state) => state.user.loadAmount);
 
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);

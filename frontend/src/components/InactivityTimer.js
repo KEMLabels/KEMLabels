@@ -5,7 +5,7 @@ import axios from "../api/axios";
 
 export default function InactivityTimer() {
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const inactivityThreshold = 600000; // 10 minutes (600000 milliseconds)
   const [lastActivityTime, setLastActivityTime] = useState(Date.now());
 

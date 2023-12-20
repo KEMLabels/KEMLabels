@@ -13,8 +13,8 @@ import Log from "../components/Log";
 export default function CreditHistory() {
   const navigate = useNavigate();
 
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const isUserVerified = useSelector((state) => state.auth.isVerified);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const isUserVerified = useSelector((state) => state.user.isVerified);
 
   const [errMsg, setErrMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");

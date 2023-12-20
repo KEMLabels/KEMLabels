@@ -72,10 +72,10 @@ export default function Navbar({ hideNavAndFooter = false }) {
 
   const dropdownMenuRef = useRef(null);
   const accountIconContainerRef = useRef(null);
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const username = useSelector((state) => state.auth.username);
-  const creditAmount = useSelector((state) => state.auth.creditAmount);
-  const joinedDate = useSelector((state) => state.auth.joinedDate);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const username = useSelector((state) => state.user.username);
+  const creditAmount = useSelector((state) => state.user.creditAmount);
+  const joinedDate = useSelector((state) => state.user.joinedDate);
 
   const [loading, setLoading] = useState(false);
   const [hideAccountDropdown, setHideAccountDropdown] = useState(true);

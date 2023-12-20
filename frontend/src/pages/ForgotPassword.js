@@ -19,7 +19,7 @@ export default function ForgotPassword() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});

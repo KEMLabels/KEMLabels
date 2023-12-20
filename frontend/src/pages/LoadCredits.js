@@ -15,8 +15,8 @@ export default function LoadCredits() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const isUserVerified = useSelector((state) => state.auth.isVerified);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const isUserVerified = useSelector((state) => state.user.isVerified);
 
   const [fieldErrors, setFieldErrors] = useState({});
   const [loadAmount, setLoadAmount] = useState("");
