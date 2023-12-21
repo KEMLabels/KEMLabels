@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Dropdown from "react-dropdown";
 import "../styles/Field.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
@@ -457,16 +458,41 @@ function RadioField({
   return (
     <div className="fieldContainer">
       <div className="fieldTextGroup">
-        <label className="fieldLabel">
-          {label}
-        </label>
+        <label className="fieldLabel">{label}</label>
       </div>
       <div className={`fieldInputGroup ${fieldInputGroupClassName}`}>
         {radioButtons}
       </div>
       {error && <span className="fieldErrorMsg">{error}</span>}
     </div>
-  )
+  );
+}
+
+function DropdownField({
+  label,
+  fullwidth = false,
+  dropdownItemOptions,
+  onChangeEvent,
+  value,
+  error,
+}) {
+  return (
+    <div className="fieldContainer">
+      <div className="fieldTextGroup">
+        <label className="fieldLabel">{label}</label>
+      </div>
+      <Dropdown
+        className={`dropdown ${fullwidth ? "fullWidth" : ""}`}
+        arrowClassName="dropdownArrow"
+        controlClassName="dropdownControl"
+        menuClassName="dropdownMenu"
+        options={dropdownItemOptions}
+        onChange={onChangeEvent}
+        value={value}
+      />
+      {error && <span className="fieldErrorMsg">{error}</span>}
+    </div>
+  );
 }
 
 export {
@@ -477,4 +503,5 @@ export {
   StripeInputField,
   SearchField,
   RadioField,
+  DropdownField,
 };
