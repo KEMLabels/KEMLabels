@@ -829,6 +829,24 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
     }
 })
 
+// Order Label
+// TODO: @Kian do the POST request here for DB update
+// 1) use the form values to send to our API
+// 2) update user's credits in DB by subtracting totalAmount from their total credits
+// 3) also save each order in a schema so we can keep track of all orders coming in. 
+// 4) Send email to both USER using email and OUR email so 2 emails to send
+// 5) also save senderInfo in formValues to DB so we can preload it to the frontend when they want to create more orders in the future
+app.post("/orderLabel", (req, res) => {
+    try {
+        const { email, formValues, totalAmount } = req.body;
+        log(email, formValues, totalAmount )
+        return res.status(200)
+    } catch (err) {
+        log(err);
+        return res.status(400).json({ msg: err.message });
+    }
+})
+
 //CRON
 // Schedule a task to run every 24 hours
 cron.schedule('0 0 */1 * *', async () => {

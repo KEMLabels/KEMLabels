@@ -75,8 +75,8 @@ export default function OrderLabel() {
   }, []);
 
   // Save input value on change
-  const saveInput = (e, section = "") => {
-    e.preventDefault();
+  const saveInput = (e, section, singleValue = false) => {
+    if (!singleValue) e.preventDefault();
 
     // Clear error message if user starts typing
     const errorCopy = { ...sectionErrors };
@@ -86,7 +86,7 @@ export default function OrderLabel() {
     setSectionErrors(errorCopy);
 
     setFormValues((prevValues) => {
-      if (section) {
+      if (!singleValue) {
         return {
           ...prevValues,
           [section]: {
@@ -97,7 +97,7 @@ export default function OrderLabel() {
       }
       return {
         ...prevValues,
-        [section]: e.target.value.trim(),
+        [section]: e.trim(),
       };
     });
 
@@ -135,9 +135,9 @@ export default function OrderLabel() {
     };
     const errors = {};
 
-    // if (courier === "" || classType === "") {
-    //   errors.package = "Please select a courier and a class type.";
-    // }
+    if (courier === "" || classType === "") {
+      errors.courierClass = "Please select a courier and a class type.";
+    }
 
     Object.keys(sections).forEach((sectionName) => {
       if (isSectionEmpty(sections[sectionName])) {
@@ -146,7 +146,7 @@ export default function OrderLabel() {
       }
     });
 
-    if (errors) {
+    if (errors.length > 0) {
       setLoading(false);
       setSectionErrors(errors);
       return;
@@ -154,7 +154,12 @@ export default function OrderLabel() {
 
     // TODO: @Kian axios call here, also SAVE SENDER INFO as a Object to user in DB
     axios
-      .post("/OrderLabel", { email: email, withCredentials: true })
+      .post("/OrderLabel", {
+        email: email,
+        withCredentials: true,
+        formValues: formValues,
+        totalAmount: totalAmount,
+      })
       .then((res) => {
         if (res.data.errMsg) {
           setSectionErrors({ container: res.data.errMsg });
@@ -205,9 +210,9 @@ export default function OrderLabel() {
             <div className="sectionHeader">
               <h2>Courier and class</h2>
             </div>
-            {sectionErrors?.courier && (
+            {sectionErrors?.courierClass && (
               <AlertMessage
-                msg={sectionErrors.courier}
+                msg={sectionErrors.courierClass}
                 type="error"
                 divId="courierSection"
               />
@@ -221,21 +226,13 @@ export default function OrderLabel() {
                     <Radio
                       label="UPS"
                       isSelected={formValues.courier === "UPS"}
-                      onRadioChange={() =>
-                        setFormValues({
-                          ...formValues,
-                          courier: "UPS",
-                        })
-                      }
+                      onRadioChange={() => saveInput("UPS", "courier", true)}
                     />
                     <Radio
                       label="Canada Post"
                       isSelected={formValues.courier === "Canada Post"}
                       onRadioChange={() =>
-                        setFormValues({
-                          ...formValues,
-                          courier: "Canada Post",
-                        })
+                        saveInput("Canada Post", "courier", true)
                       }
                     />
                   </>
@@ -245,12 +242,9 @@ export default function OrderLabel() {
                 label="Class Type"
                 fullwidth
                 dropdownItemOptions={classTypeItemOptions}
-                onChangeEvent={(e) => {
-                  setFormValues({
-                    ...formValues,
-                    classType: e.label.toString(),
-                  });
-                }}
+                onChangeEvent={(e) =>
+                  saveInput(e.label.toString(), "classType", true)
+                }
                 value={classTypeItemOptions.find(
                   (option) => option === formValues.classType
                 )}
