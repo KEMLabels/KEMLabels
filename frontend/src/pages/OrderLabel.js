@@ -25,6 +25,11 @@ export default function OrderLabel() {
   const savedSenderInfo = useSelector((state) => state.user.senderInfo);
   const creditAmount = useSelector((state) => state.user.creditAmount);
 
+  const classTypeItemOptions = [
+    "UPS Ground",
+    "UPS 2nd Day Air",
+    "UPS Next Day Air",
+  ];
   const senderAndRecipientInfo = {
     firstName: "",
     lastName: "",
@@ -39,7 +44,7 @@ export default function OrderLabel() {
   };
   const initialFormValues = {
     courier: "UPS",
-    classType: "",
+    classType: classTypeItemOptions[0],
     packageInfo: {
       weight: "",
       length: "",
@@ -58,14 +63,6 @@ export default function OrderLabel() {
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
   const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
   const [totalAmount, setTotalAmount] = useState(25);
-  const classTypeItemOptions = [
-    "UPS Ground",
-    "UPS 2nd Day Air",
-    "UPS Next Day Air",
-  ];
-  const [dropdownItemValue, setDropdownItemValue] = useState(
-    classTypeItemOptions[0]
-  );
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -249,10 +246,13 @@ export default function OrderLabel() {
                 fullwidth
                 dropdownItemOptions={classTypeItemOptions}
                 onChangeEvent={(e) => {
-                  setDropdownItemValue(e.label.toString());
+                  setFormValues({
+                    ...formValues,
+                    classType: e.label.toString(),
+                  });
                 }}
                 value={classTypeItemOptions.find(
-                  (option) => option === dropdownItemValue
+                  (option) => option === formValues.classType
                 )}
               />
             </div>
