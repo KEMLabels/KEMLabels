@@ -57,6 +57,57 @@
   margin-bottom: 0;
 }
 
+/* Order Success */
+.orderSummary {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 2rem;
+  border: solid 1px #efefef;
+  border-radius: 8px;
+}
+
+.orderSummary h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  width: 100%;
+  color: var(--primaryColor);
+}
+
+.orderSummary .orderSummarySection {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.orderSummary .orderSummarySection h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.orderSummary .orderSummarySection .orderSummaryRow {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  gap: 0.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.orderSummary .orderSummarySection .orderSummaryRow p {
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 0;
+  color: #575757;
+}
+
+.orderSummary .orderSummarySection .orderSummaryRow p strong {
+  font-weight: 500;
+  color: black;
+}
+
 @media screen and (max-width: 992px) {
   .orderLabelContainer {
     max-width: 100%;
@@ -71,6 +122,9 @@
   .orderLabelContainer .formSection .formRow {
     flex-wrap: wrap;
     gap: 0;
+  }
+  .orderSummary .orderSummarySection .orderSummaryRow {
+    width: 100%;
   }
 }
 
@@ -91,5 +145,15 @@
   }
   .orderLabelForm .orderFooter .btnContainer .kemLabelsBtn {
     width: 100%;
+  }
+  .orderLabelContainer .headingContainer h1 {
+    font-size: 1.5rem;
+  }
+  .orderSummary {
+    padding: 0.5rem 1rem;
+  }
+  .orderSummary h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0;
   }
 }
