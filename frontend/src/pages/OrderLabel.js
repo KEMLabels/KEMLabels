@@ -5,7 +5,7 @@ import "../styles/OrderLabel.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { BsArrowUp } from "react-icons/bs";
-import { DefaultField, RadioField } from "../components/Field";
+import { DefaultField, DropdownField, RadioField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
 import Checkbox from "../components/Checkbox";
@@ -58,6 +58,14 @@ export default function OrderLabel() {
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
   const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
   const [totalAmount, setTotalAmount] = useState(25);
+  const classTypeItemOptions = [
+    "UPS Ground",
+    "UPS 2nd Day Air",
+    "UPS Next Day Air",
+  ];
+  const [dropdownItemValue, setDropdownItemValue] = useState(
+    classTypeItemOptions[0]
+  );
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -235,6 +243,17 @@ export default function OrderLabel() {
                     />
                   </>
                 }
+              />
+              <DropdownField
+                label="Class Type"
+                fullwidth
+                dropdownItemOptions={classTypeItemOptions}
+                onChangeEvent={(e) => {
+                  setDropdownItemValue(e.label.toString());
+                }}
+                value={classTypeItemOptions.find(
+                  (option) => option === dropdownItemValue
+                )}
               />
             </div>
           </div>
