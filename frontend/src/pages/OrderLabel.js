@@ -161,6 +161,7 @@ export default function OrderLabel() {
   };
 
   function submitOrder() {
+    setLoading(true);
     // TODO: @Kian axios call here, also SAVE SENDER INFO as a Object to user in DB
     axios
       .post("/OrderLabel", {
