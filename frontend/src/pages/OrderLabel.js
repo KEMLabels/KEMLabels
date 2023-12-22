@@ -16,6 +16,7 @@ import mockData from "../content/mockOrderData";
 import { isDevelopmentEnv } from "../utils/Helpers";
 import { setSenderInfo } from "../redux/actions/UserAction";
 import { FaCheckCircle } from "react-icons/fa";
+import { IoCloseSharp } from "react-icons/io5";
 
 export default function OrderLabel() {
   const navigate = useNavigate();
@@ -65,6 +66,8 @@ export default function OrderLabel() {
   const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
   const [totalAmount, setTotalAmount] = useState(25);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [showOrderConfirmationPopup, setShowOrderConfirmationPopup] =
+    useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -127,7 +130,6 @@ export default function OrderLabel() {
       return;
     }
 
-    setLoading(true);
     const { courier, classType, packageInfo, senderInfo, recipientInfo } =
       formValues;
     const sections = {
@@ -148,12 +150,17 @@ export default function OrderLabel() {
       }
     });
 
-    if (errors.length > 0) {
-      setLoading(false);
+    if (Object.keys(errors).length > 0) {
       setSectionErrors(errors);
       return;
     }
 
+    // Show confirmation popup
+    document.body.style.overflow = "hidden";
+    setShowOrderConfirmationPopup(true);
+  };
+
+  function submitOrder() {
     // TODO: @Kian axios call here, also SAVE SENDER INFO as a Object to user in DB
     axios
       .post("/OrderLabel", {
@@ -169,8 +176,11 @@ export default function OrderLabel() {
           setSectionErrors({});
           setSuccessMsg("Your order has been placed. Redirecting...");
           setTimeout(() => {
+            setLoading(false);
+            setShowOrderConfirmationPopup(false);
             setOrderSuccess(true);
             window.scrollTo({ top: 0, behavior: "smooth" });
+            document.body.style.overflow = null;
           }, 1000);
         }
       })
@@ -179,11 +189,8 @@ export default function OrderLabel() {
         setSectionErrors({
           container: "An unexpected error occured. Please try again later.",
         }); // Axios default error
-      })
-      .finally(() => {
-        setLoading(false);
       });
-  };
+  }
 
   function orderSummaryItem(label, value) {
     return (
@@ -239,6 +246,43 @@ export default function OrderLabel() {
       title="Order Label"
       description="Order Shipping Labels Online - Quickly generate shipping labels by providing address and package details. Get your label sent to your email for easy printing and shipping. Streamline your shipping process with KEMLabels."
     >
+      {showOrderConfirmationPopup && (
+        <div
+          className={`orderConfirmationPopup ${
+            showOrderConfirmationPopup ? "active" : ""
+          }`}
+        >
+          <div className="popupContainer">
+            <IoCloseSharp
+              className="closeBtn"
+              onClick={() => {
+                document.body.style.overflow = null;
+                setShowOrderConfirmationPopup(false);
+              }}
+            />
+            <h1>Are you sure?</h1>
+            <p>
+              Please confirm your order details before submitting. If you are
+              sure, click confirm.
+            </p>
+            <div className="orderConfirmBtnGroup">
+              <Button
+                text="Cancel"
+                fill="outline"
+                onClickEvent={() => {
+                  document.body.style.overflow = null;
+                  setShowOrderConfirmationPopup(false);
+                }}
+              />
+              <Button
+                text="Confirm"
+                onClickEvent={() => submitOrder()}
+                loading={loading}
+              />
+            </div>
+          </div>
+        </div>
+      )}
       {orderSuccess ? (
         <div className="globalContainer orderLabelContainer">
           <div className="headingContainer">
@@ -670,7 +714,6 @@ export default function OrderLabel() {
                 />
                 <Button
                   btnType="submit"
-                  loading={loading}
                   onClickEvent={submit}
                   text="Submit order"
                 />
