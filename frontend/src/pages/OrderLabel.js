@@ -64,10 +64,10 @@ export default function OrderLabel() {
   const [loading, setLoading] = useState(false);
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
   const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
-  const [totalAmount, setTotalAmount] = useState(25);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [showOrderConfirmationPopup, setShowOrderConfirmationPopup] =
     useState(false);
+  const totalAmount = 25.0;
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -696,8 +696,7 @@ export default function OrderLabel() {
               <div className="orderTotal">
                 <p>
                   {/* TODO: Hardcoded total */}
-                  Total: <strong>${totalAmount.toFixed(2)}</strong> ($25.00 per
-                  label)
+                  Total: <strong>${totalAmount.toFixed(2)}</strong>
                 </p>
               </div>
               <div className="btnContainer">
