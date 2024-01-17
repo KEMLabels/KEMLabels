@@ -90,7 +90,7 @@ export default function CheckoutForm({
       })
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       });
   }, [
     stripe,
@@ -140,7 +140,7 @@ export default function CheckoutForm({
       .catch((e) => {
         // Handle any other errors that might occur during the request
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       })
       .finally(() => {
         setIsLoading(false);

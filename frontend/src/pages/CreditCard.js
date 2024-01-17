@@ -43,7 +43,7 @@ export default function CreditCard() {
       })
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later.");
+        setErrMsg("An unexpected error occurred. Please try again later.");
       });
   }, [isLoggedIn, navigate, isUserVerified]);
 

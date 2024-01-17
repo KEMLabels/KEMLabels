@@ -75,7 +75,7 @@ export default function ForgotPassword() {
         ) {
           setFieldErrors({ email: e.response.data.msg });
         } else
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       })
       .finally(() => setLoading(false));
   };
@@ -92,7 +92,7 @@ export default function ForgotPassword() {
       .then((res) => Log(res.data))
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       });
   }
 
@@ -110,7 +110,7 @@ export default function ForgotPassword() {
       .then((res) => Log(res))
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       })
       .finally(() => setLoading(false));
 
@@ -145,7 +145,7 @@ export default function ForgotPassword() {
         ) {
           setErrMsg(e.response.data.msg);
         } else {
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
         }
       })
       .finally(() => setLoading(false));
@@ -177,7 +177,7 @@ export default function ForgotPassword() {
       })
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       })
       .finally(() => {
         if (redirecting) {

@@ -433,7 +433,7 @@ app.get('/users/:id/verify/:token', async (req, res) => {
 app.get('/isUserVerified', async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.session.user._id });
-        if (!user) throw new Error('An error occured.');
+        if (!user) throw new Error('An error occurred.');
         const verified = user.verified;
 
         if (!verified) throw new Error('Please check your inbox for a verification link to verify your account.');
@@ -448,7 +448,7 @@ app.get('/isUserVerified', async (req, res) => {
 app.get('/checkVerification', async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.session.user._id });
-        if (!user) throw new Error('An error occured.');
+        if (!user) throw new Error('An error occurred.');
         const verified = user.verified;
         if (!verified) throw new Error('User is not verified');
         res.json({ redirect: '/' });
@@ -584,7 +584,7 @@ app.post("/updateUserPass", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const userData = await User.findOne({ email: email.toLowerCase() })
-        if (!userData) throw new Error("Unexpected error occured");
+        if (!userData) throw new Error("Unexpected error occurred");
 
         User.updateOne({
             "_id": userData._id.toString()

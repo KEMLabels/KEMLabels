@@ -26,7 +26,7 @@ export default function VerifyEmail() {
         .then((res) => {
           if (res.status === 200) navigate(res.data.redirect);
           else {
-            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+            setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
           }
         })
         .catch((e) => {
@@ -37,7 +37,7 @@ export default function VerifyEmail() {
           ) {
             setInfoMsg(e.response.data.msg);
           } else {
-            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+            setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
           }
         });
     } else navigate("/");
@@ -56,7 +56,7 @@ export default function VerifyEmail() {
       })
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       });
 
     setTimeout(() => {

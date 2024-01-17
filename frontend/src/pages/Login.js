@@ -52,7 +52,7 @@ export default function Login() {
             dispatch(setUserVerified(false));
             navigate("/verify-email");
           } else {
-            setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+            setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
           }
         });
     }
@@ -88,7 +88,7 @@ export default function Login() {
         if (e?.response?.data?.msg === "Incorrect email or password.") {
           setErrMsg(e.response.data.msg);
         } else {
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
         }
       })
       .finally(() => {

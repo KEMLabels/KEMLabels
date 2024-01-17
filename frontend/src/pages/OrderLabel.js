@@ -188,7 +188,7 @@ export default function OrderLabel() {
       .catch((e) => {
         Log("Error: ", e);
         setSectionErrors({
-          container: "An unexpected error occured. Please try again later.",
+          container: "An unexpected error occurred. Please try again later.",
         }); // Axios default error
       });
   }

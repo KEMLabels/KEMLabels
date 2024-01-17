@@ -149,7 +149,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         } else if (e?.response?.data?.msg.startsWith("You must wait")) {
           setErrMsg(e.response.data.msg);
         } else {
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
         }
       })
       .finally(() => {
@@ -169,7 +169,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       .then((res) => Log(res))
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       });
   }
 
@@ -232,7 +232,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         ) {
           setFieldErrors({ newEmail: e.response.data.msg });
         } else {
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
         }
       })
       .finally(() => {
@@ -286,7 +286,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         ) {
           setErrMsg(e.response.data.msg);
         } else {
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
         }
       })
       .finally(() => {
@@ -323,7 +323,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       })
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       })
       .finally(() => {
         setTimeout(() => {
@@ -345,7 +345,7 @@ export default function AccountSettings({ currentPage = "username" }) {
       .then((res) => Log(res))
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
       });
   }
 
@@ -413,7 +413,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         ) {
           setFieldErrors({ newPassword: e.response.data.msg });
         } else {
-          setErrMsg("An unexpected error occured. Please try again later."); // Axios default error
+          setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
         }
       })
       .finally(() => setLoading(false));
