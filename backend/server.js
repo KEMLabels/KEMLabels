@@ -61,6 +61,19 @@ const tempOTPS = require('./model/tempOTPs.js');
 
 //Start app
 app.use('/', express.static(__dirname + '/public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_SERVER);
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Credentials", "true");
+    next();
+});
+app.use(cors({
+    origin: process.env.FRONTEND_SERVER,
+    methods: ['POST', 'GET', 'PATCH', 'OPTIONS'],
+    credentials: true
+}));
 function customJsonParser(req, res, next) {
     if ((req.path === '/webhook' && req.method === 'POST') || (req.path === '/crypto/webhook' && req.method === 'POST')) {
         // If the request is for "/webhook" and it's a POST request, skip the JSON parsing
@@ -71,18 +84,6 @@ function customJsonParser(req, res, next) {
     }
 }
 app.use(customJsonParser);
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_SERVER);
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-app.use(cors({
-    origin: process.env.FRONTEND_SERVER,
-    methods: ['POST', 'GET', 'PATCH', 'OPTIONS'],
-    credentials: true
-}));
 app.use(session({
     name: 'sessionID',
     secret: 'strongass',
