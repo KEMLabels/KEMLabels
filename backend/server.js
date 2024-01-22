@@ -129,20 +129,17 @@ const transporter = nodemailer.createTransport({
 
 //STRIPE API
 app.get("/getStripePublicKey", (req, res) => {
-    const key = stripePublicKey;
-    res.json(key);
+    res.json(stripePublicKey);
 })
 
 const calculateOrderAmount = (amount) => {
-    const totalVal = amount * 100;
-    return Number(totalVal);
+    return Number(amount * 100);
 };
 
 app.post("/create-payment-intent", async (req, res) => {
     try {
         // amount is in dollars so convert to cents in paymentIntent
-        const { amount } = req.body;
-        const { email } = req.body;
+        const { amount, email } = req.body;
 
         // Create a PaymentIntent with the order amount and currency
         const paymentIntent = await stripe.paymentIntents.create({
@@ -155,59 +152,58 @@ app.post("/create-payment-intent", async (req, res) => {
                 email: email,
             },
         });
-
-        res.send({
-            clientSecret: paymentIntent.client_secret,
-        });
+        console.log('PaymentIntent created successfully:', paymentIntent);
+        res.send({ clientSecret: paymentIntent.client_secret });
     } catch (err) {
-        console.log(err);
-        res.send({ err });
+        console.error('Error creating PaymentIntent:', err);
+        res.status(500).send({ error: err.message });
     }
 });
 
 app.post('/webhook', express.raw({ type: "application/json" }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
-
     let event;
-
-    console.log(req.body);
+    console.log('Received webhook payload:', req.body);
 
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
-        console.log("Failed to verify webook." + err);
-        return;
+        console.error('Failed to verify webhook:', err);
+        return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    if (event.type === "payment_intent.succeeded") {
+    if (event.type !== "payment_intent.succeeded")  {
+        console.log(`Webhook received unknown event type: ${event.type}`);
+        return res.status(400).end();
+    }
+
+    try {
         const paymentIntent = event.data.object;
-        console.log("Payment succeeded!", paymentIntent);
-        let user = await User.findOne({ email: paymentIntent.metadata.email })
-        if (!user)
-            throw new Error('Does not exist.');
-        let userExistingCredits = user.credits;
-        User.updateOne({
-            "_id": user._id.toString()
-        }, {
-            // set amount
-            // paymentIntent.amount is in cents so convert to dollars
-            "credits": Number(userExistingCredits) + Number(paymentIntent.amount / 100)
-        })
-            .then((obj) => {
-                console.log("User credits updated");
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        console.log('Payment succeeded! Payment Intent:', paymentIntent);
+        const user = await User.findOne({ email: paymentIntent.metadata.email })
+        if (!user) {
+            console.error('User not found for email:', paymentIntent.metadata.email);
+            throw new Error('User not found.');
+        }
+
+        // paymentIntent.amount is in cents so convert to dollars
+        const userExistingCredits = user.credits;
+        const newCredits = Number(userExistingCredits) + Number(paymentIntent.amount / 100);
+        await User.updateOne({ "_id": user._id.toString() }, { "credits": newCredits });
+        console.log(`User credits updated. New credits: ${newCredits}`);
+    } catch (err) {
+        console.error('Error updating user credits:', err);
+        res.status(500).end();
     }
     res.status(200).end();
 });
 
 //COINBASE API
 app.post("/payWithCrypto", async (req, res) => {
-    const { amount } = req.body;
-
     try {
+        const { amount } = req.body;
+        console.log(`Initiating crypto payment for amount: ${amount} USD`);
+
         const charge = await resources.Charge.create({
             name: "KEMLabels Credit Deposit",
             local_price: {
@@ -220,9 +216,12 @@ app.post("/payWithCrypto", async (req, res) => {
             },
             cancel_url: `${process.env.FRONTEND_SERVER}/load-credits`
         })
+        console.log(`Crypto payment initiated. Redirecting to hosted URL: ${charge.hosted_url}`);
         res.json({ redirect: charge.hosted_url });
     } catch (err) {
-        console.log(err);
+        console.error('Error during crypto payment:', err);
+        res.status(500).json({ msg: 'Error during crypto payment.' });
+    
     }
 })
 
@@ -234,77 +233,76 @@ app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (re
             process.env.COINBASE_WEBHOOK_SECRET
         );
 
-        if(event.type === "charge:confirmed") {
+        if (event.type === "charge:confirmed") {
             console.log("Payment succeeded!");
-            let user = await User.findOne({ email: event.metadata.email })
-            if (!user)
-                throw new Error('Does not exist.');
-            let userExistingCredits = user.credits;
-            User.updateOne({
-                "_id": user._id.toString()
-            }, {
-                // set amount
-                // paymentIntent.amount is in cents so convert to dollars
-                "credits": Number(userExistingCredits) + Number(event.local.amount)
-            })
-                .then((obj) => {
-                    console.log("User credits updated");
-                })
-                .catch((err) => {
-                    console.log(err);
-                })
+            const user = await User.findOne({ email: event.metadata.email })
+            if (!user) {
+                console.error(`User not found for email: ${event.metadata.email}`);
+                throw new Error('User not found.');
+            }
+
+            // paymentIntent.amount is in cents so convert to dollars
+            const userExistingCredits = user.credits;
+            const newCredits = Number(userExistingCredits) + Number(event.local.amount);
+            await User.updateOne(
+                { "_id": user._id.toString() },
+                { "credits":  newCredits}
+            );
+            console.log(`User credits updated. New credits: ${newCredits}`);
         }
         res.status(200).end();
     } catch (err) {
-        console.log("Failed to verify webook." + err);
-        return;
+        console.error("Failed to verify webook:", err);
+        return res.status(400).json({ msg: "Failed to verify webhook." });
     }
 });
-
-//Error handler function
-async function handleErr(err, req, res, next) {
-    console.log(err.message)
-    return res.json({ errMsg: err.message })
-}
 
 //Signing in
 app.post('/signin', async (req, res) => {
     try {
         const { email, password } = req.body
-
         const data = {
             email: email,
             password: password
         }
-        var emailAddress = data.email.toLowerCase();
-        let user = await User.findOne({ email: emailAddress })
-        if (!user)
+        const emailAddress = data.email.toLowerCase();
+        const user = await User.findOne({ email: emailAddress })
+        if (!user) {
+            console.error(`Signin failed: User not found for email '${emailAddress}'.`);
             throw new Error('Incorrect email or password.');
-        else {
-            const comparePass = await bcrypt.compare(password, user.password);
-            if (!comparePass) {
-                throw new Error('Incorrect email or password.');
-            } else {
-                req.session.user = user;
-                req.session.isLoggedIn = true;
-                const userInfo = {
-                    credits: user.credits,
-                    userName: user.userName,
-                    joinedDate: user.createdAt,
-                }
-                res.json({ redirect: '/', userInfo });
-            }
         }
+
+        const comparePass = await bcrypt.compare(password, user.password);
+        if (!comparePass) {
+            console.error(`Signin failed: Incorrect password for user '${emailAddress}'.`);
+            throw new Error('Incorrect email or password.');
+        }
+
+        req.session.user = user;
+        req.session.isLoggedIn = true;
+        const userInfo = {
+            credits: user.credits,
+            userName: user.userName,
+            joinedDate: user.createdAt,
+        }
+        console.log(`User '${emailAddress}' signed in successfully.`);
+        res.status(200).json({ redirect: '/', userInfo });
     } catch (err) {
-        console.log(err);
+        console.error('Error signing in:', err);
         return res.status(400).json({ msg: err.message });
     }
 })
 
 //Logout
 app.get('/logout', (req, res) => {
-    req.session.destroy();
-    return res.json({ redirect: '/' })
+    try {
+        req.session.destroy();
+        console.log('User logged out successfully.');
+        return res.json({ redirect: '/' })
+    } catch (err) {
+        console.error('Error during logout:', err);
+        return res.status(400).json({ msg: err.message });
+    }
 })
 
 //Signing up
@@ -319,9 +317,16 @@ app.post("/signup", async (req, res) => {
         }
 
         const userNameExists = await User.findOne({ userName: data.userName })
-        if (userNameExists) throw new Error('This username is already associated with an account.');
+        if (userNameExists) {
+            console.error(`Signup failed: Username '${userName}' is already associated with an account.`);
+            throw new Error('This username is already associated with an account.');
+        }
+
         const emailExists = await User.findOne({ email: data.email })
-        if (emailExists) throw new Error('This email is already associated with an account.');
+        if (emailExists) {
+            console.error(`Signup failed: Email '${email}' is already associated with an account.`);
+            throw new Error('This email is already associated with an account.');
+        }
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(data.password, salt);
@@ -331,101 +336,112 @@ app.post("/signup", async (req, res) => {
             email: data.email,
             password: hashedPassword,
         });
-        new_user.save()
+        await new_user.save()
+        console.log(`New user created: ID '${new_user._id}', Username '${new_user.userName}', Email '${new_user.email}'`);
 
         const token = crypto.randomBytes(32).toString("hex");
         const create_token = new tempTokens({
             token: token,
             userid: new_user._id
         })
-        create_token.save()
+        await create_token.save()
+        console.log(`Verification token created and saved for user ID '${new_user._id}'`);
+
         const url = `${process.env.FRONTEND_SERVER}/users/${new_user._id}/verify/${token}`;
+        console.log(`Verification URL generated: ${url}`);
         await sendSignUpConfirmationEmail(data.email, url);
+        console.log(`Signup confirmation email sent successfully to ${data.email}.`);
 
         req.session.user = new_user;
         req.session.isLoggedIn = true;
-        res.json({ redirect: '/verify-email' });
+        res.status(200).json({ redirect: '/verify-email' });
     } catch (err) {
-        console.log(err);
+        console.error('Error signing up:', err);
         return res.status(400).json({ msg: err.message });
     }
 })
 
 //Email verification
 app.get("/generateToken", async (req, res) => {
-    const findToken = await tempTokens.findOne({ userid: req.session.user._id.toString() });
-    if (findToken) {
-        tempTokens.deleteOne({
-            _id: findToken._id.toString()
-        })
-            .then(function () {
-                console.log('successfuly deleted');
-            }).catch(function (error) {
-                console.log(error); // Failure
-            });
+    try {
+        const findToken = await tempTokens.findOne({ userid: req.session.user._id.toString() });
+        if (findToken) {
+            await tempTokens.deleteOne({ _id: findToken._id.toString() });
+            console.log('Token successfully deleted');
+        }
+        await generateTokenHelper(req.session.user._id, req.session.user.email);
+        res.status(200).send("Token generated successfully");
+    } catch (err) {
+        console.error('Error generating token:', err);
+        res.status(500).send("An error occurred while generating the token.");
     }
-    generateTokenHelper(req.session.user._id, req.session.user.email);
 })
 
 async function generateTokenHelper(userID, email) {
-    const token = crypto.randomBytes(32).toString("hex");
-    const create_token = new tempTokens({
-        token: token,
-        userid: userID
-    })
-    create_token.save()
-    const url = `${process.env.FRONTEND_SERVER}/users/${userID}/verify/${token}`;
-    console.log(url);
-    sendSignUpConfirmationEmail(email, url);
+    try {
+        const token = crypto.randomBytes(32).toString("hex");
+        const create_token = new tempTokens({
+            token: token,
+            userid: userID
+        })
+        await create_token.save()
+        const url = `${process.env.FRONTEND_SERVER}/users/${userID}/verify/${token}`;
+        console.log(`URL for email verification: ${url}`)
+        await sendSignUpConfirmationEmail(email, url);
+    } catch (err) {
+        console.error('Error generating token and sending confirmation email:', err);
+    }
 }
 
 async function sendSignUpConfirmationEmail(emailAddress, url) {
-    const content = `<p>Thank you for signing up with us!</p>
-    <p>Please use the following <a href="${url}" target="_blank" style="color:#0066ff!important;text-decoration:none">link here</a> to confirm your email address.</p>
-    <p>If you did not sign up for KEMLabels, you can safely ignore this email.</p>
-    <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
-    const signUpConfirmationEmail = emailTemplate(emailAddress, 'KEMLabels - Confirm Your Email', content);
-    transporter.sendMail(signUpConfirmationEmail, function (err, info) {
-        if (err) console.log(err)
-    });
+    try {
+        const content = `<p>Thank you for signing up with us!</p>
+        <p>Please use the following <a href="${url}" target="_blank" style="color:#0066ff!important;text-decoration:none">link here</a> to confirm your email address.</p>
+        <p>If you did not sign up for KEMLabels, you can safely ignore this email.</p>
+        <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
+        const signUpConfirmationEmail = emailTemplate(emailAddress, 'KEMLabels - Confirm Your Email', content);
+        transporter.sendMail(signUpConfirmationEmail, function (err, info) {
+            if (err) console.error('Error sending signup confirmation email:', err);
+            else console.log(`Signup confirmation email sent successfully to ${emailAddress}.`);
+        });
+    } catch (err) {
+        console.error('Error sending email for signup confirmation:', err);
+    }
 }
 
 app.get('/users/:id/verify/:token', async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.id });
-        if (!user) throw new Error('Link Invalid');
+        if (!user) {
+            console.error('User not found for verification:', user);
+            throw new Error('Link Invalid');
+        }
+
         const token = await tempTokens.findOne({ token: req.params.token });
         if (!token) {
             const previoustoken = await tempTokens.findOne({ userid: req.params.id })
             if (previoustoken) {
-                if (previoustoken.token !== req.params.token) throw new Error('Link Expired');
-            } else throw new Error('Link Invalid');
+                if (previoustoken.token !== req.params.token) {
+                    console.error('Link Expired for user:', req.params.id);
+                    throw new Error('Link Expired');
+                }
+            } else {
+                console.error('Link Invalid for user:', req.params.id);
+                throw new Error('Link Invalid');
+            }
         }
 
-        User.updateOne({
-            "_id": user._id.toString()
-        }, {
-            "verified": true
-        })
-            .then((obj) => {
-                console.log("User has been verified");
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        // Update user verification status
+        await User.updateOne({ "_id": user._id.toString() }, { "verified": true });
+        console.log('User has been verified:', user._id);
 
-        tempTokens.deleteOne({
-            token: req.params.token
-        })
-            .then(function () {
-                console.log('successfuly deleted');
-            }).catch(function (error) {
-                console.log(error); // Failure
-            });
+        // Delete the verification token
+        await tempTokens.deleteOne({ token: req.params.token });
+        console.log('Verification token successfully deleted:', req.params.token);
 
-        return res.json({ redirect: '/' });
+        return res.status(200).json({ redirect: '/' });
     } catch (err) {
-        console.log(err);
+        console.error('Error verifying user:', err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -433,27 +449,43 @@ app.get('/users/:id/verify/:token', async (req, res) => {
 app.get('/isUserVerified', async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.session.user._id });
-        if (!user) throw new Error('An error occurred.');
-        const verified = user.verified;
+        if (!user) {
+            console.error('User not found for session user ID:', req.session.user._id);
+            throw new Error('An error occurred.');
+        }
 
-        if (!verified) throw new Error('Please check your inbox for a verification link to verify your account.');
-        else res.json({ redirect: '/' });
+        const verified = user.verified;
+        if (!verified) {
+            console.error('User is not verified:', user);
+            throw new Error('Please check your inbox for a verification link to verify your account.');
+        }
+
+        console.log('User is verified:', user);
+        res.status(200).json({ redirect: '/' });
     } catch (err) {
-        console.log(err);
+        console.error('Error checking user verification:', err);
         return res.status(400).json({ msg: err.message });
     }
-
 })
 
 app.get('/checkVerification', async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.session.user._id });
-        if (!user) throw new Error('An error occurred.');
+        if (!user) {
+            console.error('User not found for session user ID:', req.session.user._id);
+            throw new Error('An error occurred.');
+        }
+
         const verified = user.verified;
-        if (!verified) throw new Error('User is not verified');
-        res.json({ redirect: '/' });
+        if (!verified) {
+            console.error('User is not verified:', user);
+            throw new Error('User is not verified');
+        }
+        
+        console.log('User is verified:', user);
+        res.status(200).json({ redirect: '/' });
     } catch (err) {
-        console.log(err);
+        console.error('Error checking user verification:', err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -461,53 +493,59 @@ app.get('/checkVerification', async (req, res) => {
 //Forgot password
 app.post("/emailExists", async (req, res) => {
     try {
-        const { email } = req.body
-
-        const data = {
-            email: email.toLowerCase()
+        const data = { email: req.body.email.toLowerCase() }
+        const user = await User.findOne({ email: data.email })
+        if (!user) {
+            console.log(`Email not found for: ${data.email}`);
+            throw new Error('Hmm... this email is not associated with an account. Please try again.');
         }
 
-        const emailExists = await User.findOne({ email: data.email })
-        if (!emailExists) throw new Error('Hmm... this email is not associated with an account. Please try again.');
-        else res.json({ emailExists });
+        console.log(`Email found for: ${data.email}`);
+        res.status(200).json({ user });
     } catch (err) {
-        console.log(err);
+        console.error('Error checking if email exists:', err);
         return res.status(400).json({ msg: err.message });
     }
 })
 
 app.post("/forgotpassword", async (req, res) => {
-    const { email, type } = req.body
-    generateOTPHelper(email, type);
+    try {
+        const { email, type } = req.body
+        if (!email) return res.status(400).json({ msg: 'Invalid email provided.' });
+        generateOTPHelper(email, type);
+        res.status(200).json({ msg: 'OTP generated successfully.' });
+    } catch (err) {
+        console.error('Error generating OTP for Forgot Password:', err);
+        return res.status(400).json({ msg: err.message });
+    }
 })
 
 app.post("/generateNewOTP", async (req, res) => {
-    const { email, type } = req.body
-    const findOTP = await tempOTPS.findOne({ email: email.toLowerCase() });
-    if (findOTP) {
-        console.log(findOTP)
-        tempOTPS.deleteOne({
-            _id: findOTP._id.toString()
-        })
-            .then(function () {
-                generateOTPHelper(email, type);
-                console.log('successfuly deleted');
-            }).catch(function (error) {
-                console.log(error); // Failure
-            });
-    } else {
+    try {
+        const { email, type } = req.body
+        const existingOTP = await tempOTPS.findOneAndDelete({ email: email.toLowerCase() });
+
+        if (existingOTP) console.log('Existing OTP record found and deleted:', existingOTP);
+        else console.log('No existing OTP record found.');
+
+        // Generate a new OTP and send the email
         generateOTPHelper(email, type);
+        res.status(200).json({ msg: 'New OTP generated successfully.' });
+    } catch (err) {
+        console.error('Error generating new OTP:', err);
+        return res.status(500).json({ msg: err.message });
     }
 })
 
 async function generateOTPHelper(email, type) {
-    const otp = Math.floor(1000 + Math.random() * 9000);
-    const create_OTP = new tempOTPS({
-        passcode: otp,
-        email: email
-    })
-    create_OTP.save()
-    sendOTPEmail(otp, email, type);
+    try {
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        const create_OTP = new tempOTPS({ passcode: otp, email: email })
+        await create_OTP.save()
+        sendOTPEmail(otp, email, type);
+    } catch (err) {
+        console.error('Error generating OTP:', err);
+    }
 }
 
 function sendOTPEmail(OTPPasscode, emailAddress, type) {
@@ -541,36 +579,37 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
     const selectedEmail = emailTypes[type];
     if (selectedEmail) {
         transporter.sendMail(selectedEmail, function (err, info) {
-            if (err) console.log(err)
+            if (err) console.error(`Error sending OTP email for type ${type}:`, err);
+            else console.log(`OTP email for type ${type} sent successfully to ${emailAddress}.`);
         });
     } else {
-        console.log('Invalid email type');
+        console.error('Error in sendOTPEmail:', error);
     }
 }
 
 app.post("/checkOTP", async (req, res) => {
     try {
-        const { enteredOTP } = req.body
-        const { email } = req.body
-        console.log('entered code: ' + enteredOTP);
-        const tempCode = await tempOTPS.findOne({ email: email.toLowerCase() });
-        if (!tempCode) throw new Error("Invalid Code");
-        console.log('correct code: ' + tempCode.passcode);
-        if (Number(enteredOTP) !== Number(tempCode.passcode)) {
-            throw new Error('Hmm... your code was incorrect. Please try again.');
-        } else {
-            tempOTPS.deleteOne({
-                passcode: enteredOTP
-            })
-                .then(function () {
-                    console.log('successfuly deleted');
-                }).catch(function (error) {
-                    console.log(error); // Failure
-                });
+        const { enteredOTP, email } = req.body
+        console.log(`OTP verification initiated for email: ${email}`);
+        console.log(`Entered OTP: ${enteredOTP}`);
+
+        const tempCode = await tempOTPS.findOneAndDelete({ email: email.toLowerCase() });
+
+        if (!tempCode) {
+            console.error('OTP verification failed: Invalid code or expired session.');
+            throw new Error("Invalid Code");
         }
+        console.log(`Correct OTP retrieved from the database: ${tempCode.passcode}`);
+
+        if (Number(enteredOTP) !== Number(tempCode.passcode)) {
+            console.error('OTP verification failed: Incorrect code entered.');
+            throw new Error('Hmm... your code was incorrect. Please try again.');
+        }
+        console.log(`OTP verification successful. Deleted record for code: ${enteredOTP}`);
+
         res.status(200).json("success");
     } catch (err) {
-        console.log(err);
+        console.error('Error during OTP verification:', err);
         return res.status(400).json({ msg: err.message });
     }
 
@@ -584,49 +623,54 @@ app.post("/updateUserPass", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const userData = await User.findOne({ email: email.toLowerCase() })
-        if (!userData) throw new Error("Unexpected error occurred");
+        if (!userData) {
+            console.error('User not found during password update.');
+            throw new Error("An unexpected error occurred. Please try again later.");
+        }
 
-        User.updateOne({
-            "_id": userData._id.toString()
-        }, {
-            "password": hashedPassword
-        })
-            .then((obj) => {
-                console.log("Updated Password");
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        await User.updateOne(
+            { "_id": userData._id.toString() },
+            { "password": hashedPassword }
+        );
+        console.log("Password updated successfully.");
 
         sendPasswordChangeEmail(email);
+        console.log("Password change notification email sent successfully.");
 
         res.json({ redirect: '/signin' });
     } catch (err) {
-        console.log(err);
+        console.error('Error updating user password:', err);
         return res.status(400).json({ msg: err.message });
     }
 })
 
 function sendPasswordChangeEmail(emailAddress) {
-    const content = `<h1 style="margin-bottom: 2rem;">Did you change your password?</h1>
-    <p>We noticed the password for your KEMLabels' account was recently changed. If this was you, rest assured that your new password is now in effect. No further action is required and you can safely ignore this email.</p>
-    <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
-    const changePassConfirmation = emailTemplate(emailAddress, 'KEMLabels Security Alert - Your Password Has Been Updated', content);
+    try {
+        const content = `<h1 style="margin-bottom: 2rem;">Did you change your password?</h1>
+        <p>We noticed the password for your KEMLabels' account was recently changed. If this was you, rest assured that your new password is now in effect. No further action is required and you can safely ignore this email.</p>
+        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
+        const changePassConfirmation = emailTemplate(emailAddress, 'KEMLabels Security Alert - Your Password Has Been Updated', content);
 
-    transporter.sendMail(changePassConfirmation, function (err, info) {
-        if (err) console.log(err)
-    });
+        transporter.sendMail(changePassConfirmation, function (err, info) {
+            if (err) console.error('Error sending password change email:', err);
+            else console.log(`Password change email sent successfully to ${emailAddress}.`);
+        });
+    } catch (err) {
+        console.error('Error sending email for updating password:', err);
+    }
 }
-
-//Account settings
 
 //Credit history
 app.get('/getCreditHistory', async (req, res) => {
     try {
+        const email = req.session.user.email;
+        console.log(`Received request to fetch credit history for user: ${email}`);
+
         const paymentIntent = await stripe.paymentIntents.search({
-            query: `status:\'succeeded\' AND metadata[\'email\']:\'${req.session.user.email}\'`,
+            query: `status:\'succeeded\' AND metadata[\'email\']:\'${email}\'`,
             limit: 100,
         });
+        console.log(`Fetched ${paymentIntent.data.length} payment intents for user: ${email}`);
 
         const formattedPaymentIntents = [];
 
@@ -651,11 +695,11 @@ app.get('/getCreditHistory', async (req, res) => {
             });
         }
 
-        console.log(formattedPaymentIntents);
+        console.log('Formatted payment intents:', formattedPaymentIntents);
         res.send(formattedPaymentIntents);
     } catch (err) {
-        console.log(err);
-        res.status(500).send('An error occurred.');
+        console.error('Error fetching credit history:', err);
+        res.status(400).send('An error occurred while fetching credit history.');
     }
 })
 
@@ -663,12 +707,13 @@ app.get('/getCreditHistory', async (req, res) => {
 app.post("/UpdateUsername", async (req, res) => {
     try {
         const { userName } = req.body;
-
         const userNameData = userName.toLowerCase();
+        console.log(`Received request to update username to ${userNameData}.`);
 
         // Retrieve the user from the session
         const user = await User.findOne({ _id: req.session.user._id });
         if (!user) {
+            console.error('User not found during username update.');
             throw new Error("An unexpected error occurred. Please try again later.");
         }
 
@@ -683,18 +728,21 @@ app.post("/UpdateUsername", async (req, res) => {
             let remainingMinutes = 60 - minutesPassed;
 
             if (remainingHours > 0 || (remainingHours === 0 && remainingMinutes > 0)) {
+                console.error(`Username change request failed: User must wait ${remainingHours} hours and ${remainingMinutes} minutes to change their username.`);
                 if (remainingHours === 24) throw new Error(`You must wait ${remainingHours} hours before you can change your username again.`);
                 else throw new Error(`You must wait ${remainingHours} hours and ${remainingMinutes} minutes before you can change your username again.`);
             }
         }
 
-        if (userNameData === req.session.user.userName) {
+        if (userNameData === user.userName) {
+            console.error('Username change request failed: New username is the same as the current username.');
             throw new Error("You cannot change your username to the same one you currently have.");
         }
 
         // Check if the new username is already used by another user
         const userNameAlreadyUsed = await User.findOne({ userName: userNameData });
         if (userNameAlreadyUsed) {
+            console.error('Username change request failed: New username is already associated with another account.');
             throw new Error("This username is already associated with an account.");
         }
 
@@ -703,25 +751,32 @@ app.post("/UpdateUsername", async (req, res) => {
             { "_id": user._id.toString() },
             { "userName": userNameData, "userNameLastChanged": currentDate }
         );
+        console.log(`Username updated successfully to ${userNameData}.`);
 
-        console.log("Updated username");
         sendUserNameChangeEmail(user.email);
+        console.log(`Username change email sent successfully to ${user.email}.`);
+
         return res.status(200).json({ msg: 'Username updated successfully.' });
     } catch (err) {
-        console.log(err);
+        console.error('Error updating username:', err);
         return res.status(400).json({ msg: err.message });
     }
 });
 
 function sendUserNameChangeEmail(emailAddress) {
-    const content = `<h1 style="margin-bottom: 2rem;">Did you change your username?</h1>
-    <p>We noticed the username for your KEMLabels' account was recently changed. If this was you, rest assured that your new username is now in effect. No further action is required and you can safely ignore this email.</p>
-    <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
-    const sendOneTimePasscodeEmail = emailTemplate(emailAddress, 'KEMLabels Security Alert - Your Username Has Been Updated', content);
+    try {
+        const content = `<h1 style="margin-bottom: 2rem;">Did you change your username?</h1>
+        <p>We noticed the username for your KEMLabels' account was recently changed. If this was you, rest assured that your new username is now in effect. No further action is required and you can safely ignore this email.</p>
+        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
+        const sendOneTimePasscodeEmail = emailTemplate(emailAddress, 'KEMLabels Security Alert - Your Username Has Been Updated', content);
 
-    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
-        if (err) console.log(err)
-    });
+        transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
+            if (err) console.error('Error sending username change email:', err);
+            else console.log(`Username change email sent successfully to ${emailAddress}.`);
+        });
+    } catch (err) {
+        console.error('Error sending email for updating username:', err);
+    }
 }
 
 //Email Change
@@ -729,50 +784,60 @@ app.post("/sendEmailChangeConfirmation", async (req, res) => {
     try {
         const { newEmail } = req.body
         const currentEmail = req.session.user.email;
+        console.log(`Received request to change email from ${currentEmail} to ${newEmail.toLowerCase()}.`);
 
         if (newEmail.toLowerCase() === currentEmail) {
+            console.error('Email change request failed: New email is the same as the current email.');
             throw new Error("You cannot change your email to the one you currently have.");
         }
 
         // Check if the new email is already used by another user
         const emailAlreadyUsed = await User.findOne({ email: newEmail.toLowerCase() });
         if (emailAlreadyUsed) {
+            console.error('Email change request failed: New email is already associated with another account.');
             throw new Error("This email is already associated with an account.");
         }
 
         const otp = Math.floor(1000 + Math.random() * 9000);
+        const create_OTP = new tempOTPS({ passcode: otp, email: newEmail })
+        await create_OTP.save()
+        console.log(`Generated OTP ${otp} for email change confirmation.`);
 
-        const create_OTP = new tempOTPS({
-            passcode: otp,
-            email: newEmail
-        })
-        create_OTP.save()
         sendEmailChangeRequestEmail(currentEmail, newEmail.toLowerCase(), otp)
+        console.log(`Email change confirmation sent successfully to ${newEmail.toLowerCase()}.`);
         return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${newEmail.toLowerCase()}.` });
     } catch (err) {
-        console.log(err);
+        console.error('Error processing email change confirmation:', err);
         return res.status(400).json({ msg: err.message });
     }
 })
 
 function sendEmailChangeRequestEmail(currentEmail, newEmail, OTPPasscode) {
-    const content = `<h1 style="margin-bottom: 2rem;">Did you change your email?</h1>
-    <p>We received a request to change the email associated with your account. If this was you, you can safely ignore this email.</p>
-    <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
-    const sendSecurityAlert = emailTemplate(currentEmail, 'KEMLabels Security Alert - Email Change Detected on Your Account', content);
+   try {
+        const content = `<h1 style="margin-bottom: 2rem;">Did you change your email?</h1>
+        <p>We received a request to change the email associated with your account. If this was you, you can safely ignore this email.</p>
+        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
+        const sendSecurityAlert = emailTemplate(currentEmail, 'KEMLabels Security Alert - Email Change Detected on Your Account', content);
 
-    transporter.sendMail(sendSecurityAlert, function (err, info) {
-        if (err) console.log(err)
-    });
-    sendOTPEmail(OTPPasscode, newEmail, "changeEmail");
+        transporter.sendMail(sendSecurityAlert, function (err, info) {
+            if (err) console.error('Error sending security alert email for updating email:', err);
+            else console.log(`Security alert email sent successfully to ${currentEmail}.`);
+        });
+        sendOTPEmail(OTPPasscode, newEmail, "changeEmail");
+        console.log(`OTP email sent successfully to ${newEmail}.`);
+    } catch (err) {
+        console.error('Error sending email for updating email:', err);
+    }
 }
 
 app.post("/updateEmailAddress", async (req, res) => {
     try {
         const { newEmail } = req.body;
+        console.log(`Received request to update email address to ${newEmail}.`);
 
         const user = await User.findOne({ _id: req.session.user._id });
         if (!user) {
+            console.error('User not found during /updateEmailAddress.');
             throw new Error("An unexpected error occurred. Please try again later.");
         }
 
@@ -780,25 +845,32 @@ app.post("/updateEmailAddress", async (req, res) => {
             { "_id": user._id.toString() },
             { "email": newEmail.toLowerCase(), "verified": false }
         );
+        console.log(`Updated email to ${newEmail} and set user as unverified.`);
 
-        console.log("Updated email and unverified user");
         sendEmailChangeEmail(newEmail.toLowerCase());
-        return res.status(200).json({ msg: 'Username updated successfully.' });
+        console.log(`Email change notification sent to ${newEmail}.`);
+
+        return res.status(200).json({ msg: 'Email address updated successfully.' });
     } catch (err) {
-        console.log(err);
+        console.error('Error updating email address:', err);
         return res.status(400).json({ msg: err.message });
     }
 })
 
 function sendEmailChangeEmail(emailAddress) {
-    const content = `<h1 style="margin-bottom: 2rem;">Did you change your email?</h1>
-    <p>We noticed the email for your KEMLabels' account was recently changed. If this was you, rest assured that your new email is now in effect. No further action is required and you can safely ignore this email.</p>
-    <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
-    const sendOneTimePasscodeEmail = emailTemplate(currentEmail, 'KEMLabels Security Alert - Your Email Has Been Updated', content);
-
-    transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
-        if (err) console.log(err)
-    });
+    try {
+        const content = `<h1 style="margin-bottom: 2rem;">Did you change your email?</h1>
+        <p>We noticed the email for your KEMLabels' account was recently changed. If this was you, rest assured that your new email is now in effect. No further action is required and you can safely ignore this email.</p>
+        <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
+        const sendOneTimePasscodeEmail = emailTemplate(emailAddress, 'KEMLabels Security Alert - Your Email Has Been Updated', content);
+    
+        transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
+            if (err) console.error('Error sending email:', err);
+            else console.log(`Email sent successfully to ${emailAddress}.`);
+        });
+    } catch (err) {
+        console.error('Error sending email for updating email:', err);
+    }
 }
 
 //Password Change
@@ -807,24 +879,31 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
         const { enteredPassword, newPassword } = req.body;
         const currentPassword = req.session.user.password;
 
+        console.log('Received request for password change confirmation.');
+
         const comparePassword = await bcrypt.compare(enteredPassword, currentPassword);
-        if (!comparePassword) throw new Error("Hmm... your current password is incorrect. Please try again.");
+        if (!comparePassword) {
+            console.error('Entered password does not match the current password.');
+            throw new Error("Hmm... your current password is incorrect. Please try again.");
+        }
 
         const comparePassWithNewPass = await bcrypt.compare(newPassword, currentPassword);
-        if (comparePassWithNewPass) throw new Error("Looks like you have entered the same password that you are using now. Please enter a differernt password.");
+        if (comparePassWithNewPass) {
+            console.error('Entered password is the same as the current password.');
+            throw new Error("Looks like you have entered the same password that you are using now. Please enter a differernt password.");
+        }
 
         const otp = Math.floor(1000 + Math.random() * 9000);
         const userEmail = req.session.user.email;
 
-        const create_OTP = new tempOTPS({
-            passcode: otp,
-            email: userEmail
-        })
-        create_OTP.save();
+        console.log(`Generated OTP ${otp} for user ${userEmail}.`);
+
+        const create_OTP = new tempOTPS({ passcode: otp, email: userEmail })
+        await create_OTP.save();
         sendOTPEmail(otp, userEmail, "changePassword");
         return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${userEmail}.` });
     } catch (err) {
-        console.log(err);
+        console.error('Error processing password change confirmation:', err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -838,11 +917,13 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
 // 5) also save senderInfo in formValues to DB so we can preload it to the frontend when they want to create more orders in the future
 app.post("/orderLabel", (req, res) => {
     try {
+        console.log("Received orderLabel request.");
         const { email, formValues, totalAmount } = req.body;
-        console.log(email, formValues, totalAmount )
-        return res.status(200)
+        console.log(`Email: ${email}, Total Amount: ${totalAmount}, Form Values: ${JSON.stringify(formValues)}`);
+        console.log("OrderLabel request processed successfully.");
+        return res.status(200).json({ msg: "OrderLabel request processed successfully." });
     } catch (err) {
-        console.log(err);
+        console.error("Error processing orderLabel request:", err);
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -851,32 +932,48 @@ app.post("/orderLabel", (req, res) => {
 // Schedule a task to run every 24 hours
 cron.schedule('0 0 */1 * *', async () => {
     try {
-        console.log('cron running');
+        console.log('CRON running');
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        console.log('Starting deletion of unverified accounts older than 24 hours...');
 
         // Delete unverified accounts created more than 24 hours ago
-        await User.deleteMany({ verified: false, createdAt: { $lt: twentyFourHoursAgo } });
+        const res = await User.deleteMany({ verified: false, createdAt: { $lt: twentyFourHoursAgo } });
+        console.log(`CRON job completed successfully. Deleted ${res.deletedCount} unverified accounts`);
     } catch (err) {
-        console.log('Error deleting unverified accounts:', err);
+        console.error('Error deleting unverified accounts:', err);
+        if (err.name === 'MongoError' && err.code === 11000) {
+            console.error('MongoDB duplicate key error. Handle it appropriately.');
+        }
+        console.error('CRON job failed.');
     }
 });
 
 //404 NOT FOUND
 app.get('*', (req, res) => {
-    throw new Error('PAGE NOT FOUND');
+    res.status(404).json('PAGE NOT FOUND');
 })
+
+//Error handler function
+async function handleErr(err, req, res, next) {
+    console.log("Error Handler:", err.message)
+    return res.json({ errMsg: err.message })
+}
 
 //Initiate Error handler
 app.use(handleErr);
 
 // Start server
 if (isDevelopmentEnv()) {
+    console.log('Running environment: DEVELOPMENT');
+
     connectDB().then(() => {
         app.listen(process.env.PORT, () => {
             console.log("Server is running on port " + process.env.PORT);
         });
     });
 } else {
+    console.log('Running environment: PRODUCTION');
+
     // Create SSL options
     const options = {
         key: fs.readFileSync('path_to_private_key.pem'),
