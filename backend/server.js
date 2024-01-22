@@ -2,7 +2,7 @@
 const express = require("express");
 const app = express();
 const cors = require('cors');
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const session = require('express-session');
 require("dotenv").config({ path: `.env.${process.env.NODE_ENV}` });
 const cookieParser = require('cookie-parser');
@@ -10,8 +10,6 @@ const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
-const https = require('https');
-const fs = require('fs');
 const { format } = require('date-fns');
 require('express-async-errors');
 const emailTemplate = require('./emailTemplate');
@@ -963,27 +961,9 @@ async function handleErr(err, req, res, next) {
 app.use(handleErr);
 
 // Start server
-if (isDevelopmentEnv()) {
-    console.log('Running environment: DEVELOPMENT');
-
-    connectDB().then(() => {
-        app.listen(process.env.PORT, () => {
-            console.log("Server is running on port " + process.env.PORT);
-        });
+console.log(`Running environment: ${isDevelopmentEnv() ? 'DEVELOPMENT' : 'PRODUCTION'}`);
+connectDB().then(() => {
+    app.listen(process.env.PORT, () => {
+        console.log("Server is running on port " + process.env.PORT);
     });
-} else {
-    console.log('Running environment: PRODUCTION');
-
-    // Create SSL options
-    const options = {
-        key: fs.readFileSync('path_to_private_key.pem'),
-        cert: fs.readFileSync('path_to_ssl_certificate.pem')
-    };
-
-    const server = https.createServer(options, app);
-    connectDB().then(() => {
-        server.listen(process.env.PORT, () => {
-            console.log("Server is running on port " + process.env.PORT);
-        });
-    });
-}
+})
