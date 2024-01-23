@@ -37,10 +37,14 @@ const isDevelopmentEnv = () => process.env.NODE_ENV === 'development';
 //Connect to Mongo and set up MongoDBStore
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.DB_STRING, { useNewUrlParser: true });
+        await mongoose.connect(process.env.DB_STRING, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        mongoose.set('useCreateIndex', true);
         console.log(`Connected to DB`);
     } catch (error) {
-        console.log("Couldn't connect to DB: ", error);
+        console.error("Couldn't connect to DB: ", error);
         process.exit(1);
     }
 }
