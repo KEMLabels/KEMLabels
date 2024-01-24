@@ -41,7 +41,6 @@ const connectDB = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
-        mongoose.set('useCreateIndex', true);
         console.log(`Connected to DB`);
     } catch (error) {
         console.error("Couldn't connect to DB: ", error);
