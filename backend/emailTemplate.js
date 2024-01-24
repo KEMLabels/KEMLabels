@@ -7,7 +7,7 @@ module.exports = (email, subject, content) => ({
       filename: "Logo.png",
       path: process.env.NODE_ENV === 'development'
         ? `${__dirname.slice(0, -8)}/frontend/public/logo/logo-primary.png`
-        : `${__dirname.slice(0, -7)}/public/logo/logo-primary.png`,
+        : `${__dirname}/logo/logo-primary.png`.replace('backend.kemlabels.com', 'public_html'),
       cid: "logo",
     },
   ],
