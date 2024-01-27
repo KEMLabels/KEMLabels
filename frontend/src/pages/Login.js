@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ReactGA from "react-ga";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
@@ -33,6 +34,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isLoggedIn) {
+      ReactGA.set({ userId: inputEmail });
       axios
         .get("/checkVerification", {
           withCredentials: true,
@@ -56,7 +58,7 @@ export default function Login() {
           }
         });
     }
-  }, [isLoggedIn, navigate, dispatch]);
+  }, [isLoggedIn, navigate, dispatch, inputEmail]);
 
   const submit = (e) => {
     e.preventDefault();
