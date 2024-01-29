@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
+import { isDevelopmentEnv } from "./utils/Helpers";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -24,13 +25,15 @@ try {
 
 export default function App() {
   const location = useLocation();
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // Avoid sending GA events in development
+    if (isDevelopmentEnv()) return;
     ReactGA.send({
       hitType: "pageview",
       page: location.pathname,
       title: document.title,
     });
-  }, [location]);
+  }, [location.pathname]);
 
   return (
     <Routes>
