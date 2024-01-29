@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ReactGA from "react-ga";
+import ReactGA from "react-ga4";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";

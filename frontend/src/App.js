@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import ReactGA from "react-ga";
+import ReactGA from "react-ga4";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -16,13 +16,20 @@ import AccountSettings from "./pages/AccountSettings";
 import CreditHistory from "./pages/CreditHistory";
 import OrderLabel from "./pages/OrderLabel";
 
-// Initialize React Ga with your tracking ID
-ReactGA.initialize("G-1C27763WQC");
+try {
+  ReactGA.initialize("G-H5QKQJTFBG");
+} catch (e) {
+  console.error("Error initializing ReactGA: ", e);
+}
 
 export default function App() {
   const location = useLocation();
   useEffect(() => {
-    ReactGA.pageview(location.pathname + location.search);
+    ReactGA.send({
+      hitType: "pageview",
+      page: location.pathname,
+      title: document.title,
+    });
   }, [location]);
 
   return (
