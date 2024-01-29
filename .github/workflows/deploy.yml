@@ -20,6 +20,7 @@ jobs:
           node-version: "16"
       - name: 🔨 Build project
         run: |
+          cd frontend
           npm install
           npm run build
       - name: 📂 Deploying to Namecheap
