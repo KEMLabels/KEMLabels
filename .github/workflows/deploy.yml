@@ -2,14 +2,11 @@ name: Namecheap Production Deployment
 run-name: ${{ github.actor }} is automated deploying to Namecheap 🚀
 
 on:
-  pull_request:
+  push:
     branches: [server-test, server-production]
-    types:
-      - closed
 
 jobs:
   web-deploy:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
