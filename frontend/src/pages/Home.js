@@ -14,7 +14,7 @@ export default function Home() {
       <div id="home" className="hero">
         <div className="heroColumn">
           <h1>
-            (test) Label Your Success,
+            (This works) Label Your Success,
             <br />
             Ship with Confidence
           </h1>
