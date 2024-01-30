@@ -32,6 +32,7 @@ jobs:
           password: ${{ secrets.FTP_BACKEND_PASSWORD }}
           protocol: ${{ secrets.FTP_PROTOCOL }}
           local-dir: ./backend/
+          exclude: "stripe.exe .env.development .env-production"
       - name: 📂 Deploying frontend to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
