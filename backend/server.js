@@ -202,7 +202,7 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
 //COINBASE API
 app.post("/payWithCrypto", async (req, res) => {
     try {
-        const { amount } = req.body;
+        const { amount, email } = req.body;
         console.log(`Initiating crypto payment for amount: ${amount} USD`);
 
         const charge = await resources.Charge.create({
@@ -213,7 +213,7 @@ app.post("/payWithCrypto", async (req, res) => {
             },
             pricing_type: "fixed_price",
             metadata: {
-                email: "test@gmail.com"
+                email: email
             },
             cancel_url: `${process.env.FRONTEND_SERVER}/load-credits`
         })

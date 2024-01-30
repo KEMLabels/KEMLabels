@@ -11,12 +11,14 @@ import axios from "../api/axios";
 import { AmountField } from "../components/Field";
 import Log from "../components/Log";
 
+
 export default function LoadCredits() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const isUserVerified = useSelector((state) => state.user.isVerified);
+  const userEmail = useSelector((state) => state.user.email);
 
   const [fieldErrors, setFieldErrors] = useState({});
   const [loadAmount, setLoadAmount] = useState("");
@@ -116,7 +118,7 @@ export default function LoadCredits() {
                   axios
                     .post(
                       "/payWithCrypto",
-                      { amount: loadAmount },
+                      { amount: loadAmount, email: userEmail },
                       { withCredentials: true }
                     )
                     .then((res) => {
