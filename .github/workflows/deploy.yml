@@ -17,9 +17,7 @@ jobs:
           node-version: "16"
       - name: 🔨 Install backend project dependencies
         run: |
-          cd ../
-          pwd
-          cd nodevenv/backend.kemlabels.com/14/lib
+          cd backend
           npm install
       - name: 🔨 Install and build frontend project dependencies
         run: |
