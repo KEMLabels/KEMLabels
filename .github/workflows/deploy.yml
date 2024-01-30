@@ -15,10 +15,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "16"
-      - name: 🔨 Install backend project dependencies
-        run: |
-          cd backend
-          npm install
       - name: 🔨 Install and build frontend project dependencies
         run: |
           cd frontend
@@ -32,7 +28,7 @@ jobs:
           password: ${{ secrets.FTP_BACKEND_PASSWORD }}
           protocol: ${{ secrets.FTP_PROTOCOL }}
           local-dir: ./backend/
-          exclude: "stripe.exe .env.development .env-production"
+          exclude: "stripe.exe .env.development .env-production node_modules/"
       - name: 📂 Deploying frontend to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
