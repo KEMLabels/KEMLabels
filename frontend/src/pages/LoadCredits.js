@@ -11,7 +11,6 @@ import axios from "../api/axios";
 import { AmountField } from "../components/Field";
 import Log from "../components/Log";
 
-
 export default function LoadCredits() {
   const dispatch = useDispatch();
   const navigate = useNavigate();

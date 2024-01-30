@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is automated deploying to Namecheap 🚀
 
 on:
   push:
-    branches: [server-test, server-production]
+    branches: [server-production]
 
 jobs:
   web-deploy:
@@ -15,16 +15,31 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "16"
-      - name: 🔨 Build project
+      - name: 🔨 Build backend project
+        run: |
+          cd backend
+          npm install
+          npm test
+      - name: 🔨 Build frontend project
         run: |
           cd frontend
           npm install
-          npm run build
-      - name: 📂 Deploying to Namecheap
+          npm run build --if-present
+          npm test
+
+      - name: 📂 Deploying backend to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          username: ${{ secrets.FTP_BACKEND_USERNAME }}
+          password: ${{ secrets.FTP_BACKEND_PASSWORD }}
+          protocol: ${{ secrets.FTP_PROTOCOL }}
+          local-dir: ./backend/
+      - name: 📂 Deploying frontend to Namecheap
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_FRONTEND_USERNAME }}
+          password: ${{ secrets.FTP_FRONTEND_PASSWORD }}
           protocol: ${{ secrets.FTP_PROTOCOL }}
           local-dir: ./frontend/build/
