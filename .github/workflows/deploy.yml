@@ -15,11 +15,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "16"
-      - name: 🔨 Build backend project
+      - name: 🔨 Install backend project dependencies
         run: |
-          cd backend
+          cd ../ && cd nodevenv/backend.kemlabels.com/14/lib
           npm install
-      - name: 🔨 Build frontend project
+      - name: 🔨 Install and build frontend project dependencies
         run: |
           cd frontend
           npm install
