@@ -675,12 +675,12 @@ app.get('/getCreditHistory', async (req, res) => {
         console.log(`Fetched ${paymentIntent.data.length} payment intents for user: ${email}`);
 
         const charge = await cryptoCharge.list({}, function (error, list, pagination) {
-            console.log(error);
-            console.log(list);
-            console.log(pagination);
+            console.error(error);
+            console.error(list);
+            console.error(pagination);
           });
 
-        console.log("charge: " + charge);
+        console.error("charge: " + charge);
 
         const formattedPaymentIntents = [];
 
