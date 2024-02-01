@@ -13,6 +13,7 @@ const mongoose = require('mongoose');
 const { format } = require('date-fns');
 require('express-async-errors');
 const emailTemplate = require('./emailTemplate');
+const nodeFetch = require('node-fetch');
 
 //Configure mongoose, app, and dotenv
 mongoose.set('strictQuery', false);
@@ -59,6 +60,7 @@ const store = new MongoDBStore({
 const User = require('./model/users.js');
 const tempTokens = require('./model/tempToken.js');
 const tempOTPS = require('./model/tempOTPs.js');
+const { type } = require("os");
 
 //Start app
 app.use('/', express.static(__dirname + '/public'));
@@ -925,12 +927,15 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
 // 3) also save each order in a schema so we can keep track of all orders coming in. 
 // 4) Send email to both USER using email and OUR email so 2 emails to send
 // 5) also save senderInfo in formValues to DB so we can preload it to the frontend when they want to create more orders in the future
-app.post("/orderLabel", (req, res) => {
+app.post("/orderLabel", async (req, res) => {
     try {
         console.log("Received orderLabel request.");
         const { email, formValues, totalAmount } = req.body;
         console.log(`Email: ${email}, Total Amount: ${totalAmount}, Form Values: ${JSON.stringify(formValues)}`);
         console.log("OrderLabel request processed successfully.");
+        const labelResponse = await nodeFetch('https://api.thelabels.store/api/v1/user/info', {headers: {Content_Type: 'application/json'}, method: "POST", body: JSON.stringify({uuid: "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf"})});
+        const data = await labelResponse.json();
+        console.log(data);
         return res.status(200).json({ msg: "OrderLabel request processed successfully." });
     } catch (err) {
         console.error("Error processing orderLabel request:", err);
