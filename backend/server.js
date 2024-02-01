@@ -29,6 +29,7 @@ const stripe = require("stripe")(stripeSecretKey);
 var coinbase = require('coinbase-commerce-node');
 var Client = coinbase.Client;
 var resources = coinbase.resources;
+var cryptoCharge = resources.Charge;
 Client.init(coinbaseApiKey);
 
 // Check hosting enviorment
@@ -205,7 +206,7 @@ app.post("/payWithCrypto", async (req, res) => {
         const { amount, email } = req.body;
         console.log(`Initiating crypto payment for amount: ${amount} USD`);
 
-        const charge = await resources.Charge.create({
+        const charge = await cryptoCharge.create({
             name: "KEMLabels Credit Deposit",
             local_price: {
                 amount: amount,
@@ -673,9 +674,10 @@ app.get('/getCreditHistory', async (req, res) => {
         });
         console.log(`Fetched ${paymentIntent.data.length} payment intents for user: ${email}`);
 
-        const charge = await resources.Charge.all({}, function (error, list) {
+        const charge = await cryptoCharge.list({}, function (error, list, pagination) {
             console.log(error);
             console.log(list);
+            console.log(pagination);
           });
 
         console.log("charge: " + charge);
