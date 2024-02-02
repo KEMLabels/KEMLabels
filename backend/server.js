@@ -678,7 +678,7 @@ app.get('/getCreditHistory', async (req, res) => {
             logger(`List: ${list}`);
             logger(`Pagination: ${pagination}`);
         });
-        logger(`Charge: ${charge}`);
+        logger(`Charge: ` + JSON.stringify(charge));
 
         const formattedPaymentIntents = [];
 
