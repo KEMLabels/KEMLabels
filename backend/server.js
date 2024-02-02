@@ -675,10 +675,18 @@ app.get('/getCreditHistory', async (req, res) => {
 
         const charge = await cryptoCharge.list({}, (error, list, pagination) => {
             logger(`Crypto charge fetch error: ${error}`, "error");
-            logger(`List: ${list}`);
-            logger(`Pagination: ${pagination}`);
+            // logger(`List: ${JSON.stringify(list)}`);
+            // logger(`Pagination: ${JSON.stringify(pagination)}`);
         });
-        logger(`Charge: ` + JSON.stringify(charge.metadata));
+        let myCharge = null;
+        for (let i = 0; i < charge[0].length; i++) {
+            if (charge[0][i].metadata.email === email) {
+                myCharge = charge[0][i];
+                break;
+            }
+        }
+        logger(`Fetched crypto charge: ${JSON.stringify(myCharge)}`);
+        // logger(`Charge: ` + JSON.stringify(charge));
 
         const formattedPaymentIntents = [];
 
