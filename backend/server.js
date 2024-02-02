@@ -60,7 +60,6 @@ const store = new MongoDBStore({
 const User = require('./model/users.js');
 const tempTokens = require('./model/tempToken.js');
 const tempOTPS = require('./model/tempOTPs.js');
-const { type } = require("os");
 
 //Start app
 app.use('/', express.static(__dirname + '/public'));
@@ -176,7 +175,7 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    if (event.type !== "payment_intent.succeeded")  {
+    if (event.type !== "payment_intent.succeeded") {
         console.log(`Webhook received unknown event type: ${event.type}`);
         return res.status(400).end();
     }
@@ -225,7 +224,7 @@ app.post("/payWithCrypto", async (req, res) => {
     } catch (err) {
         console.error('Error during crypto payment:', err);
         res.status(500).json({ msg: 'Error during crypto payment.' });
-    
+
     }
 })
 
@@ -250,7 +249,7 @@ app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (re
             const newCredits = Number(userExistingCredits) + Number(event.local.amount);
             await User.updateOne(
                 { "_id": user._id.toString() },
-                { "credits":  newCredits}
+                { "credits": newCredits }
             );
             console.log(`User credits updated. New credits: ${newCredits}`);
         }
@@ -485,7 +484,7 @@ app.get('/checkVerification', async (req, res) => {
             console.error('User is not verified:', user);
             throw new Error('User is not verified');
         }
-        
+
         console.log('User is verified:', user);
         res.status(200).json({ redirect: '/' });
     } catch (err) {
@@ -676,13 +675,13 @@ app.get('/getCreditHistory', async (req, res) => {
         });
         console.log(`Fetched ${paymentIntent.data.length} payment intents for user: ${email}`);
 
-        const charge = await cryptoCharge.list({}, function (error, list, pagination) {
-            console.error(error);
-            console.error(list);
-            console.error(pagination);
-          });
+        const charge = await cryptoCharge.list({}, (error, list, pagination) => {
+            console.log(error);
+            console.log(list);
+            console.log(pagination);
+        });
 
-        console.error("charge: " + charge);
+        console.log("charge: " + charge);
 
         const formattedPaymentIntents = [];
 
@@ -825,7 +824,7 @@ app.post("/sendEmailChangeConfirmation", async (req, res) => {
 })
 
 function sendEmailChangeRequestEmail(currentEmail, newEmail, OTPPasscode) {
-   try {
+    try {
         const content = `<h1 style="margin-bottom: 2rem;">Did you change your email?</h1>
         <p>We received a request to change the email associated with your account. If this was you, you can safely ignore this email.</p>
         <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
@@ -875,7 +874,7 @@ function sendEmailChangeEmail(emailAddress) {
         <p>We noticed the email for your KEMLabels' account was recently changed. If this was you, rest assured that your new email is now in effect. No further action is required and you can safely ignore this email.</p>
         <p>However, if you did not request this change, please contact our support team immediately at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
         const sendOneTimePasscodeEmail = emailTemplate(emailAddress, 'KEMLabels Security Alert - Your Email Has Been Updated', content);
-    
+
         transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
             if (err) console.error('Error sending email:', err);
             else console.log(`Email sent successfully to ${emailAddress}.`);
@@ -933,7 +932,14 @@ app.post("/orderLabel", async (req, res) => {
         const { email, formValues, totalAmount } = req.body;
         console.log(`Email: ${email}, Total Amount: ${totalAmount}, Form Values: ${JSON.stringify(formValues)}`);
         console.log("OrderLabel request processed successfully.");
-        const labelResponse = await nodeFetch('https://api.thelabels.store/api/v1/user/info', {headers: {Content_Type: 'application/json'}, method: "POST", body: JSON.stringify({uuid: "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf"})});
+        const labelResponse = await nodeFetch(
+            'https://api.thelabels.store/api/v1/user/info',
+            {
+                headers: { Content_Type: 'application/json' },
+                method: "POST",
+                body: JSON.stringify({ uuid: "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf" })
+            }
+        );
         const data = await labelResponse.json();
         console.log(data);
         return res.status(200).json({ msg: "OrderLabel request processed successfully." });
