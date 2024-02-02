@@ -28,10 +28,10 @@ const coinbaseApiKey = process.env.COINBASE_API;
 
 //Initiate payment methods API's
 const stripe = require("stripe")(stripeSecretKey);
-var coinbase = require('coinbase-commerce-node');
-var Client = coinbase.Client;
-var resources = coinbase.resources;
-var cryptoCharge = resources.Charge;
+const coinbase = require('coinbase-commerce-node');
+const Client = coinbase.Client;
+const resources = coinbase.resources;
+const cryptoCharge = resources.Charge;
 Client.init(coinbaseApiKey);
 
 // Check hosting enviorment
