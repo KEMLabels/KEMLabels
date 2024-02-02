@@ -14,6 +14,7 @@ const { format } = require('date-fns');
 require('express-async-errors');
 const emailTemplate = require('./emailTemplate');
 const nodeFetch = require('node-fetch');
+const logger = require('./log');
 
 //Configure mongoose, app, and dotenv
 mongoose.set('strictQuery', false);
@@ -43,9 +44,9 @@ const connectDB = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
-        console.log(`Connected to DB`);
+        logger("Connected to DB");
     } catch (error) {
-        console.error("Couldn't connect to DB: ", error);
+        logger(`Couldn't connect to DB: ${error}`, "error");
         process.exit(1);
     }
 }
@@ -155,10 +156,10 @@ app.post("/create-payment-intent", async (req, res) => {
                 email: email,
             },
         });
-        console.log('PaymentIntent created successfully:', paymentIntent);
+        logger(`PaymentIntent created successfully: ${paymentIntent}`);
         res.send({ clientSecret: paymentIntent.client_secret });
     } catch (err) {
-        console.error('Error creating PaymentIntent:', err);
+        logger(`Error creating PaymentIntent: ${err}`, "error");
         res.status(500).send({ error: err.message });
     }
 });
@@ -166,26 +167,26 @@ app.post("/create-payment-intent", async (req, res) => {
 app.post('/webhook', express.raw({ type: "application/json" }), async (req, res) => {
     const sig = req.headers['stripe-signature'];
     let event;
-    console.log('Received webhook payload:', req.body);
+    logger(`Received webhook payload:' ${JSON.stringify(req.body)}`)
 
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
-        console.error('Failed to verify webhook:', err);
+        logger(`Failed to verify webhook: ${err}`, "error");
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
     if (event.type !== "payment_intent.succeeded") {
-        console.log(`Webhook received unknown event type: ${event.type}`);
+        logger(`Webhook received unknown event type: ${event.type}`);
         return res.status(400).end();
     }
 
     try {
         const paymentIntent = event.data.object;
-        console.log('Payment succeeded! Payment Intent:', paymentIntent);
+        logger(`Payment succeeded! Payment Intent: ${paymentIntent}`);
         const user = await User.findOne({ email: paymentIntent.metadata.email })
         if (!user) {
-            console.error('User not found for email:', paymentIntent.metadata.email);
+            logger(`User not found for email: ${paymentIntent.metadata.email}`, "error");
             throw new Error('User not found.');
         }
 
@@ -193,9 +194,9 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
         const userExistingCredits = user.credits;
         const newCredits = Number(userExistingCredits) + Number(paymentIntent.amount / 100);
         await User.updateOne({ "_id": user._id.toString() }, { "credits": newCredits });
-        console.log(`User credits updated. New credits: ${newCredits}`);
+        logger(`User credits updated. New credits: ${newCredits}`);
     } catch (err) {
-        console.error('Error updating user credits:', err);
+        logger(`Error updating user credits: ${err}`, "error");
         res.status(500).end();
     }
     res.status(200).end();
@@ -205,7 +206,7 @@ app.post('/webhook', express.raw({ type: "application/json" }), async (req, res)
 app.post("/payWithCrypto", async (req, res) => {
     try {
         const { amount, email } = req.body;
-        console.log(`Initiating crypto payment for amount: ${amount} USD`);
+        logger(`Initiating crypto payment for amount: ${amount} USD`);
 
         const charge = await cryptoCharge.create({
             name: "KEMLabels Credit Deposit",
@@ -219,12 +220,11 @@ app.post("/payWithCrypto", async (req, res) => {
             },
             cancel_url: `${process.env.FRONTEND_SERVER}/load-credits`
         })
-        console.log(`Crypto payment initiated. Redirecting to hosted URL: ${charge.hosted_url}`);
+        logger(`Crypto payment initiated. Redirecting to hosted URL: ${charge.hosted_url}`);
         res.json({ redirect: charge.hosted_url });
     } catch (err) {
-        console.error('Error during crypto payment:', err);
+        logger(`Error during crypto payment: ${err}`, "error");
         res.status(500).json({ msg: 'Error during crypto payment.' });
-
     }
 })
 
@@ -237,10 +237,10 @@ app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (re
         );
 
         if (event.type === "charge:confirmed") {
-            console.log("Payment succeeded!");
+            logger("Payment succeeded!");            
             const user = await User.findOne({ email: event.metadata.email })
             if (!user) {
-                console.error(`User not found for email: ${event.metadata.email}`);
+                logger(`User not found for email: ${event.metadata.email}`, "error");
                 throw new Error('User not found.');
             }
 
@@ -251,11 +251,11 @@ app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (re
                 { "_id": user._id.toString() },
                 { "credits": newCredits }
             );
-            console.log(`User credits updated. New credits: ${newCredits}`);
+            logger(`User credits updated. New credits: ${newCredits}`);
         }
         res.status(200).end();
     } catch (err) {
-        console.error("Failed to verify webook:", err);
+        logger(`Failed to verify webhook: ${err}`, "error");
         return res.status(400).json({ msg: "Failed to verify webhook." });
     }
 });
@@ -271,13 +271,13 @@ app.post('/signin', async (req, res) => {
         const emailAddress = data.email.toLowerCase();
         const user = await User.findOne({ email: emailAddress })
         if (!user) {
-            console.error(`Signin failed: User not found for email '${emailAddress}'.`);
+            logger(`Signin failed: User not found for email '${emailAddress}'.`, "error");
             throw new Error('Incorrect email or password.');
         }
 
         const comparePass = await bcrypt.compare(password, user.password);
         if (!comparePass) {
-            console.error(`Signin failed: Incorrect password for user '${emailAddress}'.`);
+            logger(`Signin failed: Incorrect password for user '${emailAddress}'.`, "error")
             throw new Error('Incorrect email or password.');
         }
 
@@ -288,10 +288,10 @@ app.post('/signin', async (req, res) => {
             userName: user.userName,
             joinedDate: user.createdAt,
         }
-        console.log(`User '${emailAddress}' signed in successfully.`);
+        logger(`User '${emailAddress}' signed in successfully.`);
         res.status(200).json({ redirect: '/', userInfo });
     } catch (err) {
-        console.error('Error signing in:', err);
+        logger(`Error signing in: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -300,10 +300,10 @@ app.post('/signin', async (req, res) => {
 app.get('/logout', (req, res) => {
     try {
         req.session.destroy();
-        console.log('User logged out successfully.');
+        logger('User logged out successfully.');
         return res.json({ redirect: '/' })
     } catch (err) {
-        console.error('Error during logout:', err);
+        logger(`Error during logout: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -321,13 +321,13 @@ app.post("/signup", async (req, res) => {
 
         const userNameExists = await User.findOne({ userName: data.userName })
         if (userNameExists) {
-            console.error(`Signup failed: Username '${userName}' is already associated with an account.`);
+            logger(`Signup failed: Username '${userName}' is already associated with an account.`, "error");
             throw new Error('This username is already associated with an account.');
         }
 
         const emailExists = await User.findOne({ email: data.email })
         if (emailExists) {
-            console.error(`Signup failed: Email '${email}' is already associated with an account.`);
+            logger(`Signup failed: Email '${email}' is already associated with an account.`, "error");
             throw new Error('This email is already associated with an account.');
         }
 
@@ -340,7 +340,7 @@ app.post("/signup", async (req, res) => {
             password: hashedPassword,
         });
         await new_user.save()
-        console.log(`New user created: ID '${new_user._id}', Username '${new_user.userName}', Email '${new_user.email}'`);
+        logger(`New user created: ID '${new_user._id}', Username '${new_user.userName}', Email '${new_user.email}'`);
 
         const token = crypto.randomBytes(32).toString("hex");
         const create_token = new tempTokens({
@@ -348,18 +348,18 @@ app.post("/signup", async (req, res) => {
             userid: new_user._id
         })
         await create_token.save()
-        console.log(`Verification token created and saved for user ID '${new_user._id}'`);
+        logger(`Verification token created and saved for user ID '${new_user._id}'`);
 
         const url = `${process.env.FRONTEND_SERVER}/users/${new_user._id}/verify/${token}`;
-        console.log(`Verification URL generated: ${url}`);
+        logger(`Verification URL generated: ${url}`);
         await sendSignUpConfirmationEmail(data.email, url);
-        console.log(`Signup confirmation email sent successfully to ${data.email}.`);
+        logger(`Signup confirmation email sent successfully to '${data.email}'.`);
 
         req.session.user = new_user;
         req.session.isLoggedIn = true;
         res.status(200).json({ redirect: '/verify-email' });
     } catch (err) {
-        console.error('Error signing up:', err);
+        logger(`Error signing up: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -370,12 +370,12 @@ app.get("/generateToken", async (req, res) => {
         const findToken = await tempTokens.findOne({ userid: req.session.user._id.toString() });
         if (findToken) {
             await tempTokens.deleteOne({ _id: findToken._id.toString() });
-            console.log('Token successfully deleted');
+            logger('Token successfully deleted');
         }
         await generateTokenHelper(req.session.user._id, req.session.user.email);
         res.status(200).send("Token generated successfully");
     } catch (err) {
-        console.error('Error generating token:', err);
+        logger(`Error generating token: ${err}`, "error");
         res.status(500).send("An error occurred while generating the token.");
     }
 })
@@ -389,10 +389,10 @@ async function generateTokenHelper(userID, email) {
         })
         await create_token.save()
         const url = `${process.env.FRONTEND_SERVER}/users/${userID}/verify/${token}`;
-        console.log(`URL for email verification: ${url}`)
+        logger(`URL for email verification: ${url}`)
         await sendSignUpConfirmationEmail(email, url);
     } catch (err) {
-        console.error('Error generating token and sending confirmation email:', err);
+        logger(`Error generating token and sending confirmation email: ${err}`, "error");
     }
 }
 
@@ -404,11 +404,11 @@ async function sendSignUpConfirmationEmail(emailAddress, url) {
         <p>Have any questions? Please contact us at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
         const signUpConfirmationEmail = emailTemplate(emailAddress, 'KEMLabels - Confirm Your Email', content);
         transporter.sendMail(signUpConfirmationEmail, function (err, info) {
-            if (err) console.error('Error sending signup confirmation email:', err);
-            else console.log(`Signup confirmation email sent successfully to ${emailAddress}.`);
+            if (err) logger(`Error sending signup confirmation email: ${err}`, "error");
+            else logger(`Signup confirmation email sent successfully to ${emailAddress}.`);
         });
     } catch (err) {
-        console.error('Error sending email for signup confirmation:', err);
+        logger(`Error sending email for signup confirmation: ${err}`, "error");
     }
 }
 
@@ -416,7 +416,7 @@ app.get('/users/:id/verify/:token', async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.id });
         if (!user) {
-            console.error('User not found for verification:', user);
+            logger(`User not found for verification: ${user}`, "error");
             throw new Error('Link Invalid');
         }
 
@@ -425,26 +425,26 @@ app.get('/users/:id/verify/:token', async (req, res) => {
             const previoustoken = await tempTokens.findOne({ userid: req.params.id })
             if (previoustoken) {
                 if (previoustoken.token !== req.params.token) {
-                    console.error('Link Expired for user:', req.params.id);
+                    logger(`Link Expired for user: ${req.params.id}`, "error");
                     throw new Error('Link Expired');
                 }
             } else {
-                console.error('Link Invalid for user:', req.params.id);
+                logger(`Link Invalid for user: ${req.params.id}`, "error");
                 throw new Error('Link Invalid');
             }
         }
 
         // Update user verification status
         await User.updateOne({ "_id": user._id.toString() }, { "verified": true });
-        console.log('User has been verified:', user._id);
+        logger(`User has been verified: ${user._id}`);
 
         // Delete the verification token
         await tempTokens.deleteOne({ token: req.params.token });
-        console.log('Verification token successfully deleted:', req.params.token);
+        logger(`Verification token successfully deleted: ${req.params.token}`);
 
         return res.status(200).json({ redirect: '/' });
     } catch (err) {
-        console.error('Error verifying user:', err);
+        logger(`Error verifying user: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -453,20 +453,20 @@ app.get('/isUserVerified', async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.session.user._id });
         if (!user) {
-            console.error('User not found for session user ID:', req.session.user._id);
+            logger(`User not found for session user ID: ${req.session.user._id}`, "error");
             throw new Error('An error occurred.');
         }
 
         const verified = user.verified;
         if (!verified) {
-            console.error('User is not verified:', user);
+            logger(`User is not verified: ${user}`, "error");
             throw new Error('Please check your inbox for a verification link to verify your account.');
         }
 
-        console.log('User is verified:', user);
+        logger(`User is verified: ${user}`);
         res.status(200).json({ redirect: '/' });
     } catch (err) {
-        console.error('Error checking user verification:', err);
+        logger(`Error checking user verification: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -475,20 +475,20 @@ app.get('/checkVerification', async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.session.user._id });
         if (!user) {
-            console.error('User not found for session user ID:', req.session.user._id);
+            logger(`User not found for session user ID: ${req.session.user._id}`, "error");
             throw new Error('An error occurred.');
         }
 
         const verified = user.verified;
         if (!verified) {
-            console.error('User is not verified:', user);
+            logger(`User is not verified: ${user}`, "error");
             throw new Error('User is not verified');
         }
 
-        console.log('User is verified:', user);
+        logger(`User is verified: ${user}`);
         res.status(200).json({ redirect: '/' });
     } catch (err) {
-        console.error('Error checking user verification:', err);
+        logger(`Error checking user verification: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -499,14 +499,14 @@ app.post("/emailExists", async (req, res) => {
         const data = { email: req.body.email.toLowerCase() }
         const user = await User.findOne({ email: data.email })
         if (!user) {
-            console.log(`Email not found for: ${data.email}`);
+            logger(`Email not found for: ${data.email}`, "error");
             throw new Error('Hmm... this email is not associated with an account. Please try again.');
         }
 
-        console.log(`Email found for: ${data.email}`);
+        logger(`Email found for: ${data.email}`);
         res.status(200).json({ user });
     } catch (err) {
-        console.error('Error checking if email exists:', err);
+        logger(`Error checking if email exists: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -518,7 +518,7 @@ app.post("/forgotpassword", async (req, res) => {
         generateOTPHelper(email, type);
         res.status(200).json({ msg: 'OTP generated successfully.' });
     } catch (err) {
-        console.error('Error generating OTP for Forgot Password:', err);
+        logger(`Error generating OTP for Forgot Password: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -528,14 +528,14 @@ app.post("/generateNewOTP", async (req, res) => {
         const { email, type } = req.body
         const existingOTP = await tempOTPS.findOneAndDelete({ email: email.toLowerCase() });
 
-        if (existingOTP) console.log('Existing OTP record found and deleted:', existingOTP);
-        else console.log('No existing OTP record found.');
+        if (existingOTP) logger(`Existing OTP record found and deleted: ${existingOTP}`);
+        else logger('No existing OTP record found.');
 
         // Generate a new OTP and send the email
         generateOTPHelper(email, type);
         res.status(200).json({ msg: 'New OTP generated successfully.' });
     } catch (err) {
-        console.error('Error generating new OTP:', err);
+        logger(`Error generating new OTP: ${err}`, "error");
         return res.status(500).json({ msg: err.message });
     }
 })
@@ -547,7 +547,7 @@ async function generateOTPHelper(email, type) {
         await create_OTP.save()
         sendOTPEmail(otp, email, type);
     } catch (err) {
-        console.error('Error generating OTP:', err);
+        logger(`Error generating OTP: ${err}`, "error");
     }
 }
 
@@ -582,37 +582,35 @@ function sendOTPEmail(OTPPasscode, emailAddress, type) {
     const selectedEmail = emailTypes[type];
     if (selectedEmail) {
         transporter.sendMail(selectedEmail, function (err, info) {
-            if (err) console.error(`Error sending OTP email for type ${type}:`, err);
-            else console.log(`OTP email for type ${type} sent successfully to ${emailAddress}.`);
+            if (err) logger(`Error sending OTP email for type ${type}: ${err}`, "error");
+            else logger(`OTP email for type ${type} sent successfully to '${emailAddress}'.`);
         });
-    } else {
-        console.error('Error in sendOTPEmail:', error);
-    }
+    } else logger(`Error in sendOTPEmail: ${error}`, "error");
 }
 
 app.post("/checkOTP", async (req, res) => {
     try {
         const { enteredOTP, email } = req.body
-        console.log(`OTP verification initiated for email: ${email}`);
-        console.log(`Entered OTP: ${enteredOTP}`);
+        logger(`OTP verification initiated for email: ${email}`);
+        logger(`Entered OTP: ${enteredOTP}`);
 
         const tempCode = await tempOTPS.findOneAndDelete({ email: email.toLowerCase() });
 
         if (!tempCode) {
-            console.error('OTP verification failed: Invalid code or expired session.');
+            logger('OTP verification failed: Invalid code or expired session.', "error");
             throw new Error("Invalid Code");
         }
-        console.log(`Correct OTP retrieved from the database: ${tempCode.passcode}`);
+        logger(`Correct OTP retrieved from the database: ${tempCode.passcode}`);
 
         if (Number(enteredOTP) !== Number(tempCode.passcode)) {
-            console.error('OTP verification failed: Incorrect code entered.');
+            logger('OTP verification failed: Incorrect code entered.', "error");
             throw new Error('Hmm... your code was incorrect. Please try again.');
         }
-        console.log(`OTP verification successful. Deleted record for code: ${enteredOTP}`);
+        logger(`OTP verification successful. Deleted record for code: ${enteredOTP}`);
 
         res.status(200).json("success");
     } catch (err) {
-        console.error('Error during OTP verification:', err);
+        logger(`Error during OTP verification: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 
@@ -627,7 +625,7 @@ app.post("/updateUserPass", async (req, res) => {
 
         const userData = await User.findOne({ email: email.toLowerCase() })
         if (!userData) {
-            console.error('User not found during password update.');
+            logger(`User not found for email '${email}' during password update.`, "error");
             throw new Error("An unexpected error occurred. Please try again later.");
         }
 
@@ -635,14 +633,14 @@ app.post("/updateUserPass", async (req, res) => {
             { "_id": userData._id.toString() },
             { "password": hashedPassword }
         );
-        console.log("Password updated successfully.");
+        logger(`Password updated successfully for user '${email}'`);
 
         sendPasswordChangeEmail(email);
-        console.log("Password change notification email sent successfully.");
+        logger(`Password change notification email sent successfully to '${email}'.`);
 
         res.json({ redirect: '/signin' });
     } catch (err) {
-        console.error('Error updating user password:', err);
+        logger(`Error updating user password: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -655,11 +653,11 @@ function sendPasswordChangeEmail(emailAddress) {
         const changePassConfirmation = emailTemplate(emailAddress, 'KEMLabels Security Alert - Your Password Has Been Updated', content);
 
         transporter.sendMail(changePassConfirmation, function (err, info) {
-            if (err) console.error('Error sending password change email:', err);
-            else console.log(`Password change email sent successfully to ${emailAddress}.`);
+            if (err) logger(`Error sending password change email: ${err}`, "error");
+            else logger(`Password change email sent successfully to ${emailAddress}.`);
         });
     } catch (err) {
-        console.error('Error sending email for updating password:', err);
+        logger(`Error sending email for updating password: ${err}`, "error");
     }
 }
 
@@ -667,21 +665,20 @@ function sendPasswordChangeEmail(emailAddress) {
 app.get('/getCreditHistory', async (req, res) => {
     try {
         const email = req.session.user.email;
-        console.log(`Received request to fetch credit history for user: ${email}`);
+        logger(`Received request to fetch credit history for user: ${email}`);
 
         const paymentIntent = await stripe.paymentIntents.search({
             query: `status:\'succeeded\' AND metadata[\'email\']:\'${email}\'`,
             limit: 100,
         });
-        console.log(`Fetched ${paymentIntent.data.length} payment intents for user: ${email}`);
+        logger(`Fetched ${paymentIntent.data.length} payment intents for user: ${email}`);
 
         const charge = await cryptoCharge.list({}, (error, list, pagination) => {
-            console.log(error);
-            console.log(list);
-            console.log(pagination);
+            logger(`Crypto charge fetch error: ${error}`, "error");
+            logger(`List: ${list}`);
+            logger(`Pagination: ${pagination}`);
         });
-
-        console.log("charge: " + charge);
+        logger(`Charge: ${charge}`);
 
         const formattedPaymentIntents = [];
 
@@ -706,10 +703,10 @@ app.get('/getCreditHistory', async (req, res) => {
             });
         }
 
-        console.log('Formatted payment intents:', formattedPaymentIntents);
+        logger(`Formatted payment intents: ${formattedPaymentIntents}`);
         res.send(formattedPaymentIntents);
     } catch (err) {
-        console.error('Error fetching credit history:', err);
+        logger(`Error fetching credit history: ${err}`, "error");
         res.status(400).send('An error occurred while fetching credit history.');
     }
 })
@@ -719,12 +716,12 @@ app.post("/UpdateUsername", async (req, res) => {
     try {
         const { userName } = req.body;
         const userNameData = userName.toLowerCase();
-        console.log(`Received request to update username to ${userNameData}.`);
+        logger(`Received request to update username to ${userNameData}.`);
 
         // Retrieve the user from the session
         const user = await User.findOne({ _id: req.session.user._id });
         if (!user) {
-            console.error('User not found during username update.');
+            logger('User not found during username update.', "error");
             throw new Error("An unexpected error occurred. Please try again later.");
         }
 
@@ -736,24 +733,24 @@ app.post("/UpdateUsername", async (req, res) => {
             const minutesPassed = Math.floor((timeDiff % 3600000) / 60000);
 
             const remainingHours = 24 - hoursPassed;
-            let remainingMinutes = 60 - minutesPassed;
+            const remainingMinutes = 60 - minutesPassed;
 
             if (remainingHours > 0 || (remainingHours === 0 && remainingMinutes > 0)) {
-                console.error(`Username change request failed: User must wait ${remainingHours} hours and ${remainingMinutes} minutes to change their username.`);
+                logger(`Username change request failed: User must wait ${remainingHours} hours and ${remainingMinutes} minutes to change their username.`, "error");
                 if (remainingHours === 24) throw new Error(`You must wait ${remainingHours} hours before you can change your username again.`);
                 else throw new Error(`You must wait ${remainingHours} hours and ${remainingMinutes} minutes before you can change your username again.`);
             }
         }
 
         if (userNameData === user.userName) {
-            console.error('Username change request failed: New username is the same as the current username.');
+            logger('Username change request failed: New username is the same as the current username.', "error");
             throw new Error("You cannot change your username to the same one you currently have.");
         }
 
         // Check if the new username is already used by another user
         const userNameAlreadyUsed = await User.findOne({ userName: userNameData });
         if (userNameAlreadyUsed) {
-            console.error('Username change request failed: New username is already associated with another account.');
+            logger('Username change request failed: New username is already associated with another account.', "error");
             throw new Error("This username is already associated with an account.");
         }
 
@@ -762,14 +759,13 @@ app.post("/UpdateUsername", async (req, res) => {
             { "_id": user._id.toString() },
             { "userName": userNameData, "userNameLastChanged": currentDate }
         );
-        console.log(`Username updated successfully to ${userNameData}.`);
+        logger(`Username updated successfully to ${userNameData}.`);
 
         sendUserNameChangeEmail(user.email);
-        console.log(`Username change email sent successfully to ${user.email}.`);
-
+        logger(`Username change email sent successfully to ${user.email}.`);
         return res.status(200).json({ msg: 'Username updated successfully.' });
     } catch (err) {
-        console.error('Error updating username:', err);
+        logger(`Error updating username: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 });
@@ -782,11 +778,11 @@ function sendUserNameChangeEmail(emailAddress) {
         const sendOneTimePasscodeEmail = emailTemplate(emailAddress, 'KEMLabels Security Alert - Your Username Has Been Updated', content);
 
         transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
-            if (err) console.error('Error sending username change email:', err);
-            else console.log(`Username change email sent successfully to ${emailAddress}.`);
+            if (err) logger(`Error sending username change email: ${err}`, "error");
+            else logger(`Username change email sent successfully to ${emailAddress}.`);
         });
     } catch (err) {
-        console.error('Error sending email for updating username:', err);
+        logger(`Error sending email for updating username: ${err}`);
     }
 }
 
@@ -795,30 +791,30 @@ app.post("/sendEmailChangeConfirmation", async (req, res) => {
     try {
         const { newEmail } = req.body
         const currentEmail = req.session.user.email;
-        console.log(`Received request to change email from ${currentEmail} to ${newEmail.toLowerCase()}.`);
+        logger(`Received request to change email from ${currentEmail} to ${newEmail.toLowerCase()}.`);
 
         if (newEmail.toLowerCase() === currentEmail) {
-            console.error('Email change request failed: New email is the same as the current email.');
+            logger('Email change request failed: New email is the same as the current email.', "error");
             throw new Error("You cannot change your email to the one you currently have.");
         }
 
         // Check if the new email is already used by another user
         const emailAlreadyUsed = await User.findOne({ email: newEmail.toLowerCase() });
         if (emailAlreadyUsed) {
-            console.error('Email change request failed: New email is already associated with another account.');
+            logger('Email change request failed: New email is already associated with another account.', "error");
             throw new Error("This email is already associated with an account.");
         }
 
         const otp = Math.floor(1000 + Math.random() * 9000);
         const create_OTP = new tempOTPS({ passcode: otp, email: newEmail })
         await create_OTP.save()
-        console.log(`Generated OTP ${otp} for email change confirmation.`);
+        logger(`Generated OTP ${otp} for email change confirmation.`);
 
         sendEmailChangeRequestEmail(currentEmail, newEmail.toLowerCase(), otp)
-        console.log(`Email change confirmation sent successfully to ${newEmail.toLowerCase()}.`);
+        logger(`Email change confirmation sent successfully to ${newEmail.toLowerCase()}.`);
         return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${newEmail.toLowerCase()}.` });
     } catch (err) {
-        console.error('Error processing email change confirmation:', err);
+        logger(`Error processing email change confirmation: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -831,24 +827,24 @@ function sendEmailChangeRequestEmail(currentEmail, newEmail, OTPPasscode) {
         const sendSecurityAlert = emailTemplate(currentEmail, 'KEMLabels Security Alert - Email Change Detected on Your Account', content);
 
         transporter.sendMail(sendSecurityAlert, function (err, info) {
-            if (err) console.error('Error sending security alert email for updating email:', err);
-            else console.log(`Security alert email sent successfully to ${currentEmail}.`);
+            if (err) logger(`Error sending security alert email for updating email: ${err}`, "error");
+            else logger(`Security alert email sent successfully to ${currentEmail}.`);
         });
         sendOTPEmail(OTPPasscode, newEmail, "changeEmail");
-        console.log(`OTP email sent successfully to ${newEmail}.`);
+        logger(`OTP email sent successfully to ${newEmail}.`);
     } catch (err) {
-        console.error('Error sending email for updating email:', err);
+        logger(`Error sending email for updating email: ${err}`, "error");
     }
 }
 
 app.post("/updateEmailAddress", async (req, res) => {
     try {
         const { newEmail } = req.body;
-        console.log(`Received request to update email address to ${newEmail}.`);
+        logger(`Received request to update email address to ${newEmail}.`);
 
         const user = await User.findOne({ _id: req.session.user._id });
         if (!user) {
-            console.error('User not found during /updateEmailAddress.');
+            logger('User not found during email update: /updateEmailAddress.', "error");
             throw new Error("An unexpected error occurred. Please try again later.");
         }
 
@@ -856,14 +852,13 @@ app.post("/updateEmailAddress", async (req, res) => {
             { "_id": user._id.toString() },
             { "email": newEmail.toLowerCase(), "verified": false }
         );
-        console.log(`Updated email to ${newEmail} and set user as unverified.`);
+        logger(`Updated email to ${newEmail} and set user as unverified.`);
 
         sendEmailChangeEmail(newEmail.toLowerCase());
-        console.log(`Email change notification sent to ${newEmail}.`);
-
+        logger(`Email change notification email sent successfully to ${newEmail.toLowerCase()}.`);
         return res.status(200).json({ msg: 'Email address updated successfully.' });
     } catch (err) {
-        console.error('Error updating email address:', err);
+        logger(`Error updating email address: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -876,11 +871,11 @@ function sendEmailChangeEmail(emailAddress) {
         const sendOneTimePasscodeEmail = emailTemplate(emailAddress, 'KEMLabels Security Alert - Your Email Has Been Updated', content);
 
         transporter.sendMail(sendOneTimePasscodeEmail, function (err, info) {
-            if (err) console.error('Error sending email:', err);
-            else console.log(`Email sent successfully to ${emailAddress}.`);
+            if (err) logger(`Error sending email: ${err}`, "error");
+            else logger(`Email sent successfully to ${emailAddress}.`);
         });
     } catch (err) {
-        console.error('Error sending email for updating email:', err);
+        logger(`Error sending email for updating email: ${err}`, "error");
     }
 }
 
@@ -889,32 +884,30 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
     try {
         const { enteredPassword, newPassword } = req.body;
         const currentPassword = req.session.user.password;
-
-        console.log('Received request for password change confirmation.');
+        logger('Received request for password change confirmation.');
 
         const comparePassword = await bcrypt.compare(enteredPassword, currentPassword);
         if (!comparePassword) {
-            console.error('Entered password does not match the current password.');
+            logger('Entered password does not match the current password.', "error");
             throw new Error("Hmm... your current password is incorrect. Please try again.");
         }
 
         const comparePassWithNewPass = await bcrypt.compare(newPassword, currentPassword);
         if (comparePassWithNewPass) {
-            console.error('Entered password is the same as the current password.');
+            logger('Entered password is the same as the current password.', "error");
             throw new Error("Looks like you have entered the same password that you are using now. Please enter a differernt password.");
         }
 
         const otp = Math.floor(1000 + Math.random() * 9000);
         const userEmail = req.session.user.email;
-
-        console.log(`Generated OTP ${otp} for user ${userEmail}.`);
+        logger(`Generated OTP ${otp} for user ${userEmail}.`);
 
         const create_OTP = new tempOTPS({ passcode: otp, email: userEmail })
         await create_OTP.save();
         sendOTPEmail(otp, userEmail, "changePassword");
         return res.status(200).json({ msg: `A confirmation email with instructions has been sent to ${userEmail}.` });
     } catch (err) {
-        console.error('Error processing password change confirmation:', err);
+        logger(`Error processing password change confirmation: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -928,10 +921,10 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
 // 5) also save senderInfo in formValues to DB so we can preload it to the frontend when they want to create more orders in the future
 app.post("/orderLabel", async (req, res) => {
     try {
-        console.log("Received orderLabel request.");
+        logger("Received orderLabel request.");
         const { email, formValues, totalAmount } = req.body;
-        console.log(`Email: ${email}, Total Amount: ${totalAmount}, Form Values: ${JSON.stringify(formValues)}`);
-        console.log("OrderLabel request processed successfully.");
+        logger(`Email: ${email}, Total Amount: ${totalAmount}, Form Values: ${JSON.stringify(formValues)}`);
+        logger("OrderLabel request processed successfully.");
         const labelResponse = await nodeFetch(
             'https://api.thelabels.store/api/v1/user/info',
             {
@@ -941,10 +934,10 @@ app.post("/orderLabel", async (req, res) => {
             }
         );
         const data = await labelResponse.json();
-        console.log(data);
+        logger(data);
         return res.status(200).json({ msg: "OrderLabel request processed successfully." });
     } catch (err) {
-        console.error("Error processing orderLabel request:", err);
+        logger(`Error processing orderLabel request: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
@@ -953,19 +946,19 @@ app.post("/orderLabel", async (req, res) => {
 // Schedule a task to run every 24 hours
 cron.schedule('0 0 */1 * *', async () => {
     try {
-        console.log('CRON running');
+        logger('CRON running');
         const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        console.log('Starting deletion of unverified accounts older than 24 hours...');
+        logger('Starting deletion of unverified accounts older than 24 hours...');
 
         // Delete unverified accounts created more than 24 hours ago
         const res = await User.deleteMany({ verified: false, createdAt: { $lt: twentyFourHoursAgo } });
-        console.log(`CRON job completed successfully. Deleted ${res.deletedCount} unverified accounts`);
+        logger(`CRON job completed successfully. Deleted ${res.deletedCount} unverified accounts`);
     } catch (err) {
-        console.error('Error deleting unverified accounts:', err);
+        logger(`Error deleting unverified accounts: ${err}`, "error");
         if (err.name === 'MongoError' && err.code === 11000) {
-            console.error('MongoDB duplicate key error. Handle it appropriately.');
+            logger('MongoDB duplicate key error. Handle it appropriately.', "error");
         }
-        console.error('CRON job failed.');
+        logger('CRON job failed.', "error");
     }
 });
 
@@ -976,7 +969,7 @@ app.get('*', (req, res) => {
 
 //Error handler function
 async function handleErr(err, req, res, next) {
-    console.log("Error Handler:", err.message)
+    logger(`Error Handler: ${err}`, "error")
     return res.json({ errMsg: err.message })
 }
 
@@ -984,9 +977,9 @@ async function handleErr(err, req, res, next) {
 app.use(handleErr);
 
 // Start server
-console.log(`Running environment: ${isDevelopmentEnv() ? 'DEVELOPMENT' : 'PRODUCTION'}`);
+logger(`Running environment: ${isDevelopmentEnv() ? 'DEVELOPMENT' : 'PRODUCTION'}`);
 connectDB().then(() => {
     app.listen(process.env.PORT, () => {
-        console.log("Server is running on port " + process.env.PORT);
+        logger(`Server is running on port ${process.env.PORT}`);
     });
 })
