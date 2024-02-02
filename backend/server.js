@@ -221,7 +221,7 @@ app.post("/payWithCrypto", async (req, res) => {
             cancel_url: `${process.env.FRONTEND_SERVER}/load-credits`
         })
         logger(`Crypto payment initiated. Redirecting to hosted URL: ${charge.hosted_url}`);
-        res.json({ redirect: charge.hosted_url });
+        res.send(200).json({ redirect: charge.hosted_url });
     } catch (err) {
         logger(`Error during crypto payment: ${err}`, "error");
         res.status(500).json({ msg: 'Error during crypto payment.' });
