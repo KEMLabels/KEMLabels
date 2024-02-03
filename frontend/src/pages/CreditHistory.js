@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { FaRegCopy } from "react-icons/fa";
+import { FiLoader } from "react-icons/fi";
 import PageLayout from "../components/PageLayout";
 import "../styles/Global.css";
 import "../styles/CreditHistory.css";
@@ -97,7 +98,6 @@ export default function CreditHistory() {
     },
   ];
 
-  if (isFetching) return null;
   return (
     <PageLayout
       title="Credit History"
@@ -110,7 +110,12 @@ export default function CreditHistory() {
           {infoMsg && <AlertMessage msg={infoMsg} type="info" />}
         </div>
         <div className="tableContainer">
-          {creditHistoryData.length > 0 ? (
+          {isFetching ? (
+            <div className="loadingContainer">
+              <FiLoader className="loading" size={50} />
+              <span className="loadingText">Loading transactions...</span>
+            </div>
+          ) : creditHistoryData.length > 0 ? (
             <Table
               data={data}
               columns={creditHistoryColumns}

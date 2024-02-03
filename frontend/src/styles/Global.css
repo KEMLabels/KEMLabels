@@ -434,6 +434,46 @@ body {
   outline: none;
 }
 
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #383838;
+  margin: 1rem;
+  animation: spin 2s linear infinite;
+  transition: all 0.3s ease-in-out;
+}
+
+.loadingText {
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin-top: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg);
+    opacity: 0.6;
+  }
+}
+
 @media screen and (max-width: 1200px) {
   .table tbody td {
     font-size: 0.9rem;
