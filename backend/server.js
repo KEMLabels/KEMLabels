@@ -221,7 +221,7 @@ app.post("/payWithCrypto", async (req, res) => {
             cancel_url: `${process.env.FRONTEND_SERVER}/load-credits`
         })
         logger(`Crypto payment initiated. Redirecting to hosted URL: ${charge.hosted_url}`);
-        res.send(200).json({ redirect: charge.hosted_url });
+        res.json({ redirect: charge.hosted_url });
     } catch (err) {
         logger(`Error during crypto payment: ${err}`, "error");
         res.status(500).json({ msg: 'Error during crypto payment.' });
@@ -237,7 +237,7 @@ app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (re
         );
 
         if (event.type === "charge:confirmed") {
-            logger("Payment succeeded!");            
+            logger("Payment succeeded!");
             const user = await User.findOne({ email: event.metadata.email })
             if (!user) {
                 logger(`User not found for email: ${event.metadata.email}`, "error");
@@ -661,47 +661,27 @@ function sendPasswordChangeEmail(emailAddress) {
     }
 }
 
-//Credit history
-app.get('/getCreditHistory', async (req, res) => {
+async function getStripePayemnts(email) {
+    logger(`Fetching Stripe payments for user: ${email}`)
     try {
-        const email = req.session.user.email;
-        logger(`Received request to fetch credit history for user: ${email}`);
-
         const paymentIntent = await stripe.paymentIntents.search({
             query: `status:\'succeeded\' AND metadata[\'email\']:\'${email}\'`,
             limit: 100,
         });
-        logger(`Fetched ${paymentIntent.data.length} payment intents for user: ${email}`);
+        logger(`Fetched ${paymentIntent.data.length} payment intents`);
 
-        const charge = await cryptoCharge.list({}, (error, list, pagination) => {
-            logger(`Crypto charge fetch error: ${error}`, "error");
-            // logger(`List: ${JSON.stringify(list)}`);
-            // logger(`Pagination: ${JSON.stringify(pagination)}`);
-        });
-        let myCharge = null;
-        for (let i = 0; i < charge[0].length; i++) {
-            if (charge[0][i].metadata.email === email) {
-                myCharge = charge[0][i];
-                break;
-            }
-        }
-        logger(`Fetched crypto charge: ${JSON.stringify(myCharge)}`);
-        // logger(`Charge: ` + JSON.stringify(charge));
-
-        const formattedPaymentIntents = [];
+        const paymentIntents = [];
 
         for (const intent of paymentIntent.data) {
             const createdTimestamp = intent.created;
-
             const createdDate = format(new Date(createdTimestamp * 1000), 'MMMM dd, yyyy');
             const createdTime = format(new Date(createdTimestamp * 1000), 'hh:mm a');
-
             const statusMapping = {
                 succeeded: 'Success',
                 processing: 'Processing',
             };
 
-            formattedPaymentIntents.push({
+            paymentIntents.push({
                 refId: intent.id,
                 paymentDate: createdDate,
                 paymentTime: createdTime,
@@ -710,9 +690,90 @@ app.get('/getCreditHistory', async (req, res) => {
                 status: statusMapping[intent.status] || 'Failed',
             });
         }
+        logger(`Stripe payments fetched size: ${paymentIntents.length}, ${JSON.stringify(paymentIntents)}`)
+        return paymentIntents;
+    } catch (err) {
+        logger(`Error fetching Stripe payments: ${err}`, "error");
+        return [];
+    }
+}
 
-        logger(`Formatted payment intents: ${formattedPaymentIntents}`);
-        res.send(formattedPaymentIntents);
+async function getCoinbasePayments(email) {
+    logger(`Fetching Coinbase payments for user: ${email}`)
+    try {
+        const chargeList = await cryptoCharge.list({}, (error, list, pagination) => {
+            if (error) {
+                logger(`Crypto charge fetch error: ${error}`, "error");
+                return [];
+            }
+            // logger(`List: ${JSON.stringify(list)}`);
+            // logger(`Pagination: ${JSON.stringify(pagination)}`);
+        });
+        const userCharge = chargeList[0].filter(charge => charge.metadata.email === email);
+        if (!userCharge) {
+            logger(`No payments found for user: ${email}`);
+            return [];
+        }
+        logger(`Fetched crypto charge: ${JSON.stringify(userCharge)}`);
+        // logger(`Charge: ` + JSON.stringify(charge));
+
+        const payments = [];
+
+        for (const charge of userCharge) {
+            const statusMapping = {
+                created: 'Processing',
+                pending: 'Processing',
+                completed: 'Success',
+            };
+
+            for (const payment of charge.payments) {
+                const createdTimestamp = payment.created_at;
+                const createdDate = format(new Date(createdTimestamp), 'MMMM dd, yyyy');
+                const createdTime = format(new Date(createdTimestamp), 'hh:mm a');
+                payments.push({
+                    refId: payment.id,
+                    paymentDate: createdDate,
+                    paymentTime: createdTime,
+                    amount: payment.value.local.amount,
+                    type: 'Coinbase',
+                    status: statusMapping[payment.status] || 'Failed',
+                });
+            }
+        }
+        logger(`Coinbase payments fetched size: ${payments.length}, ${JSON.stringify(payments)}`)
+        return payments;
+    } catch (err) {
+        logger(`Error fetching Coinbase payments: ${err}`, "error");
+        return [];
+    }
+}
+
+//Credit history
+app.get('/getCreditHistory', async (req, res) => {
+    try {
+        const email = req.session.user.email;
+        logger(`Received request to fetch credit history for user: ${email}`);
+
+        const payments = [];
+        const stripePayments = await getStripePayemnts(email);
+        if (stripePayments) payments.push(...stripePayments);
+        const coinbasePayments = await getCoinbasePayments(email);
+        if (coinbasePayments) payments.push(...coinbasePayments);
+
+        // Sort the payments by date and time
+        payments.sort((a, b) => {
+            const dateA = new Date(a.paymentDate);
+            const dateB = new Date(b.paymentDate);
+            if (dateA === dateB) {
+                const timeA = new Date(a.paymentTime);
+                const timeB = new Date(b.paymentTime);
+                return timeB - timeA;
+            }
+            return dateB - dateA;
+        });
+
+        logger(`Formatted payments: ${JSON.stringify(payments)}`);
+        res.send(payments);
     } catch (err) {
         logger(`Error fetching credit history: ${err}`, "error");
         res.status(400).send('An error occurred while fetching credit history.');
