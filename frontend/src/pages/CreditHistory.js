@@ -29,12 +29,13 @@ export default function CreditHistory() {
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
     if (!isUserVerified) navigate("/verify-email");
+  }, [isLoggedIn, navigate, isUserVerified]);
+
+  useEffect(() => {
     axios
       .get("/getCreditHistory", { withCredentials: true })
       .then((res) => {
-        if (res) {
-          setCreditHistoryData(res.data);
-        }
+        if (res) setCreditHistoryData(res.data);
       })
       .catch((e) => {
         Log("Error: ", e);
@@ -43,7 +44,7 @@ export default function CreditHistory() {
       .finally(() => {
         setIsFetching(false);
       });
-  }, [isLoggedIn, navigate, isUserVerified]);
+  }, []);
 
   /** @type import('@tanstack/react-table').ColumnDef<any> */
   const creditHistoryColumns = [
