@@ -727,16 +727,17 @@ async function getCoinbasePayments(email) {
             };
 
             for (const payment of charge.payments) {
-                const createdTimestamp = payment.created_at;
+                const createdTimestamp = payment.detected_at;
                 const createdDate = format(new Date(createdTimestamp), 'MMMM dd, yyyy');
                 const createdTime = format(new Date(createdTimestamp), 'hh:mm a');
+                const paymentStatus = payment.status[0].toUpperCase() + payment.status.slice(1).toLowerCase();
                 payments.push({
-                    refId: payment.id,
+                    refId: payment.payment_id,
                     paymentDate: createdDate,
                     paymentTime: createdTime,
                     amount: payment.value.local.amount,
                     type: 'Coinbase',
-                    status: statusMapping[payment.status] || 'Failed',
+                    status: statusMapping[paymentStatus] || 'Failed',
                 });
             }
         }
