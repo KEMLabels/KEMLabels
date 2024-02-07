@@ -5,18 +5,18 @@ import "../styles/OrderLabel.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { BsArrowUp } from "react-icons/bs";
-import { DefaultField, DropdownField, RadioField } from "../components/Field";
+import { FaCheckCircle } from "react-icons/fa";
+import { IoCloseSharp } from "react-icons/io5";
+import { DefaultField, DropdownField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
 import Checkbox from "../components/Checkbox";
-import Radio from "../components/Radio";
 import axios from "../api/axios";
 import Log from "../components/Log";
 import mockData from "../content/mockOrderData";
 import { isDevelopmentEnv } from "../utils/Helpers";
-import { setSenderInfo } from "../redux/actions/UserAction";
-import { FaCheckCircle } from "react-icons/fa";
-import { IoCloseSharp } from "react-icons/io5";
+import { setSenderInfo, setUserCreditAmount } from "../redux/actions/UserAction";
+import { courierTypes, classTypes } from "../content/orderLabelsConstants";
 
 export default function OrderLabel() {
   const navigate = useNavigate();
@@ -27,11 +27,6 @@ export default function OrderLabel() {
   const savedSenderInfo = useSelector((state) => state.user.senderInfo);
   const creditAmount = useSelector((state) => state.user.creditAmount);
 
-  const classTypeItemOptions = [
-    "UPS Ground",
-    "UPS 2nd Day Air",
-    "UPS Next Day Air",
-  ];
   const senderAndRecipientInfo = {
     firstName: "",
     lastName: "",
@@ -45,8 +40,8 @@ export default function OrderLabel() {
     country: "",
   };
   const initialFormValues = {
-    courier: "UPS",
-    classType: classTypeItemOptions[0],
+    courier: "",
+    classType: "",
     packageInfo: {
       weight: "",
       length: "",
@@ -65,9 +60,8 @@ export default function OrderLabel() {
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
   const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
   const [orderSuccess, setOrderSuccess] = useState(false);
-  const [showOrderConfirmationPopup, setShowOrderConfirmationPopup] =
-    useState(false);
-  const totalAmount = 25.0;
+  const [showOrderConfirmPopup, setShowOrderConfirmPopup] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(25); // HARDCODED
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -88,6 +82,7 @@ export default function OrderLabel() {
     if (section === "packageInfo") delete errorCopy["package"];
     else if (section === "recipientInfo") delete errorCopy["recipient"];
     else if (section === "senderInfo") delete errorCopy["sender"];
+    else if (section === "courier" || section === "classType") delete errorCopy["courierClass"];
     setSectionErrors(errorCopy);
 
     setFormValues((prevValues) => {
@@ -139,7 +134,7 @@ export default function OrderLabel() {
     };
     const errors = {};
 
-    if (courier === "" || classType === "") {
+    if (!courier || !classType) {
       errors.courierClass = "Please select a courier and a class type.";
     }
 
@@ -157,7 +152,7 @@ export default function OrderLabel() {
 
     // Show confirmation popup
     document.body.style.overflow = "hidden";
-    setShowOrderConfirmationPopup(true);
+    setShowOrderConfirmPopup(true);
   };
 
   function submitOrder() {
@@ -178,7 +173,8 @@ export default function OrderLabel() {
           setSuccessMsg("Your order has been placed. Redirecting...");
           setTimeout(() => {
             setLoading(false);
-            setShowOrderConfirmationPopup(false);
+            setShowOrderConfirmPopup(false);
+            dispatch(setUserCreditAmount(creditAmount - totalAmount));
             setOrderSuccess(true);
             window.scrollTo({ top: 0, behavior: "smooth" });
             document.body.style.overflow = null;
@@ -247,10 +243,10 @@ export default function OrderLabel() {
       title="Order Label"
       description="Order Shipping Labels Online - Quickly generate shipping labels by providing address and package details. Get your label sent to your email for easy printing and shipping. Streamline your shipping process with KEMLabels."
     >
-      {showOrderConfirmationPopup && (
+      {showOrderConfirmPopup && (
         <div
           className={`orderConfirmationPopup ${
-            showOrderConfirmationPopup ? "active" : ""
+            showOrderConfirmPopup ? "active" : ""
           }`}
         >
           <div className="popupContainer">
@@ -258,7 +254,7 @@ export default function OrderLabel() {
               className="closeBtn"
               onClick={() => {
                 document.body.style.overflow = null;
-                setShowOrderConfirmationPopup(false);
+                setShowOrderConfirmPopup(false);
               }}
             />
             <h1>Are you sure?</h1>
@@ -272,7 +268,7 @@ export default function OrderLabel() {
                 fill="outline"
                 onClickEvent={() => {
                   document.body.style.overflow = null;
-                  setShowOrderConfirmationPopup(false);
+                  setShowOrderConfirmPopup(false);
                 }}
               />
               <Button
@@ -321,7 +317,7 @@ export default function OrderLabel() {
             {successMsg && <AlertMessage msg={successMsg} type="success" />}
           </div>
           <form action="POST" className="orderLabelForm">
-            <div id="courierSection" className="formSection">
+            <div id="courierClassSection" className="formSection">
               <div className="sectionHeader">
                 <h2>Courier and class</h2>
               </div>
@@ -329,40 +325,31 @@ export default function OrderLabel() {
                 <AlertMessage
                   msg={sectionErrors.courierClass}
                   type="error"
-                  divId="courierSection"
+                  divId="courierClassSection"
                 />
               )}
               <div className="formRow">
-                <RadioField
+                <DropdownField
                   label="Courier Type"
-                  fieldInputGroupClassName="orderRadioInputGroup"
-                  radioButtons={
-                    <>
-                      <Radio
-                        label="UPS"
-                        isSelected={formValues.courier === "UPS"}
-                        onRadioChange={() => saveInput("UPS", "courier", true)}
-                      />
-                      <Radio
-                        label="Canada Post"
-                        isSelected={formValues.courier === "Canada Post"}
-                        onRadioChange={() =>
-                          saveInput("Canada Post", "courier", true)
-                        }
-                      />
-                    </>
-                  }
+                  fullwidth
+                  dropdownItemOptions={courierTypes}
+                  onChangeEvent={(e) => {
+                    const courier = e.label.toString();
+                    saveInput(courier, "courier", true);
+                    if (courier !== formValues.courier) {
+                      saveInput("", "classType", true); // Clear class type if courier changes
+                    }
+                  }}
+                  value={formValues?.courier}
                 />
                 <DropdownField
                   label="Class Type"
                   fullwidth
-                  dropdownItemOptions={classTypeItemOptions}
-                  onChangeEvent={(e) =>
-                    saveInput(e.label.toString(), "classType", true)
-                  }
-                  value={classTypeItemOptions.find(
-                    (option) => option === formValues.classType
-                  )}
+                  dropdownItemOptions={classTypes[formValues.courier] || []}
+                  onChangeEvent={(e) => {
+                    saveInput(e.label.toString(), "classType", true);
+                  }}
+                  value={formValues?.classType}
                 />
               </div>
             </div>

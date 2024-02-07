@@ -1,6 +1,6 @@
 {
-  "courier": "UPS",
-  "classType": "UPS Ground",
+  "courier": "USPS",
+  "classType": "Priority Express: 1-2 days",
   "packageInfo": {
     "weight": 85.98,
     "length": 32.1,
