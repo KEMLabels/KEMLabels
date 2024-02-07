@@ -16,6 +16,7 @@ export default function CreditHistory() {
 
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const isUserVerified = useSelector((state) => state.user.isVerified);
+  const email = useSelector((state) => state.user.email);
 
   const [errMsg, setErrMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
@@ -33,7 +34,7 @@ export default function CreditHistory() {
 
   useEffect(() => {
     axios
-      .get("/getCreditHistory", { withCredentials: true })
+      .get("/getCreditHistory", { email: email }, { withCredentials: true })
       .then((res) => {
         if (res) setCreditHistoryData(res.data);
       })

@@ -751,7 +751,7 @@ async function getCoinbasePayments(email) {
 //Credit history
 app.get('/getCreditHistory', async (req, res) => {
     try {
-        const email = req.session.user.email;
+        const { email } = req.body;
         logger(`Received request to fetch credit history for user: ${email}`);
 
         const payments = [];
