@@ -61,7 +61,8 @@ export default function OrderLabel() {
   const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [showOrderConfirmPopup, setShowOrderConfirmPopup] = useState(false);
-  const [totalAmount, setTotalAmount] = useState(25); // HARDCODED
+  // const [totalAmount, setTotalAmount] = useState(25); // HARDCODED
+  const totalAmount = 25; // HARDCODED
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
