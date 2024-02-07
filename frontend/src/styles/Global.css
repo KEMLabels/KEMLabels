@@ -293,7 +293,7 @@ body {
 .dropdown .dropdownMenu {
   border-color: #f0f0f0;
   border-radius: 0 0 8px 8px;
-  z-index: 0;
+  z-index: 1;
 }
 
 .dropdown .dropdownMenu .Dropdown-option {

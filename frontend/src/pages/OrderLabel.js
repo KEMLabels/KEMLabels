@@ -40,7 +40,7 @@ export default function OrderLabel() {
     country: "",
   };
   const initialFormValues = {
-    courier: "",
+    courier: courierTypes[0],
     classType: "",
     packageInfo: {
       weight: "",
@@ -157,7 +157,6 @@ export default function OrderLabel() {
 
   function submitOrder() {
     setLoading(true);
-    // TODO: @Kian axios call here, also SAVE SENDER INFO as a Object to user in DB
     axios
       .post("/OrderLabel", {
         email: email,
