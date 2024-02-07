@@ -45,7 +45,7 @@ export default function CreditHistory() {
       .finally(() => {
         setIsFetching(false);
       });
-  }, []);
+  }, [email]);
 
   /** @type import('@tanstack/react-table').ColumnDef<any> */
   const creditHistoryColumns = [
