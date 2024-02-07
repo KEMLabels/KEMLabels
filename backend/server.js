@@ -236,7 +236,7 @@ app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (re
             process.env.COINBASE_WEBHOOK_SECRET
         );
 
-        if (event.type === "charge:confirmed") {
+        if (event.type === "charge:confirmed" || event.type === "charge:resolved") {
             logger("Payment succeeded!");
             const user = await User.findOne({ email: event.metadata.email })
             if (!user) {
