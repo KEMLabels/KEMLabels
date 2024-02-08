@@ -994,6 +994,7 @@ app.post("/orderLabel", async (req, res) => {
         const { email, formValues, totalAmount } = req.body;
         logger(`Email: ${email}, Total Amount: ${totalAmount}, Form Values: ${JSON.stringify(formValues)}`);
         logger("OrderLabel request processed successfully.");
+        //Connect to the ORDER LABEL API
         const labelResponse = await nodeFetch(
             'https://api.thelabels.store/api/v1/user/info',
             {
@@ -1004,6 +1005,132 @@ app.post("/orderLabel", async (req, res) => {
         );
         const data = await labelResponse.json();
         logger(data);
+        //PLACE ORDER:
+        if (formValues.courier === "UPS USA") {
+            const createUPSUSALabel = await nodeFetch(
+                'https://api.thelabels.store/api/v1/ups/create',
+                {
+                    headers: { Content_Type: 'application/json' },
+                    method: "POST",
+                    body: JSON.stringify({ 
+                        uuid: "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf",
+                        country: "US",
+                        service_speed: `${formValues.classType}`,
+                        sender: {
+                            name: `${formValues.senderInfo.firstName + ' ' + formValues.senderInfo.lastName}`,
+                            address1: `${formValues.senderInfo.street}`,
+                            address2: `${formValues.senderInfo.suite}`,
+                            city: `${formValues.senderInfo.city}`,
+                            state: `${formValues.senderInfo.state}`,
+                            postal_code: `${formValues.senderInfo.zip}`,
+                            phone: `${formValues.senderInfo.phone}`
+                        },
+                        recipient: {
+                            name: `${formValues.recipientInfo.firstName + ' ' + formValues.recipientInfo.lastName}`,
+                            address1: `${formValues.recipientInfo.street}`,
+                            address2: `${formValues.recipientInfo.suite}`,
+                            city: `${formValues.recipientInfo.city}`,
+                            state: `${formValues.recipientInfo.state}`,
+                            postal_code: `${formValues.recipientInfo.zip}`,
+                            phone: `${formValues.recipientInfo.phone}`
+                        },
+                        package: {
+                            length: `${formValues.packageInfo.length}`,
+                            width: `${formValues.packageInfo.width}`,
+                            height: `${formValues.packageInfo.height}`,
+                            weight: `${formValues.packageInfo.weight}`,
+                            description: `${formValues.packageInfo.description}`,
+                            references: [`${formValues.packageInfo.referenceNumber}`],
+                            saturday_delivery: false
+                        }
+                    })
+                }
+            );
+            const data = await createUPSUSALabel.json();
+            logger(data);
+        } else if (formValues.courier === "UPS CA") {
+            const createUPSCALabel = await nodeFetch(
+                'https://api.thelabels.store/api/v1/ups/create',
+                {
+                    headers: { Content_Type: 'application/json' },
+                    method: "POST",
+                    body: JSON.stringify({ 
+                        uuid: "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf",
+                        country: "CA",
+                        service_speed: `${formValues.classType}`,
+                        sender: {
+                            name: `${formValues.senderInfo.firstName + ' ' + formValues.senderInfo.lastName}`,
+                            address1: `${formValues.senderInfo.street}`,
+                            address2: `${formValues.senderInfo.suite}`,
+                            city: `${formValues.senderInfo.city}`,
+                            state: `${formValues.senderInfo.state}`,
+                            postal_code: `${formValues.senderInfo.zip}`,
+                            phone: `${formValues.senderInfo.phone}`
+                        },
+                        recipient: {
+                            name: `${formValues.recipientInfo.firstName + ' ' + formValues.recipientInfo.lastName}`,
+                            address1: `${formValues.recipientInfo.street}`,
+                            address2: `${formValues.recipientInfo.suite}`,
+                            city: `${formValues.recipientInfo.city}`,
+                            state: `${formValues.recipientInfo.state}`,
+                            postal_code: `${formValues.recipientInfo.zip}`,
+                            phone: `${formValues.recipientInfo.phone}`
+                        },
+                        package: {
+                            length: `${formValues.packageInfo.length}`,
+                            width: `${formValues.packageInfo.width}`,
+                            height: `${formValues.packageInfo.height}`,
+                            weight: `${formValues.packageInfo.weight}`,
+                            description: `${formValues.packageInfo.description}`,
+                            references: [`${formValues.packageInfo.referenceNumber}`],
+                            saturday_delivery: false
+                        }
+                    })
+                }
+            );
+            const data = await createUPSCALabel.json();
+            logger(data);
+        } else if (formValues.courier === "USPS") {
+            const createUSPSLabel = await nodeFetch(
+                'https://api.thelabels.store/api/v1/usps/create',
+                {
+                    headers: { Content_Type: 'application/json' },
+                    method: "POST",
+                    body: JSON.stringify({ 
+                        uuid: "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf",
+                        service_speed: `${formValues.classType}`,
+                        sender: {
+                            name: `${formValues.senderInfo.firstName + ' ' + formValues.senderInfo.lastName}`,
+                            address1: `${formValues.senderInfo.street}`,
+                            address2: `${formValues.senderInfo.suite}`,
+                            city: `${formValues.senderInfo.city}`,
+                            state: `${formValues.senderInfo.state}`,
+                            postal_code: `${formValues.senderInfo.zip}`,
+                            phone: `${formValues.senderInfo.phone}`
+                        },
+                        recipient: {
+                            name: `${formValues.recipientInfo.firstName + ' ' + formValues.recipientInfo.lastName}`,
+                            address1: `${formValues.recipientInfo.street}`,
+                            address2: `${formValues.recipientInfo.suite}`,
+                            city: `${formValues.recipientInfo.city}`,
+                            state: `${formValues.recipientInfo.state}`,
+                            postal_code: `${formValues.recipientInfo.zip}`,
+                            phone: `${formValues.recipientInfo.phone}`
+                        },
+                        package: {
+                            length: `${formValues.packageInfo.length}`,
+                            width: `${formValues.packageInfo.width}`,
+                            height: `${formValues.packageInfo.height}`,
+                            weight: `${formValues.packageInfo.weight}`,
+                            description: `${formValues.packageInfo.description}`,
+                            references: [`${formValues.packageInfo.referenceNumber}`]
+                        }
+                    })
+                }
+            );
+            const data = await createUSPSLabel.json();
+            logger(data);
+        }
         return res.status(200).json({ msg: "OrderLabel request processed successfully." });
     } catch (err) {
         logger(`Error processing orderLabel request: ${err}`, "error");
