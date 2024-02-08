@@ -15,7 +15,10 @@ import axios from "../api/axios";
 import Log from "../components/Log";
 import mockData from "../content/mockOrderData";
 import { isDevelopmentEnv } from "../utils/Helpers";
-import { setSenderInfo, setUserCreditAmount } from "../redux/actions/UserAction";
+import {
+  setSenderInfo,
+  setUserCreditAmount,
+} from "../redux/actions/UserAction";
 import { courierTypes, classTypes } from "../content/orderLabelsConstants";
 
 export default function OrderLabel() {
@@ -83,7 +86,8 @@ export default function OrderLabel() {
     if (section === "packageInfo") delete errorCopy["package"];
     else if (section === "recipientInfo") delete errorCopy["recipient"];
     else if (section === "senderInfo") delete errorCopy["sender"];
-    else if (section === "courier" || section === "classType") delete errorCopy["courierClass"];
+    else if (section === "courier" || section === "classType")
+      delete errorCopy["courierClass"];
     setSectionErrors(errorCopy);
 
     setFormValues((prevValues) => {
@@ -92,13 +96,13 @@ export default function OrderLabel() {
           ...prevValues,
           [section]: {
             ...prevValues[section],
-            [e.target.name]: e.target.value.trim(),
+            [e.target.name]: e.target.value,
           },
         };
       }
       return {
         ...prevValues,
-        [section]: e.trim(),
+        [section]: e,
       };
     });
 
@@ -156,8 +160,25 @@ export default function OrderLabel() {
     setShowOrderConfirmPopup(true);
   };
 
-  function submitOrder() {
+  function trimFormValues() {
+    const formValuesCopy = { ...formValues };
+    Object.keys(formValuesCopy).forEach((section) => {
+      if (section === "courier" || section === "classType") {
+        formValuesCopy[section] = formValuesCopy[section].trim();
+      } else {
+        Object.keys(formValuesCopy[section]).forEach((field) => {
+          const value = formValuesCopy[section][field];
+          if (typeof value !== "string" && !(value instanceof String)) return;
+          formValuesCopy[section][field] = value.trim();
+        });
+      }
+    });
+    return formValuesCopy;
+  }
+
+  function confirmOrder() {
     setLoading(true);
+    const formValues = trimFormValues();
     axios
       .post("/OrderLabel", {
         email: email,
@@ -273,7 +294,7 @@ export default function OrderLabel() {
               />
               <Button
                 text="Confirm"
-                onClickEvent={() => submitOrder()}
+                onClickEvent={confirmOrder}
                 loading={loading}
               />
             </div>
