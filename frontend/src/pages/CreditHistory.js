@@ -34,7 +34,7 @@ export default function CreditHistory() {
 
   useEffect(() => {
     axios
-      .get("/getCreditHistory", { email: email }, { withCredentials: true })
+      .post("/getCreditHistory", { email: email }, { withCredentials: true })
       .then((res) => {
         if (res) setCreditHistoryData(res.data);
       })
