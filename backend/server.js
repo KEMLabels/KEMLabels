@@ -686,7 +686,7 @@ async function getStripePayemnts(email) {
                 paymentDate: createdDate,
                 paymentTime: createdTime,
                 amount: intent.amount / 100, // convert to dollars
-                type: 'Stripe',
+                type: 'Credit Card',
                 status: statusMapping[intent.status] || 'Failed',
             });
         }
@@ -735,7 +735,7 @@ async function getCoinbasePayments(email) {
                     paymentDate: createdDate,
                     paymentTime: createdTime,
                     amount: payment.value.local.amount,
-                    type: 'Coinbase',
+                    type: 'Cryto',
                     status: statusMapping[payment.status.toLowerCase()] || 'Failed',
                 });
             }
