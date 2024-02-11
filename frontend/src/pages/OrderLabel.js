@@ -435,10 +435,10 @@ export default function OrderLabel() {
               <div className="formRow">
                 <DefaultField
                   label="Reference number"
-                  helpText="Can be your invoice number found on your order details."
+                  helpText="Order numbers, invoice numbers, or other codes separated by commas."
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={20}
+                  maxLength={100}
                   name="referenceNumber"
                   currentValue={formValues?.packageInfo?.referenceNumber}
                   optional

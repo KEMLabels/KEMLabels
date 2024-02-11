@@ -991,7 +991,16 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
 app.post("/orderLabel", async (req, res) => {
     try {
         logger("Received orderLabel request.");
-        const { email, formValues, totalAmount } = req.body;
+        const { email, totalAmount } = req.body;
+        const formValues = {
+            ...req.body.formValues,
+            packageInfo: {
+                ...req.body.packageInfo,
+                referenceNumber: req.body.formValues.packageInfo.referenceNumber
+                    .split(",")
+                    .map((num) => num.trim()) || []
+            }
+        };
         logger(`Email: ${email}, Total Amount: ${totalAmount}, Form Values: ${JSON.stringify(formValues)}`);
         logger("OrderLabel request processed successfully.");
         //Connect to the ORDER LABEL API
