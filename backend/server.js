@@ -1005,7 +1005,7 @@ app.post("/orderLabel", async (req, res) => {
         logger("OrderLabel request processed successfully.");
         //Connect to the ORDER LABEL API
         const labelResponse = await nodeFetch(
-            'https://api.thelabels.store/api/v1/user/info',
+            process.env.API_LABELS_USER_INFO,
             {
                 headers: { Content_Type: 'application/json' },
                 method: "POST",
@@ -1017,11 +1017,11 @@ app.post("/orderLabel", async (req, res) => {
         //PLACE ORDER:
         if (formValues.courier === "UPS USA") {
             const createUPSUSALabel = await nodeFetch(
-                'https://api.thelabels.store/api/v1/ups/create',
+                 process.env.API_LABELS_ORDER_CREATE_UPS,
                 {
                     headers: { Content_Type: 'application/json' },
                     method: "POST",
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         uuid: "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf",
                         country: "US",
                         service_speed: `${formValues.classType}`,
@@ -1059,11 +1059,11 @@ app.post("/orderLabel", async (req, res) => {
             logger(data);
         } else if (formValues.courier === "UPS CA") {
             const createUPSCALabel = await nodeFetch(
-                'https://api.thelabels.store/api/v1/ups/create',
+                process.env.API_LABELS_ORDER_CREATE_UPS,
                 {
                     headers: { Content_Type: 'application/json' },
                     method: "POST",
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         uuid: "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf",
                         country: "CA",
                         service_speed: `${formValues.classType}`,
@@ -1101,11 +1101,11 @@ app.post("/orderLabel", async (req, res) => {
             logger(data);
         } else if (formValues.courier === "USPS") {
             const createUSPSLabel = await nodeFetch(
-                'https://api.thelabels.store/api/v1/usps/create',
+                process.env.API_LABELS_ORDER_CREATE_USPS,
                 {
                     headers: { Content_Type: 'application/json' },
                     method: "POST",
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         uuid: "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf",
                         service_speed: `${formValues.classType}`,
                         sender: {
