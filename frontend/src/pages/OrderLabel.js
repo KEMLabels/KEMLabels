@@ -5,8 +5,6 @@ import "../styles/OrderLabel.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { BsArrowUp } from "react-icons/bs";
-import { FaCheckCircle } from "react-icons/fa";
-import { IoCloseSharp } from "react-icons/io5";
 import { DefaultField, DropdownField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
@@ -20,6 +18,8 @@ import {
   setUserCreditAmount,
 } from "../redux/actions/UserAction";
 import { courierTypes, classTypes } from "../content/orderLabelsConstants";
+import OrderConfirmPopup from "../components/OrderConfirmPopup";
+import OrderSuccess from "../components/OrderSuccess";
 
 export default function OrderLabel() {
   const navigate = useNavigate();
@@ -210,114 +210,20 @@ export default function OrderLabel() {
       });
   }
 
-  function orderSummaryItem(label, value) {
-    return (
-      <div className="orderSummaryRow">
-        <p>{label}</p>
-        <p>
-          <strong>{value || "N/A"}</strong>
-        </p>
-      </div>
-    );
-  }
-
-  function renderContactInfo(title, info) {
-    return (
-      <>
-        <h3>{title}</h3>
-        {Object.entries(info).map(([label, value]) =>
-          orderSummaryItem(label, value)
-        )}
-      </>
-    );
-  }
-
-  function orderSummary() {
-    const { courier, classType, packageInfo, senderInfo, recipientInfo } =
-      formValues;
-    return (
-      <div className="orderSummary">
-        <h2>Order Summary</h2>
-        <div className="orderSummarySection">
-          <h3>Courier and Class</h3>
-          {orderSummaryItem("Courier", courier)}
-          {orderSummaryItem("Class", classType)}
-        </div>
-        <div className="orderSummarySection">
-          <h3>Package Details</h3>
-          {Object.entries(packageInfo).map(([label, value]) =>
-            orderSummaryItem(label, value)
-          )}
-        </div>
-        <div className="orderSummarySection">
-          {renderContactInfo("Sender Information", senderInfo)}
-        </div>
-        <div className="orderSummarySection">
-          {renderContactInfo("Recipient Information", recipientInfo)}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <PageLayout
       title="Order Label"
       description="Order Shipping Labels Online - Quickly generate shipping labels by providing address and package details. Get your label sent to your email for easy printing and shipping. Streamline your shipping process with KEMLabels."
     >
       {showOrderConfirmPopup && (
-        <div
-          className={`orderConfirmationPopup ${
-            showOrderConfirmPopup ? "active" : ""
-          }`}
-        >
-          <div className="popupContainer">
-            <IoCloseSharp
-              className="closeBtn"
-              onClick={() => {
-                document.body.style.overflow = null;
-                setShowOrderConfirmPopup(false);
-              }}
-            />
-            <h1>Are you sure?</h1>
-            <p>
-              Please confirm your order details before submitting. If you are
-              sure, click confirm.
-            </p>
-            <div className="orderConfirmBtnGroup">
-              <Button
-                text="Cancel"
-                fill="outline"
-                onClickEvent={() => {
-                  document.body.style.overflow = null;
-                  setShowOrderConfirmPopup(false);
-                }}
-              />
-              <Button
-                text="Confirm"
-                onClickEvent={confirmOrder}
-                loading={loading}
-              />
-            </div>
-          </div>
-        </div>
+        <OrderConfirmPopup
+          setShowOrderConfirmPopup={setShowOrderConfirmPopup}
+          confirmOrder={confirmOrder}
+          loading={loading}
+        />
       )}
       {orderSuccess ? (
-        <div className="globalContainer orderLabelContainer">
-          <div className="headingContainer">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                marginBottom: "1.5rem",
-              }}
-            >
-              <FaCheckCircle size={80} color="#00cc66" />
-            </div>
-            <h1>Thank you for your Order!</h1>
-            <p>You will recieve an email of your order details.</p>
-          </div>
-          {orderSummary()}
-        </div>
+        <OrderSuccess formValues={formValues} />
       ) : (
         <div className="globalContainer orderLabelContainer">
           <div className="headingContainer">

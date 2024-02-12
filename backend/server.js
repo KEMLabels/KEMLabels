@@ -1086,7 +1086,7 @@ app.post("/orderLabel", async (req, res) => {
         }
         //Create label
         const labelRes = await createLabel(endpoint, uuid, formValues, country, satDelivery);
-        logger(`Created label: ${labelRes}`);
+        logger(`Created label: ${JSON.stringify(labelRes)}`);
         if (!labelRes) {
             logger("Error creating label", "error");
             throw new Error("Error creating label");
