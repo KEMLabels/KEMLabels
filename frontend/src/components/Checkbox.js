@@ -1,8 +1,13 @@
 import "../styles/Checkbox.css";
 
-export default function Checkbox({ label, isSelected, onCheckboxChange }) {
+export default function Checkbox({
+  label,
+  isSelected,
+  onCheckboxChange,
+  customStyle = {},
+}) {
   return (
-    <div className="checkboxContainer">
+    <div className="checkboxContainer" style={customStyle}>
       <input
         type="checkbox"
         name={label}

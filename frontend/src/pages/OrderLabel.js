@@ -17,7 +17,11 @@ import {
   setSenderInfo,
   setUserCreditAmount,
 } from "../redux/actions/UserAction";
-import { courierTypes, classTypes } from "../content/orderLabelsConstants";
+import {
+  courierTypes,
+  classTypes,
+  pricing,
+} from "../content/orderLabelsConstants";
 import OrderConfirmPopup from "../components/OrderConfirmPopup";
 import OrderSuccess from "../components/OrderSuccess";
 
@@ -64,8 +68,8 @@ export default function OrderLabel() {
   const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [showOrderConfirmPopup, setShowOrderConfirmPopup] = useState(false);
-  // const [totalAmount, setTotalAmount] = useState(25); // HARDCODED
-  const totalAmount = 25; // HARDCODED
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [signatureChecked, setSignatureChecked] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -76,6 +80,15 @@ export default function OrderLabel() {
     window.addEventListener("scroll", scrollHandler);
     return () => window.removeEventListener("scroll", scrollHandler);
   }, []);
+
+  useEffect(() => {
+    console.log("Total Price: ", totalPrice);
+  }, [totalPrice]);
+
+  function calculatePrice(courier, classType, isSignatureChecked) {
+    const price = pricing[courier][classType] || 0;
+    return isSignatureChecked ? price + 1 : price;
+  }
 
   // Save input value on change
   const saveInput = (e, section, singleValue = false) => {
@@ -125,7 +138,7 @@ export default function OrderLabel() {
     e.preventDefault();
 
     // Check if user has enough credits, if not, display error message
-    if (creditAmount - totalAmount < 0) {
+    if (creditAmount - totalPrice < 0) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -184,7 +197,7 @@ export default function OrderLabel() {
         email: email,
         withCredentials: true,
         formValues: formValues,
-        totalAmount: totalAmount,
+        totalPrice: totalPrice,
       })
       .then((res) => {
         if (res.data.errMsg) {
@@ -195,7 +208,7 @@ export default function OrderLabel() {
           setTimeout(() => {
             setLoading(false);
             setShowOrderConfirmPopup(false);
-            dispatch(setUserCreditAmount(creditAmount - totalAmount));
+            dispatch(setUserCreditAmount(creditAmount - totalPrice));
             setOrderSuccess(true);
             window.scrollTo({ top: 0, behavior: "smooth" });
             document.body.style.overflow = null;
@@ -232,7 +245,7 @@ export default function OrderLabel() {
               Please complete all mandatory fields to proceed with placing your
               order.
             </p>
-            {creditAmount - totalAmount < 0 && (
+            {(creditAmount === 0 || creditAmount - totalPrice < 0) && (
               <AlertMessage
                 msg="You have insufficient funds to purchase. Please load your credits first to proceed with your purchase."
                 type="error"
@@ -275,10 +288,36 @@ export default function OrderLabel() {
                   dropdownItemOptions={classTypes[formValues.courier] || []}
                   onChangeEvent={(e) => {
                     saveInput(e.label.toString(), "classType", true);
+                    setTotalPrice(
+                      calculatePrice(
+                        formValues.courier,
+                        e.label,
+                        signatureChecked
+                      )
+                    );
                   }}
                   value={formValues?.classType}
                 />
               </div>
+              {totalPrice > 0 && (
+                <div className="formRow">
+                  <Checkbox
+                    label="Signature (+ $1.00 USD)"
+                    isSelected={signatureChecked}
+                    onCheckboxChange={() => {
+                      const { courier, classType } = formValues;
+                      setSignatureChecked((prevChecked) => {
+                        const updatedChecked = !prevChecked;
+                        setTotalPrice(
+                          calculatePrice(courier, classType, updatedChecked)
+                        );
+                        return updatedChecked;
+                      });
+                    }}
+                    customStyle={{ marginBottom: "1.5rem" }}
+                  />
+                </div>
+              )}
             </div>
 
             <div id="packageSection" className="formSection">
@@ -609,8 +648,7 @@ export default function OrderLabel() {
             <div className="orderFooter">
               <div className="orderTotal">
                 <p>
-                  {/* TODO: Hardcoded total */}
-                  Total: <strong>${totalAmount.toFixed(2)}</strong>
+                  Total: <strong>${totalPrice.toFixed(2)}</strong>
                 </p>
               </div>
               <div className="btnContainer">
