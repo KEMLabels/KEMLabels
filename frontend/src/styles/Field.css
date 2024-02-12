@@ -129,6 +129,7 @@
 
 .fieldContainer .fieldInputGroup .fieldInput.disabled {
   background-color: #efefef;
+  color: #858585;
 }
 
 .fieldContainer .fieldInputGroup .fieldInput.disabled::placeholder {

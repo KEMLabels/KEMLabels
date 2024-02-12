@@ -285,6 +285,20 @@ export default function OrderLabel() {
                       saveInput("", "classType", true); // Clear class type if courier changes
                       setTotalPrice(0);
                     }
+                    const country = courier === "UPS CA" ? "CANADA" : "USA";
+                    setFormValues((prevValues) => {
+                      return {
+                        ...prevValues,
+                        senderInfo: {
+                          ...prevValues.senderInfo,
+                          country: country,
+                        },
+                        recipientInfo: {
+                          ...prevValues.recipientInfo,
+                          country: country,
+                        },
+                      };
+                    });
                   }}
                   value={formValues?.courier}
                 />
@@ -437,7 +451,6 @@ export default function OrderLabel() {
                 <DefaultField
                   label="First name"
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
-                  placeholder="John"
                   minLength={1}
                   maxLength={50}
                   name="firstName"
@@ -446,7 +459,6 @@ export default function OrderLabel() {
                 <DefaultField
                   label="Last name"
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
-                  placeholder="Doe"
                   minLength={1}
                   maxLength={50}
                   name="lastName"
@@ -467,7 +479,6 @@ export default function OrderLabel() {
                   label="Phone number"
                   helpText="(XXX) XXX-XXXX."
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
-                  placeholder="(XXX) XXX-XXXX"
                   minLength={10}
                   maxLength={10}
                   name="phone"
@@ -478,7 +489,6 @@ export default function OrderLabel() {
                 <DefaultField
                   label="Street"
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
-                  placeholder="Start typing your address..."
                   minLength={1}
                   maxLength={50}
                   name="street"
@@ -527,12 +537,11 @@ export default function OrderLabel() {
                 />
                 <DefaultField
                   label="Country"
-                  onChangeEvent={(e) => saveInput(e, "senderInfo")}
-                  placeholder="Canada"
                   minLength={1}
                   maxLength={50}
                   name="country"
                   currentValue={formValues?.senderInfo?.country}
+                  disabled
                 />
               </div>
             </div>
@@ -552,7 +561,6 @@ export default function OrderLabel() {
                 <DefaultField
                   label="First name"
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
-                  placeholder="John"
                   minLength={1}
                   maxLength={50}
                   name="firstName"
@@ -561,7 +569,6 @@ export default function OrderLabel() {
                 <DefaultField
                   label="Last name"
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
-                  placeholder="Doe"
                   minLength={1}
                   maxLength={50}
                   name="lastName"
@@ -582,7 +589,6 @@ export default function OrderLabel() {
                   label="Phone number"
                   helpText="(XXX) XXX-XXXX."
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
-                  placeholder="(XXX) XXX-XXXX"
                   minLength={10}
                   maxLength={10}
                   name="phone"
@@ -593,7 +599,6 @@ export default function OrderLabel() {
                 <DefaultField
                   label="Street"
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
-                  placeholder="Start typing your address..."
                   minLength={1}
                   maxLength={50}
                   name="street"
@@ -642,12 +647,11 @@ export default function OrderLabel() {
                 />
                 <DefaultField
                   label="Country"
-                  onChangeEvent={(e) => saveInput(e, "recipientInfo")}
-                  placeholder="Canada"
                   minLength={1}
                   maxLength={50}
                   name="country"
                   currentValue={formValues?.recipientInfo?.country}
+                  disabled
                 />
               </div>
             </div>
