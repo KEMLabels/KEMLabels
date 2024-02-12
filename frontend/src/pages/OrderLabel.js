@@ -245,16 +245,21 @@ export default function OrderLabel() {
               Please complete all mandatory fields to proceed with placing your
               order.
             </p>
-            {(creditAmount === 0 || creditAmount - totalPrice < 0) && (
+            {/* {(creditAmount === 0 || creditAmount - totalPrice < 0) && (
               <AlertMessage
                 msg="You have insufficient funds to purchase. Please load your credits first to proceed with your purchase."
                 type="error"
               />
-            )}
+            )} */}
             {sectionErrors?.container && (
               <AlertMessage msg={sectionErrors.container} type="error" />
             )}
             {successMsg && <AlertMessage msg={successMsg} type="success" />}
+          </div>
+          <div className="orderTotal orderHeader">
+            <p>
+              Order Total: <strong>${totalPrice.toFixed(2)}</strong>
+            </p>
           </div>
           <form action="POST" className="orderLabelForm">
             <div id="courierClassSection" className="formSection">
@@ -278,6 +283,7 @@ export default function OrderLabel() {
                     saveInput(courier, "courier", true);
                     if (courier !== formValues.courier) {
                       saveInput("", "classType", true); // Clear class type if courier changes
+                      setTotalPrice(0);
                     }
                   }}
                   value={formValues?.courier}
@@ -648,7 +654,7 @@ export default function OrderLabel() {
             <div className="orderFooter">
               <div className="orderTotal">
                 <p>
-                  Total: <strong>${totalPrice.toFixed(2)}</strong>
+                  Order Total: <strong>${totalPrice.toFixed(2)}</strong>
                 </p>
               </div>
               <div className="btnContainer">

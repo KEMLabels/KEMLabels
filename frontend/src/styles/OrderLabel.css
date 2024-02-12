@@ -45,14 +45,19 @@
   gap: 1rem;
 }
 
-.orderLabelForm .orderFooter .orderTotal {
+.orderTotal {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.orderLabelForm .orderFooter .orderTotal p {
-  font-size: 1.1rem;
+.orderTotal.orderHeader {
+  justify-content: right;
+  padding-bottom: 1.5rem;
+}
+
+.orderTotal p {
+  font-size: 1.2rem;
   font-weight: 300;
   margin-bottom: 0;
 }
@@ -254,5 +259,8 @@
   .orderConfirmationPopup .popupContainer .closeBtn {
     width: 2.5rem;
     height: 2.5rem;
+  }
+  .orderTotal.orderHeader {
+    justify-content: center;
   }
 }
