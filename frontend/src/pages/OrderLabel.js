@@ -37,7 +37,6 @@ export default function OrderLabel() {
   const senderAndRecipientInfo = {
     firstName: "",
     lastName: "",
-    companyName: "",
     phone: "",
     street: "",
     suite: "",
@@ -476,15 +475,6 @@ export default function OrderLabel() {
                 />
               </div>
               <div className="formRow">
-                <DefaultField
-                  label="Company name"
-                  onChangeEvent={(e) => saveInput(e, "senderInfo")}
-                  maxLength={50}
-                  name="companyName"
-                  currentValue={formValues?.senderInfo?.companyName}
-                  fixTextAlignment
-                  optional
-                />
                 <PhoneField
                   label="Phone number"
                   fieldType="tel"
@@ -494,6 +484,7 @@ export default function OrderLabel() {
                   maxLength={10}
                   name="phone"
                   currentValue={formValues?.senderInfo?.phone}
+                  halfWidth
                 />
               </div>
               <div className="formRow">
@@ -587,15 +578,6 @@ export default function OrderLabel() {
                 />
               </div>
               <div className="formRow">
-                <DefaultField
-                  label="Company name"
-                  onChangeEvent={(e) => saveInput(e, "recipientInfo")}
-                  maxLength={50}
-                  name="companyName"
-                  currentValue={formValues?.recipientInfo?.companyName}
-                  fixTextAlignment
-                  optional
-                />
                 <PhoneField
                   label="Phone number"
                   fieldType="tel"
@@ -605,6 +587,7 @@ export default function OrderLabel() {
                   maxLength={10}
                   name="phone"
                   currentValue={formValues?.recipientInfo?.phone}
+                  halfWidth
                 />
               </div>
               <div className="formRow">

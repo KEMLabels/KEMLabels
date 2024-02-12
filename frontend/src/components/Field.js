@@ -25,6 +25,7 @@ function DefaultField({
   error, // Error message
   onChangeEvent,
   customStyle,
+  halfWidth = false,
   fixTextAlignment = false,
   shortField = false,
   disabled = false,
@@ -43,7 +44,11 @@ function DefaultField({
     .join(" ");
 
   return (
-    <div className={`fieldContainer ${containerClassName}`}>
+    <div
+      className={`fieldContainer ${containerClassName} ${
+        halfWidth ? "halfWidth" : ""
+      }`}
+    >
       <div
         className={`fieldTextGroup ${fixTextAlignment ? "textAlignment" : ""}`}
       >
@@ -108,6 +113,7 @@ function PhoneField({
   error, // Error message
   onChangeEvent,
   customStyle,
+  halfWidth = false,
   fixTextAlignment = false,
   shortField = false,
   disabled = false,
@@ -127,7 +133,11 @@ function PhoneField({
     currentValue ? formatPhoneNumber(currentValue) : ""
   );
   return (
-    <div className={`fieldContainer ${containerClassName}`}>
+    <div
+      className={`fieldContainer ${containerClassName} ${
+        halfWidth ? "halfWidth" : ""
+      }`}
+    >
       <div
         className={`fieldTextGroup ${fixTextAlignment ? "textAlignment" : ""}`}
       >

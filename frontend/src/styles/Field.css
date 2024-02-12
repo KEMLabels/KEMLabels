@@ -7,6 +7,11 @@
   flex-wrap: wrap;
 }
 
+.fieldContainer.halfWidth {
+  width: 50%;
+  padding-right: 1rem;
+}
+
 .fieldContainer .searchIcon {
   display: flex;
   position: absolute;
@@ -174,6 +179,10 @@
 @media screen and (max-width: 768px) {
   .fieldContainer {
     margin-bottom: 1rem;
+  }
+  .fieldContainer.halfWidth {
+    width: 100%;
+    padding-right: 0;
   }
   .fieldContainer .fieldInputGroup.shortField {
     width: 40%;
