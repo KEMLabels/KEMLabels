@@ -15,6 +15,7 @@ require('express-async-errors');
 const emailTemplate = require('./emailTemplate');
 const nodeFetch = require('node-fetch');
 const logger = require('./log');
+const fs = require('fs');
 
 //Configure mongoose, app, and dotenv
 mongoose.set('strictQuery', false);
@@ -1128,6 +1129,7 @@ async function handleErr(err, req, res, next) {
 app.use(handleErr);
 
 // Start server
+if (fs.existsSync('logs.log')) fs.writeFileSync('logs.log', ''); // Clear logs file
 logger(`Running environment: ${isDevelopmentEnv() ? 'DEVELOPMENT' : 'PRODUCTION'}`);
 connectDB().then(() => {
     app.listen(process.env.PORT, () => {
