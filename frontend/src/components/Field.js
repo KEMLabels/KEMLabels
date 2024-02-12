@@ -4,6 +4,7 @@ import "../styles/Field.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdSearch } from "react-icons/md";
 import { regex } from "../utils/Validation";
+import { formatPhoneNumber } from "../utils/Helpers";
 
 function DefaultField({
   id,
@@ -87,6 +88,82 @@ function DefaultField({
           />
         )}
         {postfix && <span className="inputPostfix">{postfix}</span>}
+      </div>
+      {error && <span className="fieldErrorMsg">{error}</span>}
+    </div>
+  );
+}
+
+function PhoneField({
+  id,
+  className = "",
+  containerClassName = "",
+  name = "",
+  label,
+  helpText,
+  title = "",
+  initialValue,
+  currentValue,
+  placeholder = "",
+  error, // Error message
+  onChangeEvent,
+  customStyle,
+  fixTextAlignment = false,
+  shortField = false,
+  disabled = false,
+  optional = false,
+}) {
+  const inputClassNames = [
+    "fieldInput",
+    "phone",
+    className,
+    disabled && "disabled",
+    error && "invalid",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const [phone, setPhone] = useState(
+    currentValue ? formatPhoneNumber(currentValue) : ""
+  );
+  return (
+    <div className={`fieldContainer ${containerClassName}`}>
+      <div
+        className={`fieldTextGroup ${fixTextAlignment ? "textAlignment" : ""}`}
+      >
+        <label className={`fieldLabel ${optional ? "optional" : ""}`}>
+          {label}
+          {optional && <span>{"(optional)"}</span>}
+        </label>
+        {helpText && <span className="helpText">{helpText}</span>}
+      </div>
+      <div className={`fieldInputGroup ${shortField ? "shortField" : ""}`}>
+        <input
+          id={id}
+          className={inputClassNames}
+          type="tel"
+          name={name}
+          title={title}
+          pattern="[0-9\/]*"
+          style={{ ...customStyle }}
+          defaultValue={initialValue}
+          value={phone}
+          placeholder={placeholder}
+          disabled={disabled}
+          onChange={(e) => {
+            const numericValue = e.target.value.replace(/\D/g, "").slice(0, 10);
+            const formattedValue = formatPhoneNumber(numericValue);
+            setPhone(formattedValue);
+            if (onChangeEvent) {
+              onChangeEvent({
+                ...e,
+                target: { ...e.target, name: name, value: numericValue },
+              });
+            } else {
+              e.preventDefault();
+            }
+          }}
+        />
       </div>
       {error && <span className="fieldErrorMsg">{error}</span>}
     </div>
@@ -522,4 +599,5 @@ export {
   SearchField,
   RadioField,
   DropdownField,
+  PhoneField,
 };

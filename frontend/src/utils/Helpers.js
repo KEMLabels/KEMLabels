@@ -45,5 +45,20 @@ export function validatePasswordOnTyping(password, setPasswordValid) {
   setPasswordValid(passwordValid);
 }
 
+export function formatPhoneNumber(value) {
+  // Remove all non-numeric characters from the input value
+  const cleaned = value.replace(/\D/g, '');
+
+  // Apply formatting based on the cleaned value
+  const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+  if (match) {
+    // Check if all digits are entered, otherwise, return formatted string with only entered digits
+    return match[1] ? '(' + match[1] + (match[2] ? ') ' + match[2] + (match[3] ? ' - ' + match[3] : '') : '') : '';
+  }
+
+  // If no match is found, return an empty string
+  return '';
+}
+
 // Check hosting enviorment
 export const isDevelopmentEnv = () => process.env.NODE_ENV === "development";

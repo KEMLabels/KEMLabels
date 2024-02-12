@@ -5,7 +5,7 @@ import "../styles/OrderLabel.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { BsArrowUp } from "react-icons/bs";
-import { DefaultField, DropdownField } from "../components/Field";
+import { DefaultField, DropdownField, PhoneField } from "../components/Field";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
 import Checkbox from "../components/Checkbox";
@@ -81,10 +81,6 @@ export default function OrderLabel() {
     return () => window.removeEventListener("scroll", scrollHandler);
   }, []);
 
-  useEffect(() => {
-    console.log("Total Price: ", totalPrice);
-  }, [totalPrice]);
-
   function calculatePrice(courier, classType, isSignatureChecked) {
     const price = pricing[courier][classType] || 0;
     return isSignatureChecked ? price + 1 : price;
@@ -92,15 +88,16 @@ export default function OrderLabel() {
 
   // Save input value on change
   const saveInput = (e, section, singleValue = false) => {
-    if (!singleValue) e.preventDefault();
+    if (!singleValue && e.preventDefault) e.preventDefault();
 
     // Clear error message if user starts typing
     const errorCopy = { ...sectionErrors };
     if (section === "packageInfo") delete errorCopy["package"];
     else if (section === "recipientInfo") delete errorCopy["recipient"];
     else if (section === "senderInfo") delete errorCopy["sender"];
-    else if (section === "courier" || section === "classType")
+    else if (section === "courier" || section === "classType") {
       delete errorCopy["courierClass"];
+    }
     setSectionErrors(errorCopy);
 
     setFormValues((prevValues) => {
@@ -475,8 +472,9 @@ export default function OrderLabel() {
                   fixTextAlignment
                   optional
                 />
-                <DefaultField
+                <PhoneField
                   label="Phone number"
+                  fieldType="tel"
                   helpText="(XXX) XXX-XXXX."
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
                   minLength={10}
@@ -585,8 +583,9 @@ export default function OrderLabel() {
                   fixTextAlignment
                   optional
                 />
-                <DefaultField
+                <PhoneField
                   label="Phone number"
+                  fieldType="tel"
                   helpText="(XXX) XXX-XXXX."
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
                   minLength={10}
