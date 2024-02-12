@@ -1036,16 +1036,16 @@ async function createLabel(endpoint, uuid, formValues, country = null, satDelive
 // Order Label
 // TODO: @Kian do the POST request here for DB update
 // 1) use the form values to send to our API
-// 2) update user's credits in DB by subtracting totalAmount from their total credits
+// 2) update user's credits in DB by subtracting totalPrice from their total credits
 // 3) also save each order in a schema so we can keep track of all orders coming in. 
 // 4) Send email to both USER using email and OUR email so 2 emails to send
 // 5) also save senderInfo in formValues to DB so we can preload it to the frontend when they want to create more orders in the future
 app.post("/orderLabel", async (req, res) => {
     try {
         logger("Received orderLabel request.");
-        const { email, totalAmount, formValues } = req.body;
+        const { email, totalPrice, formValues } = req.body;
         const uuid = "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf";
-        logger(`Email: ${email}, Total Amount: ${totalAmount}, Form Values: ${JSON.stringify(formValues)}`);
+        logger(`Email: ${email}, Total Amount: ${totalPrice}, Form Values: ${JSON.stringify(formValues)}`);
         logger("OrderLabel request processed successfully.");
         //Connect to the ORDER LABEL API
         const labelResponse = await nodeFetch(

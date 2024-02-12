@@ -678,7 +678,16 @@ export default function OrderLabel() {
                   <Button
                     fill="outline"
                     text="Autofill"
-                    onClickEvent={() => setFormValues(mockData)}
+                    onClickEvent={() => {
+                      setFormValues(mockData);
+                      setTotalPrice(
+                        calculatePrice(
+                          mockData.courier,
+                          mockData.classType,
+                          signatureChecked
+                        )
+                      );
+                    }}
                   />
                 )}
                 <Button
