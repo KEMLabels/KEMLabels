@@ -242,12 +242,12 @@ export default function OrderLabel() {
               Please complete all mandatory fields to proceed with placing your
               order.
             </p>
-            {/* {(creditAmount === 0 || creditAmount - totalPrice < 0) && (
+            {(creditAmount === 0 || creditAmount - totalPrice < 0) && (
               <AlertMessage
                 msg="You have insufficient funds to purchase. Please load your credits first to proceed with your purchase."
                 type="error"
               />
-            )} */}
+            )}
             {sectionErrors?.container && (
               <AlertMessage msg={sectionErrors.container} type="error" />
             )}
