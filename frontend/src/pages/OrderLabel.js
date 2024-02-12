@@ -44,7 +44,7 @@ export default function OrderLabel() {
     city: "",
     state: "",
     zip: "",
-    country: "",
+    country: "USA",
   };
   const initialFormValues = {
     courier: courierTypes[0],
