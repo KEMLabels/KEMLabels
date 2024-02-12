@@ -72,6 +72,16 @@
   transition: all ease-in-out 0.3s;
 }
 
+.fieldContainer .fieldInputGroup .fieldInput.textarea {
+  min-height: 100px;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -ms-transition: none;
+  -o-transition: none;
+  transition: none;
+  resize: vertical;
+}
+
 .fieldContainer .fieldInputGroup .inputPrefix,
 .fieldContainer .fieldInputGroup .inputPostfix {
   display: flex;

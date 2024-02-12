@@ -31,6 +31,7 @@ function DefaultField({
 }) {
   const inputClassNames = [
     "fieldInput",
+    fieldType === "textarea" ? "textarea" : "",
     className,
     disabled && "disabled",
     prefix && "prefix",
@@ -53,21 +54,38 @@ function DefaultField({
       </div>
       <div className={`fieldInputGroup ${shortField ? "shortField" : ""}`}>
         {prefix && <span className="inputPrefix">{prefix}</span>}
-        <input
-          id={id}
-          className={inputClassNames}
-          type={fieldType}
-          name={name}
-          title={title}
-          style={{ ...customStyle }}
-          defaultValue={initialValue}
-          value={currentValue}
-          placeholder={placeholder}
-          disabled={disabled}
-          minLength={minLength || null}
-          maxLength={maxLength || null}
-          onChange={(e) => (onChangeEvent ? onChangeEvent(e) : null)}
-        />
+        {fieldType === "textarea" ? (
+          <textarea
+            id={id}
+            className={inputClassNames}
+            name={name}
+            title={title}
+            style={{ ...customStyle }}
+            defaultValue={initialValue}
+            value={currentValue}
+            placeholder={placeholder}
+            disabled={disabled}
+            minLength={minLength || null}
+            maxLength={maxLength || null}
+            onChange={(e) => (onChangeEvent ? onChangeEvent(e) : null)}
+          />
+        ) : (
+          <input
+            id={id}
+            className={inputClassNames}
+            type={fieldType}
+            name={name}
+            title={title}
+            style={{ ...customStyle }}
+            defaultValue={initialValue}
+            value={currentValue}
+            placeholder={placeholder}
+            disabled={disabled}
+            minLength={minLength || null}
+            maxLength={maxLength || null}
+            onChange={(e) => (onChangeEvent ? onChangeEvent(e) : null)}
+          />
+        )}
         {postfix && <span className="inputPostfix">{postfix}</span>}
       </div>
       {error && <span className="fieldErrorMsg">{error}</span>}
