@@ -981,36 +981,40 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
     }
 })
 
-async function createLabel(endpoint, uuid, formValues, country=null, satDelivery=null) {
+async function createLabel(endpoint, uuid, formValues, country = null, satDelivery = null) {
     const { classType, senderInfo, recipientInfo, packageInfo } = formValues;
+    const references = [];
+    if (packageInfo.referenceNumber) references.push(packageInfo.referenceNumber);
+    if (packageInfo.referenceNumber2) references.push(packageInfo.referenceNumber2);
+
     const body = {
         uuid: uuid,
-        service_speed: `${classType}`,
+        service_speed: classType,
         sender: {
             name: `${senderInfo.firstName} ${senderInfo.lastName}`,
-            address1: `${senderInfo.street}`,
-            address2: `${senderInfo.suite}`,
-            city: `${senderInfo.city}`,
-            state: `${senderInfo.state}`,
-            postal_code: `${senderInfo.zip}`,
-            phone: `${senderInfo.phone}`
+            address1: senderInfo.street,
+            address2: senderInfo.suite,
+            city: senderInfo.city,
+            state: senderInfo.state,
+            postal_code: senderInfo.zip,
+            phone: senderInfo.phone,
         },
         recipient: {
             name: `${recipientInfo.firstName} ${recipientInfo.lastName}`,
-            address1: `${recipientInfo.street}`,
-            address2: `${recipientInfo.suite}`,
-            city: `${recipientInfo.city}`,
-            state: `${recipientInfo.state}`,
-            postal_code: `${recipientInfo.zip}`,
-            phone: `${recipientInfo.phone}`
+            address1: recipientInfo.street,
+            address2: recipientInfo.suite,
+            city: recipientInfo.city,
+            state: recipientInfo.state,
+            postal_code: recipientInfo.zip,
+            phone: recipientInfo.phone,
         },
         package: {
-            length: `${packageInfo.length}`,
-            width: `${packageInfo.width}`,
-            height: `${packageInfo.height}`,
-            weight: `${packageInfo.weight}`,
-            description: `${packageInfo.description}`,
-            references: `${packageInfo.referenceNumber}`,
+            length: packageInfo.length,
+            width: packageInfo.width,
+            height: packageInfo.height,
+            weight: packageInfo.weight,
+            description: packageInfo.description,
+            references: references,
         }
     }
 
@@ -1039,16 +1043,7 @@ async function createLabel(endpoint, uuid, formValues, country=null, satDelivery
 app.post("/orderLabel", async (req, res) => {
     try {
         logger("Received orderLabel request.");
-        const { email, totalAmount } = req.body;
-        const formValues = {
-            ...req.body.formValues,
-            packageInfo: {
-                ...req.body.packageInfo,
-                referenceNumber: req.body.formValues.packageInfo.referenceNumber
-                    .split(",")
-                    .map((num) => num.trim()) || []
-            }
-        };
+        const { email, totalAmount, formValues } = req.body;
         const uuid = "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf";
         logger(`Email: ${email}, Total Amount: ${totalAmount}, Form Values: ${JSON.stringify(formValues)}`);
         logger("OrderLabel request processed successfully.");

@@ -56,6 +56,7 @@ export default function OrderLabel() {
       height: "",
       description: "",
       referenceNumber: "",
+      referenceNumber2: "",
     },
     senderInfo: { ...senderAndRecipientInfo, ...savedSenderInfo },
     recipientInfo: { ...senderAndRecipientInfo },
@@ -396,13 +397,25 @@ export default function OrderLabel() {
               </div>
               <div className="formRow">
                 <DefaultField
-                  label="Reference number"
-                  helpText="Order numbers, invoice numbers, or other codes separated by commas."
+                  label="Reference number 1"
+                  helpText="Order numbers or invoice numbers."
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={100}
+                  maxLength={50}
                   name="referenceNumber"
                   currentValue={formValues?.packageInfo?.referenceNumber}
+                  optional
+                />
+              </div>
+              <div className="formRow">
+                <DefaultField
+                  label="Reference number 2"
+                  helpText="Order numbers or invoice numbers."
+                  onChangeEvent={(e) => saveInput(e, "packageInfo")}
+                  minLength={1}
+                  maxLength={50}
+                  name="referenceNumber2"
+                  currentValue={formValues?.packageInfo?.referenceNumber2}
                   optional
                 />
               </div>
