@@ -24,6 +24,12 @@ import {
 } from "../content/orderLabelsConstants";
 import OrderConfirmPopup from "../components/OrderConfirmPopup";
 import OrderSuccess from "../components/OrderSuccess";
+import {
+  validatePackageHeight,
+  validatePackageLength,
+  validatePackageWeight,
+  validatePackageWidth,
+} from "../utils/Validation";
 
 export default function OrderLabel() {
   const navigate = useNavigate();
@@ -70,6 +76,7 @@ export default function OrderLabel() {
   const [showOrderConfirmPopup, setShowOrderConfirmPopup] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const [signatureChecked, setSignatureChecked] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
@@ -131,8 +138,34 @@ export default function OrderLabel() {
     return Object.values(section).some((value) => value === "");
   };
 
+  function validatePackage(packageInfo) {
+    const packageWeightvalid = validatePackageWeight(
+      packageInfo.weight,
+      setFieldErrors
+    );
+    const packageLengthValid = validatePackageLength(
+      packageInfo.length,
+      setFieldErrors
+    );
+    const packageWidthValid = validatePackageWidth(
+      packageInfo.width,
+      setFieldErrors
+    );
+    const packageHeightValid = validatePackageHeight(
+      packageInfo.height,
+      setFieldErrors
+    );
+    return (
+      !packageWeightvalid ||
+      !packageLengthValid ||
+      !packageWidthValid ||
+      !packageHeightValid
+    );
+  }
+
   const submit = (e) => {
     e.preventDefault();
+    setFieldErrors({}); // Clear any previous errors
 
     // Check if user has enough credits, if not, display error message
     if (creditAmount - totalPrice < 0) {
@@ -160,6 +193,12 @@ export default function OrderLabel() {
       }
     });
 
+    if (!errors.package && validatePackage(packageInfo)) {
+      errors.package =
+        "Please review your package details and ensure that all fields are filled in correctly.";
+    }
+
+    // If there are errors, display them and return
     if (Object.keys(errors).length > 0) {
       setSectionErrors(errors);
       return;
@@ -351,23 +390,24 @@ export default function OrderLabel() {
               <div className="formRow">
                 <DefaultField
                   label="Weight"
-                  helpText="Maximum weight is 150 lbs."
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={3}
+                  maxLength={5}
                   name="weight"
                   currentValue={formValues?.packageInfo?.weight}
                   postfix="lbs"
+                  error={fieldErrors?.packageWeight}
                   shortField
                 />
                 <DefaultField
                   label="Length"
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={3}
+                  maxLength={5}
                   name="length"
                   currentValue={formValues?.packageInfo?.length}
                   postfix="in"
+                  error={fieldErrors?.packageLength}
                   shortField
                   fixTextAlignment
                 />
@@ -377,20 +417,22 @@ export default function OrderLabel() {
                   label="Width"
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={3}
+                  maxLength={5}
                   name="width"
                   currentValue={formValues?.packageInfo?.width}
                   postfix="in"
+                  error={fieldErrors?.packageWidth}
                   shortField
                 />
                 <DefaultField
                   label="Height"
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={3}
+                  maxLength={5}
                   name="height"
                   currentValue={formValues?.packageInfo?.height}
                   postfix="in"
+                  error={fieldErrors?.packageHeight}
                   shortField
                 />
               </div>

@@ -34,7 +34,11 @@ export function validateUsernameOnSubmit(username, setFieldErrors) {
   return true;
 }
 
-export function validateEmailOnSubmit(email, setFieldErrors, fieldName = "email") {
+export function validateEmailOnSubmit(
+  email,
+  setFieldErrors,
+  fieldName = "email"
+) {
   if (!lengthRangeCheck(email, 3, 100)) {
     return setFieldErrors((currentErrors) => ({
       ...currentErrors,
@@ -44,7 +48,8 @@ export function validateEmailOnSubmit(email, setFieldErrors, fieldName = "email"
   if (!regex.email.test(email))
     return setFieldErrors((currentErrors) => ({
       ...currentErrors,
-      [fieldName]: "The email you entered doesn't look right. Please try again.",
+      [fieldName]:
+        "The email you entered doesn't look right. Please try again.",
     }));
   return true;
 }
@@ -61,11 +66,16 @@ export function validatePasswordSpecialChar(password) {
   return regex.password.specialChar.test(password);
 }
 
-export function validatePasswordOnSubmit(password, setFieldErrors, fieldName = "password") {
+export function validatePasswordOnSubmit(
+  password,
+  setFieldErrors,
+  fieldName = "password"
+) {
   if (!lengthRangeCheck(password, 8, 50)) {
     return setFieldErrors((currentErrors) => ({
       ...currentErrors,
-      [fieldName]: "Please ensure your password is between 8 and 50 characters.",
+      [fieldName]:
+        "Please ensure your password is between 8 and 50 characters.",
     }));
   }
   if (!regex.passwordCombined.test(password)) {
@@ -90,6 +100,66 @@ export function validateTablePagination(
     parsedNumValue > maxPage
   ) {
     return false;
+  }
+  return true;
+}
+
+export function validatePackageWeight(weight, setFieldErrors) {
+  if (isNaN(weight) || weight <= 0) {
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      packageWeight: "Weight must be a number greater than 0.",
+    }));
+  } else if (weight > 100000) {
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      packageWeight: "Weight must be less than 100000 lbs.",
+    }));
+  }
+  return true;
+}
+
+export function validatePackageLength(length, setFieldErrors) {
+  if (isNaN(length) || length <= 0) {
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      packageLength: "Length must be a number greater than 0.",
+    }));
+  } else if (length > 100000) {
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      packageLength: "Length must be less than 100000 inches.",
+    }));
+  }
+  return true;
+}
+
+export function validatePackageWidth(width, setFieldErrors) {
+  if (isNaN(width) || width <= 0) {
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      packageWidth: "Width must be a number greater than 0.",
+    }));
+  } else if (width > 100000) {
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      packageWidth: "Width must be less than 100000 inches.",
+    }));
+  }
+  return true;
+}
+
+export function validatePackageHeight(height, setFieldErrors) {
+  if (isNaN(height) || height <= 0) {
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      packageHeight: "Height must be a number greater than 0.",
+    }));
+  } else if (height > 100000) {
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      packageHeight: "Height must be less than 100000 inches.",
+    }));
   }
   return true;
 }
