@@ -234,6 +234,7 @@ export default function OrderLabel() {
         withCredentials: true,
         formValues: formValues,
         totalPrice: totalPrice,
+        signature: signatureChecked,
       })
       .then((res) => {
         if (res.data.errMsg) {

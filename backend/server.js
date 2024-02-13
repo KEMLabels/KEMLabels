@@ -982,15 +982,17 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
     }
 })
 
-async function createLabel(endpoint, uuid, formValues, country = null, satDelivery = null) {
-    const { classType, senderInfo, recipientInfo, packageInfo } = formValues;
+async function createLabel(endpoint, uuid, formValues, signature, country = null, satDelivery = null) {
+    const { courier, senderInfo, recipientInfo, packageInfo } = formValues;
     const references = [];
+    let classType = formValues.classType;
     if (packageInfo.referenceNumber) references.push(packageInfo.referenceNumber);
     if (packageInfo.referenceNumber2) references.push(packageInfo.referenceNumber2);
+    if (signature) classType = classType.split(':')[0] + ' Signature';
 
     const body = {
         uuid: uuid,
-        service_speed: classType,
+        service_speed: `${courier} ${classType}`,
         sender: {
             name: `${senderInfo.firstName} ${senderInfo.lastName}`,
             address1: senderInfo.street,
@@ -1044,10 +1046,11 @@ async function createLabel(endpoint, uuid, formValues, country = null, satDelive
 app.post("/orderLabel", async (req, res) => {
     try {
         logger("Received orderLabel request.");
-        const { email, totalPrice, formValues } = req.body;
         const uuid = "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf";
+        const { email, totalPrice, formValues, signature } = req.body;
         logger(`Email: ${email}, Total Amount: ${totalPrice}, Form Values: ${JSON.stringify(formValues)}`);
         logger("OrderLabel request processed successfully.");
+
         //Connect to the ORDER LABEL API
         const labelResponse = await nodeFetch(
             process.env.API_LABELS_USER_INFO,
@@ -1080,11 +1083,14 @@ app.post("/orderLabel", async (req, res) => {
             default:
                 break;
         }
-        //Create label
-        const labelRes = await createLabel(endpoint, uuid, formValues, country, satDelivery);
-        logger(`Created label: ${JSON.stringify(labelRes)}`);
-        if (!labelRes) {
-            logger("Error creating label", "error");
+        
+        try {
+            //Create label
+            const labelRes = await createLabel(endpoint, uuid, formValues, signature, country, satDelivery);
+            if (!labelRes) throw new Error("Error creating label");
+            logger(`Created label: ${JSON.stringify(labelRes)}`);
+        } catch (err) {
+            logger(`Error creating label: ${err}`, "error");
             throw new Error("Error creating label");
         }
         return res.status(200).json({ msg: "OrderLabel request processed successfully." });
