@@ -1049,19 +1049,22 @@ app.post("/orderLabel", async (req, res) => {
         const uuid = "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf";
         const { email, totalPrice, formValues, signature } = req.body;
         logger(`Email: ${email}, Total Amount: ${totalPrice}, Form Values: ${JSON.stringify(formValues)}`);
-        logger("OrderLabel request processed successfully.");
 
         //Connect to the ORDER LABEL API
         const labelResponse = await nodeFetch(
             process.env.API_LABELS_USER_INFO,
             {
-                headers: { Content_Type: 'application/json' },
+                headers: { "Content-Type": "application/json" },
                 method: "POST",
-                body: JSON.stringify({ uuid: uuid })
+                body: JSON.stringify({ "uuid": uuid })
             }
         );
-        const data = await labelResponse.json();
-        logger(`User info: ${JSON.stringify(data)}`);
+        const userInfo = await labelResponse.json();
+        logger(`User info: ${JSON.stringify(userInfo)}`);
+        if (!userInfo || userInfo.status !== "success") {
+            logger(`API Error - User Info: ${userInfo.status}, ${userInfo.message}`, "error");
+            throw new Error(userInfo.message);
+        }
 
         let country = null;
         let satDelivery = null;
@@ -1085,10 +1088,13 @@ app.post("/orderLabel", async (req, res) => {
         }
         
         try {
-            //Create label
+            // Create label
             const labelRes = await createLabel(endpoint, uuid, formValues, signature, country, satDelivery);
-            if (!labelRes) throw new Error("Error creating label");
-            logger(`Created label: ${JSON.stringify(labelRes)}`);
+            if (!labelRes || labelRes.status !== "success") {
+                logger(`API Error - Create Label: ${labelRes.status}, ${labelRes.message}`, "error");
+                throw new Error(labelRes.message);
+            }
+            logger(`Label Data: ${JSON.stringify(labelRes.data)}`);
         } catch (err) {
             logger(`Error creating label: ${err}`, "error");
             throw new Error("Error creating label");
