@@ -393,7 +393,7 @@ export default function OrderLabel() {
                   label="Weight"
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={5}
+                  maxLength={2}
                   name="weight"
                   currentValue={formValues?.packageInfo?.weight}
                   postfix="lbs"
@@ -404,7 +404,7 @@ export default function OrderLabel() {
                   label="Length"
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={5}
+                  maxLength={2}
                   name="length"
                   currentValue={formValues?.packageInfo?.length}
                   postfix="in"
@@ -418,7 +418,7 @@ export default function OrderLabel() {
                   label="Width"
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={5}
+                  maxLength={2}
                   name="width"
                   currentValue={formValues?.packageInfo?.width}
                   postfix="in"
@@ -429,7 +429,7 @@ export default function OrderLabel() {
                   label="Height"
                   onChangeEvent={(e) => saveInput(e, "packageInfo")}
                   minLength={1}
-                  maxLength={5}
+                  maxLength={2}
                   name="height"
                   currentValue={formValues?.packageInfo?.height}
                   postfix="in"

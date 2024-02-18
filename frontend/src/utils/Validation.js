@@ -110,10 +110,10 @@ export function validatePackageWeight(weight, setFieldErrors) {
       ...currentErrors,
       packageWeight: "Weight must be a number greater than 0.",
     }));
-  } else if (weight > 100000) {
+  } else if (weight > 70) {
     return setFieldErrors((currentErrors) => ({
       ...currentErrors,
-      packageWeight: "Weight must be less than 100000 lbs.",
+      packageWeight: "Weight must be 70 lbs or less.",
     }));
   }
   return true;
@@ -125,10 +125,10 @@ export function validatePackageLength(length, setFieldErrors) {
       ...currentErrors,
       packageLength: "Length must be a number greater than 0.",
     }));
-  } else if (length > 100000) {
+  } else if (length > 70) {
     return setFieldErrors((currentErrors) => ({
       ...currentErrors,
-      packageLength: "Length must be less than 100000 inches.",
+      packageLength: "Length must be 70 inches less.",
     }));
   }
   return true;
@@ -140,10 +140,10 @@ export function validatePackageWidth(width, setFieldErrors) {
       ...currentErrors,
       packageWidth: "Width must be a number greater than 0.",
     }));
-  } else if (width > 100000) {
+  } else if (width > 70) {
     return setFieldErrors((currentErrors) => ({
       ...currentErrors,
-      packageWidth: "Width must be less than 100000 inches.",
+      packageWidth: "Width must be 70 inches or less.",
     }));
   }
   return true;
@@ -155,10 +155,10 @@ export function validatePackageHeight(height, setFieldErrors) {
       ...currentErrors,
       packageHeight: "Height must be a number greater than 0.",
     }));
-  } else if (height > 100000) {
+  } else if (height > 70) {
     return setFieldErrors((currentErrors) => ({
       ...currentErrors,
-      packageHeight: "Height must be less than 100000 inches.",
+      packageHeight: "Height must be 70 inches or less.",
     }));
   }
   return true;
