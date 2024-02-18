@@ -989,6 +989,7 @@ async function createLabel(endpoint, uuid, formValues, signature, country = null
     if (packageInfo.referenceNumber) references.push(packageInfo.referenceNumber);
     if (packageInfo.referenceNumber2) references.push(packageInfo.referenceNumber2);
     if (signature) classType = classType.split(':')[0] + ' Signature';
+    else classType = classType.split(':')[0];
 
     const body = {
         uuid: uuid,
@@ -1028,7 +1029,7 @@ async function createLabel(endpoint, uuid, formValues, signature, country = null
     const res = await nodeFetch(
         endpoint,
         {
-            headers: { Content_Type: 'application/json' },
+            headers: { "Content-Type": "application/json" },
             method: "POST",
             body: JSON.stringify(body)
         }
@@ -1090,11 +1091,12 @@ app.post("/orderLabel", async (req, res) => {
         try {
             // Create label
             const labelRes = await createLabel(endpoint, uuid, formValues, signature, country, satDelivery);
+            logger(`Create Label Response: ${JSON.stringify(labelRes)}`);
             if (!labelRes || labelRes.status !== "success") {
                 logger(`API Error - Create Label: ${labelRes.status}, ${labelRes.message}`, "error");
                 throw new Error(labelRes.message);
             }
-            logger(`Label Data: ${JSON.stringify(labelRes.data)}`);
+            logger(`Create Label Data: ${JSON.stringify(labelRes.data)}`);
         } catch (err) {
             logger(`Error creating label: ${err}`, "error");
             throw new Error("Error creating label");
