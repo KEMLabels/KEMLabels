@@ -1,4 +1,4 @@
-module.exports = (email, subject, content) => ({
+module.exports = (email, subject, content, attachments={}) => ({
   from: `KEMLabels <${process.env.MAIL_USER}>`,
   to: email,
   subject: subject,
@@ -10,6 +10,7 @@ module.exports = (email, subject, content) => ({
         : `${__dirname}/logo/logo-primary.png`.replace('backend.kemlabels.com', 'public_html'),
       cid: "logo",
     },
+    ...attachments,
   ],
   html: `
   <div style="max-width: 1000px;border:solid 1px #CBCBCB; margin: 0 auto;padding: 50px 60px;box-sizing:border-box;">

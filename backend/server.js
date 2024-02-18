@@ -980,7 +980,28 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
         logger(`Error processing password change confirmation: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
-})
+});
+
+// TODO: Fix this email template for PDF handling
+function sendLabelInfoEmail(email, tracking, labelPDF, receiptPDF) {
+    try {
+        const attachments = [];
+        attachments.push({ filename: 'shipping_label.pdf', content: labelPDF });
+        attachments.push({ filename: 'receipt_label.pdf', content: receiptPDF });
+        
+        const content = `<h1 style="margin-bottom: 2rem;">Thank you for you order!</h1>
+        <p>Your order has been received and we have attached your shipping label in a PDF attachment to this email.</p>
+        <p>For any questions or concerns, please contact our support team at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
+        const orderConfirmation = emailTemplate(email, 'KEMLabels - Your Shipping Label Order is Ready', content, attachments);
+
+        transporter.sendMail(orderConfirmation, function (err, info) {
+            if (err) logger(`Error sending shipping label order confirmation to customer: ${err}`, "error");
+            else logger(`Shipping label order confirmation email sent successfully to ${email}.`);
+        });
+    } catch (err) {
+        logger(`Error sending email for updating email: ${err}`, "error");
+    }
+}
 
 async function createLabel(endpoint, uuid, formValues, signature, country = null, satDelivery = null) {
     const { courier, senderInfo, recipientInfo, packageInfo } = formValues;
@@ -1097,6 +1118,12 @@ app.post("/orderLabel", async (req, res) => {
                 throw new Error(labelRes.message);
             }
             logger(`Create Label Data: ${JSON.stringify(labelRes.data)}`);
+
+            // Update user's credits, if "save" is checked on form (Towa has to send this info in req.body)
+            // save order info to DB 
+            // send email to user with PDF label attachment, and to our email with the same attachment
+            const { tracking, label_pdf, receipt_pdf } = labelRes.data;
+            sendLabelInfoEmail(email, tracking, label_pdf, receipt_pdf);
         } catch (err) {
             logger(`Error creating label: ${err}`, "error");
             throw new Error("Error creating label");
