@@ -240,6 +240,10 @@ export default function OrderLabel() {
       .then((res) => {
         if (res.data.errMsg) {
           setSectionErrors({ container: res.data.errMsg });
+          setLoading(false);
+          setShowOrderConfirmPopup(false);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          document.body.style.overflow = null;
         } else {
           setSectionErrors({});
           setSuccessMsg("Your order has been placed. Redirecting...");
@@ -258,6 +262,10 @@ export default function OrderLabel() {
         setSectionErrors({
           container: "An unexpected error occurred. Please try again later.",
         }); // Axios default error
+        setLoading(false);
+        setShowOrderConfirmPopup(false);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        document.body.style.overflow = null;
       });
   }
 
