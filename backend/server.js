@@ -62,6 +62,7 @@ const store = new MongoDBStore({
 const User = require('./model/users.js');
 const tempTokens = require('./model/tempToken.js');
 const tempOTPS = require('./model/tempOTPs.js');
+const senderInfoSchema = require('./model/senderInfo.js')
 
 //Start app
 app.use('/', express.static(__dirname + '/public'));
@@ -342,6 +343,12 @@ app.post("/signup", async (req, res) => {
         });
         await new_user.save()
         logger(`New user created: ID '${new_user._id}', Username '${new_user.userName}', Email '${new_user.email}'`);
+
+        const new_user_senderInfo = new senderInfoSchema({
+            userEmail: new_user.email,
+        });
+        await new_user_senderInfo.save()
+        logger(`New senderInfo created for the user: ID ${new_user_senderInfo.userEmail}`);
 
         const token = crypto.randomBytes(32).toString("hex");
         const create_token = new tempTokens({
@@ -988,7 +995,7 @@ function sendLabelInfoEmail(email, tracking, labelPDF, receiptPDF) {
         const attachments = [];
         attachments.push({ filename: 'shipping_label.pdf', content: labelPDF });
         attachments.push({ filename: 'receipt_label.pdf', content: receiptPDF });
-        
+
         const content = `<h1 style="margin-bottom: 2rem;">Thank you for you order!</h1>
         <p>Your order has been received and we have attached your shipping label in a PDF attachment to this email.</p>
         <p>For any questions or concerns, please contact our support team at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
@@ -1002,6 +1009,22 @@ function sendLabelInfoEmail(email, tracking, labelPDF, receiptPDF) {
         logger(`Error sending email for updating email: ${err}`, "error");
     }
 }
+
+//Get the user's sender information
+app.post("/getUserSenderInfo", async (req, res) => {
+    const { userEmail } = req.body;
+    try {
+        const senderInfo = await senderInfoSchema.findOne({ userEmail: userEmail })
+        if (!senderInfo) {
+            logger(`User not found for email: ${email}`, "error");
+            throw new Error('User not found.');
+        }
+        res.send(senderInfo);
+    } catch (error) {
+        logger(`Error processing request: ${err}`, "error");
+        return res.status(400).json({ msg: err.message });
+    }
+});
 
 async function createLabel(endpoint, uuid, formValues, signature, country = null, satDelivery = null) {
     const { courier, senderInfo, recipientInfo, packageInfo } = formValues;
@@ -1058,6 +1081,44 @@ async function createLabel(endpoint, uuid, formValues, signature, country = null
     return res.json();
 }
 
+async function successOrderUpdateDB(email, totalPrice, formValues, saveSenderInfo) {
+    try {
+        const user = await User.findOne({ email: email })
+        if (!user) {
+            logger(`User not found for email: ${email}`, "error");
+            throw new Error('User not found.');
+        }
+        const userExistingCredits = user.credits;
+        const newCredits = Number(userExistingCredits) - Number(totalPrice);
+        await User.updateOne({ "_id": user._id.toString() }, { "credits": newCredits });
+        logger(`User credits updated. New credits: ${newCredits}`);
+
+        //Put if statement here if the saveInfo is enabled
+        if (saveSenderInfo) {
+            const { courier, senderInfo, recipientInfo, packageInfo } = formValues;
+            const userSenderInfo = await senderInfoSchema.findOne({ userEmail: email })
+            if (!userSenderInfo) {
+                logger(`User not found error`);
+                throw new Error('User not found.');
+            }
+            await userSenderInfo.updateOne(
+                { "name": senderInfo.name },
+                { "address1": senderInfo.address1 },
+                { "address2": senderInfo.address2 },
+                { "city": senderInfo.city },
+                { "state": senderInfo.state },
+                { "postal_code": senderInfo.postal_code },
+                { "phone": senderInfo.phone },
+                { "country": senderInfo.country },
+            );
+            logger(`User senderInfo updated.`);
+        }
+    } catch (error) {
+        logger(`Error updating user credits: ${err}`, "error");
+        res.status(500).end();
+    }
+}
+
 // Order Label
 // TODO: @Kian do the POST request here for DB update
 // 1) use the form values to send to our API
@@ -1108,7 +1169,7 @@ app.post("/orderLabel", async (req, res) => {
             default:
                 break;
         }
-        
+
         try {
             // Create label
             const labelRes = await createLabel(endpoint, uuid, formValues, signature, country, satDelivery);
@@ -1118,7 +1179,7 @@ app.post("/orderLabel", async (req, res) => {
                 throw new Error(labelRes.message);
             }
             logger(`Create Label Data: ${JSON.stringify(labelRes.data)}`);
-
+            await successOrderUpdateDB(email, totalPrice, formValues, saveSenderInfo);
             // Update user's credits, if "save" is checked on form (Towa has to send this info in req.body)
             // save order info to DB 
             // send email to user with PDF label attachment, and to our email with the same attachment
