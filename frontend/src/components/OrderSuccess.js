@@ -2,6 +2,28 @@ import React from "react";
 import { FaCheckCircle } from "react-icons/fa";
 
 export default function OrderSuccess({ formValues }) {
+  const packageInfoLabels = {
+    weight: "Weight",
+    length: "Length",
+    width: "Width",
+    height: "Height",
+    description: "Description",
+    referenceNumber: "Reference Number",
+    referenceNumber2: "Reference Number 2",
+  };
+
+  const contactInfoLabels = {
+    firstName: "First Name",
+    lastName: "Last Name",
+    phone: "Phone",
+    street: "Street",
+    suite: "Suite",
+    city: "City",
+    state: "State",
+    zip: "Zip",
+    country: "Country",
+  };
+
   function orderSummaryItem(label, value) {
     return (
       <div className="orderSummaryRow">
@@ -18,7 +40,7 @@ export default function OrderSuccess({ formValues }) {
       <>
         <h3>{title}</h3>
         {Object.entries(info).map(([label, value]) =>
-          orderSummaryItem(label, value)
+          orderSummaryItem(contactInfoLabels[label], value)
         )}
       </>
     );
@@ -38,7 +60,7 @@ export default function OrderSuccess({ formValues }) {
         <div className="orderSummarySection">
           <h3>Package Details</h3>
           {Object.entries(packageInfo).map(([label, value]) =>
-            orderSummaryItem(label, value)
+            orderSummaryItem(packageInfoLabels[label], value)
           )}
         </div>
         <div className="orderSummarySection">
