@@ -1003,14 +1003,25 @@ function sendLabelInfoEmail(email, pdfContent, filename) {
             }
         ];
 
-        const content = `<h1 style="margin-bottom: 2rem;">Thank you for you order!</h1>
+        // Customer email content
+        const customerContent = `<h1 style="margin-bottom: 2rem;">Thank you for you order!</h1>
         <p>Your order has been received and we have attached your shipping label in a PDF attachment to this email.</p>
         <p>For any questions or concerns, please contact our support team at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
-        const orderConfirmation = emailTemplate(email, 'KEMLabels - Your Shipping Label Order is Ready', content, attachments);
+        const customerOrderConfirm = emailTemplate(email, 'KEMLabels - Your Shipping Label Order is Ready', customerContent, attachments);
 
-        transporter.sendMail(orderConfirmation, function (err, info) {
+        transporter.sendMail(customerOrderConfirm, (err, info) => {
             if (err) logger(`Error sending shipping label order confirmation to customer: ${err}`, "error");
             else logger(`Shipping label order confirmation email sent successfully to ${email}.`);
+        });
+
+        // KEMLabels email content
+        const kemContent = `<h1 style="margin-bottom: 2rem;">New Shipping Label Order</h1>
+        <p>A new shipping label order has been placed by ${email}. The shipping label has been attached to this email.</p>`;
+        const kemlabelsOrderConfirm = emailTemplate(process.env.MAIL_USER, 'KEMLabels - New Shipping Label Order', kemContent, attachments);
+
+        transporter.sendMail(kemlabelsOrderConfirm, (err, info) => {
+            if (err) logger(`Error sending shipping label order confirmation to KEMLabels: ${err}`, "error");
+            else logger(`Shipping label order confirmation email sent successfully to KEMLabels.`);
         });
     } catch (err) {
         logger(`Error sending email for updating email: ${err}`, "error");
@@ -1149,6 +1160,8 @@ function handleLabelPDF(tracking, labelPDF, email, filename) {
         if (fs.existsSync(`./order_label_pdf/${filename}`)) fs.unlinkSync(`./order_label_pdf/${filename}`);
         fs.writeFileSync(`./order_label_pdf/${filename}`, decodedLabelPDF);
         logger(`Shipping label PDF saved successfully for tracking number: ${tracking}`);
+
+        // Send email to customer and KEMLabels
         sendLabelInfoEmail(email, decodedLabelPDF, filename);
     } catch (err) {
         logger(`Error handling shipping label PDF: ${err}`, "error");
