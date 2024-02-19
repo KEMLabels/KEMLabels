@@ -1142,12 +1142,12 @@ async function senderInfoUpdateDB(email, formValues) {
             { "country": senderInfo.country },
         );
         if (!updateSenderInfo) {
-            logger(`Error updating user senderInfo: ${err}`, "error");
+            logger("Error updating user senderInfo", "error");
             throw new Error('Error updating user senderInfo.');
         }
         logger("User sender information updated successfully.");
     } catch (error) {
-        logger(`Error updating user credits: ${err}`, "error");
+        logger(`Error updating user credits: ${error}`, "error");
         res.status(500).end();
     }
 }

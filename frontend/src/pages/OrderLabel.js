@@ -66,6 +66,12 @@ export default function OrderLabel() {
     senderInfo: { ...senderAndRecipientInfo, ...savedSenderInfo },
     recipientInfo: { ...senderAndRecipientInfo },
   };
+  const optionalFields = [
+    "referenceNumber",
+    "referenceNumber2",
+    "description",
+    "suite",
+  ];
   const [formValues, setFormValues] = useState(initialFormValues);
   const [sectionErrors, setSectionErrors] = useState({});
   const [successMsg, setSuccessMsg] = useState(false);
@@ -107,13 +113,17 @@ export default function OrderLabel() {
     }
     setSectionErrors(errorCopy);
 
+    const numericalFields = ["weight", "length", "width", "height"];
     setFormValues((prevValues) => {
       if (!singleValue) {
+        const value = numericalFields.includes(e.target.name)
+          ? Number(e.target.value)
+          : e.target.value;
         return {
           ...prevValues,
           [section]: {
             ...prevValues[section],
-            [e.target.name]: e.target.value,
+            [e.target.name]: value,
           },
         };
       }
@@ -135,7 +145,13 @@ export default function OrderLabel() {
   };
 
   const isSectionEmpty = (section) => {
-    return Object.values(section).some((value) => value === "");
+    Object.keys(section).forEach((field) => {
+      if (section[field] === "" && !optionalFields.includes(field)) {
+        Log(`Missing field: ${field}`);
+        return true;
+      }
+    });
+    return false;
   };
 
   function validatePackage(packageInfo) {
@@ -405,6 +421,12 @@ export default function OrderLabel() {
                     e.target.value = e.target.value
                       .replace(/\D/g, "")
                       .slice(0, 2);
+                    if (fieldErrors?.packageWeight) {
+                      setFieldErrors((prevErrors) => {
+                        delete prevErrors.packageWeight;
+                        return { ...prevErrors };
+                      });
+                    }
                     saveInput(e, "packageInfo");
                   }}
                   minLength={1}
@@ -422,6 +444,12 @@ export default function OrderLabel() {
                     e.target.value = e.target.value
                       .replace(/\D/g, "")
                       .slice(0, 2);
+                    if (fieldErrors?.packageLength) {
+                      setFieldErrors((prevErrors) => {
+                        delete prevErrors.packageLength;
+                        return { ...prevErrors };
+                      });
+                    }
                     saveInput(e, "packageInfo");
                   }}
                   minLength={1}
@@ -441,6 +469,12 @@ export default function OrderLabel() {
                     e.target.value = e.target.value
                       .replace(/\D/g, "")
                       .slice(0, 2);
+                    if (fieldErrors?.packageWidth) {
+                      setFieldErrors((prevErrors) => {
+                        delete prevErrors.packageWidth;
+                        return { ...prevErrors };
+                      });
+                    }
                     saveInput(e, "packageInfo");
                   }}
                   minLength={1}
@@ -458,6 +492,12 @@ export default function OrderLabel() {
                     e.target.value = e.target.value
                       .replace(/\D/g, "")
                       .slice(0, 2);
+                    if (fieldErrors?.packageHeight) {
+                      setFieldErrors((prevErrors) => {
+                        delete prevErrors.packageHeight;
+                        return { ...prevErrors };
+                      });
+                    }
                     saveInput(e, "packageInfo");
                   }}
                   minLength={1}
