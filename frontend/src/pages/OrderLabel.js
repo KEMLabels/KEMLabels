@@ -522,7 +522,7 @@ export default function OrderLabel() {
                 <PhoneField
                   label="Phone number"
                   fieldType="tel"
-                  helpText="(XXX) XXX-XXXX."
+                  helpText="(XXX) XXX-XXXX"
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
                   minLength={10}
                   maxLength={10}
@@ -574,7 +574,7 @@ export default function OrderLabel() {
               <div className="formRow">
                 <DefaultField
                   label="Province / State"
-                  helpText="Please enter the abbreviation. (i.e. CA for California)"
+                  helpText="Province code abbreviations (CA for California)"
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
                   placeholder="CA"
                   minLength={1}
@@ -627,7 +627,7 @@ export default function OrderLabel() {
                 <PhoneField
                   label="Phone number"
                   fieldType="tel"
-                  helpText="(XXX) XXX-XXXX."
+                  helpText="(XXX) XXX-XXXX"
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
                   minLength={10}
                   maxLength={10}
@@ -679,7 +679,7 @@ export default function OrderLabel() {
               <div className="formRow">
                 <DefaultField
                   label="Province / State"
-                  helpText="Please enter the abbreviation. (i.e. CA for California)"
+                  helpText="Province code abbreviations (CA for California)"
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
                   placeholder="CA"
                   minLength={1}
