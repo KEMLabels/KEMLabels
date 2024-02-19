@@ -346,6 +346,14 @@ app.post("/signup", async (req, res) => {
 
         const new_user_senderInfo = new senderInfoSchema({
             userEmail: new_user.email,
+            name: " ",
+            address1: " ",
+            address2: " ",
+            city: " ",
+            state: " ",
+            postal_code: " ",
+            phone: " ",
+            country: " "
         });
         await new_user_senderInfo.save()
         logger(`New senderInfo created for the user: ID ${new_user_senderInfo.userEmail}`);
