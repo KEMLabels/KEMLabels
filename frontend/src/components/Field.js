@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dropdown from "react-dropdown";
 import "../styles/Field.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -132,6 +132,11 @@ function PhoneField({
   const [phone, setPhone] = useState(
     currentValue ? formatPhoneNumber(currentValue) : ""
   );
+
+  useEffect(() => {
+    if (currentValue) setPhone(formatPhoneNumber(currentValue));
+  }, [currentValue]);
+
   return (
     <div
       className={`fieldContainer ${containerClassName} ${
