@@ -235,7 +235,7 @@ export default function OrderLabel() {
         formValues: formValues,
         totalPrice: totalPrice,
         signature: signatureChecked,
-        saveSenderInfo : saveSenderInfo,
+        saveSenderInfo: saveSenderInfo,
       })
       .then((res) => {
         if (res.data.errMsg) {
@@ -392,7 +392,13 @@ export default function OrderLabel() {
               <div className="formRow">
                 <DefaultField
                   label="Weight"
-                  onChangeEvent={(e) => saveInput(e, "packageInfo")}
+                  helpText="Whole numbers only, no decimals."
+                  onChangeEvent={(e) => {
+                    e.target.value = e.target.value
+                      .replace(/\D/g, "")
+                      .slice(0, 2);
+                    saveInput(e, "packageInfo");
+                  }}
                   minLength={1}
                   maxLength={2}
                   name="weight"
@@ -403,7 +409,13 @@ export default function OrderLabel() {
                 />
                 <DefaultField
                   label="Length"
-                  onChangeEvent={(e) => saveInput(e, "packageInfo")}
+                  helpText="Whole numbers only, no decimals."
+                  onChangeEvent={(e) => {
+                    e.target.value = e.target.value
+                      .replace(/\D/g, "")
+                      .slice(0, 2);
+                    saveInput(e, "packageInfo");
+                  }}
                   minLength={1}
                   maxLength={2}
                   name="length"
@@ -411,13 +423,18 @@ export default function OrderLabel() {
                   postfix="in"
                   error={fieldErrors?.packageLength}
                   shortField
-                  fixTextAlignment
                 />
               </div>
               <div className="formRow">
                 <DefaultField
                   label="Width"
-                  onChangeEvent={(e) => saveInput(e, "packageInfo")}
+                  helpText="Whole numbers only, no decimals."
+                  onChangeEvent={(e) => {
+                    e.target.value = e.target.value
+                      .replace(/\D/g, "")
+                      .slice(0, 2);
+                    saveInput(e, "packageInfo");
+                  }}
                   minLength={1}
                   maxLength={2}
                   name="width"
@@ -428,7 +445,13 @@ export default function OrderLabel() {
                 />
                 <DefaultField
                   label="Height"
-                  onChangeEvent={(e) => saveInput(e, "packageInfo")}
+                  helpText="Whole numbers only, no decimals."
+                  onChangeEvent={(e) => {
+                    e.target.value = e.target.value
+                      .replace(/\D/g, "")
+                      .slice(0, 2);
+                    saveInput(e, "packageInfo");
+                  }}
                   minLength={1}
                   maxLength={2}
                   name="height"

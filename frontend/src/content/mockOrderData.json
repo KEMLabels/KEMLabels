@@ -2,10 +2,10 @@
   "courier": "USPS",
   "classType": "Express: 1-2 days",
   "packageInfo": {
-    "weight": 55.98,
-    "length": 32.1,
-    "width": 24.8,
-    "height": 12.5,
+    "weight": 55,
+    "length": 32,
+    "width": 24,
+    "height": 12,
     "description": "This is a test package.",
     "referenceNumber": "1234567890"
   },
