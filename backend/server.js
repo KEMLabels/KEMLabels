@@ -1251,9 +1251,34 @@ cron.schedule('0 0 */1 * *', async () => {
 
         // Delete unverified accounts created more than 24 hours ago
         const res = await User.deleteMany({ verified: false, createdAt: { $lt: twentyFourHoursAgo } });
+        if (!res) logger(`Error deleting unverified accounts: ${err}`, "error");
         logger(`CRON job completed successfully. Deleted ${res.deletedCount} unverified accounts`);
     } catch (err) {
-        logger(`Error deleting unverified accounts: ${err}`, "error");
+        if (err.name === 'MongoError' && err.code === 11000) {
+            logger('MongoDB duplicate key error. Handle it appropriately.', "error");
+        }
+        logger('CRON job failed.', "error");
+    }
+});
+
+// Schedule a task to run every Sunday midnight
+cron.schedule('0 0 * * 0', () => {
+    try {
+        logger('CRON running');
+        logger('Starting weekly deletion of shipping label order pdf files...');
+
+        // Delete shipping label order pdf files
+        const dir = './order_label_pdf';
+        if (fs.existsSync(dir)) {
+            const files = fs.readdirSync(dir);
+            for (const file of files) {
+                fs.unlinkSync(`${dir}/${file}`, (err) => {
+                    if (err) logger(`Error deleting shipping label order pdf: ${err}`, "error");
+                });
+            }
+            logger(`Deleted ${files.length} shipping label order pdf files`);
+        } else logger("Directory not found for shipping label order pdf files.");
+    } catch (err) {
         if (err.name === 'MongoError' && err.code === 11000) {
             logger('MongoDB duplicate key error. Handle it appropriately.', "error");
         }
