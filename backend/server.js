@@ -722,8 +722,6 @@ async function getCoinbasePayments(email) {
                 logger(`Crypto charge fetch error: ${error}`, "error");
                 return [];
             }
-            // logger(`List: ${JSON.stringify(list)}`);
-            // logger(`Pagination: ${JSON.stringify(pagination)}`);
         });
         const userCharge = chargeList[0].filter(charge => charge.metadata.email === email);
         if (!userCharge) {
@@ -731,10 +729,8 @@ async function getCoinbasePayments(email) {
             return [];
         }
         logger(`Fetched crypto charge: ${JSON.stringify(userCharge)}`);
-        // logger(`Charge: ` + JSON.stringify(charge));
 
         const payments = [];
-
         for (const charge of userCharge) {
             const statusMapping = {
                 created: 'Processing',
@@ -751,7 +747,7 @@ async function getCoinbasePayments(email) {
                     paymentDate: createdDate,
                     paymentTime: createdTime,
                     amount: payment.value.local.amount,
-                    type: 'Cryto',
+                    type: 'Crypto',
                     status: statusMapping[payment.status.toLowerCase()] || 'Failed',
                 });
             }
