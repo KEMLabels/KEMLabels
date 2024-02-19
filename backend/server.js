@@ -1069,7 +1069,7 @@ app.post("/orderLabel", async (req, res) => {
     try {
         logger("Received orderLabel request.");
         const uuid = "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf";
-        const { email, totalPrice, formValues, signature } = req.body;
+        const { email, totalPrice, formValues, signature, saveSenderInfo } = req.body;
         logger(`Email: ${email}, Total Amount: ${totalPrice}, Form Values: ${JSON.stringify(formValues)}`);
 
         //Connect to the ORDER LABEL API

@@ -71,7 +71,7 @@ export default function OrderLabel() {
   const [successMsg, setSuccessMsg] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
-  const [senderInfoChecked, setSenderInfoChecked] = useState(!!savedSenderInfo);
+  const [saveSenderInfo, setSaveSenderInfo] = useState(!!savedSenderInfo);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [showOrderConfirmPopup, setShowOrderConfirmPopup] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -124,7 +124,7 @@ export default function OrderLabel() {
     });
 
     // Update sender info in redux store if user checks the checkbox
-    if (senderInfoChecked && section === "senderInfo") {
+    if (saveSenderInfo && section === "senderInfo") {
       dispatch(
         setSenderInfo({
           ...savedSenderInfo,
@@ -235,6 +235,7 @@ export default function OrderLabel() {
         formValues: formValues,
         totalPrice: totalPrice,
         signature: signatureChecked,
+        saveSenderInfo : saveSenderInfo,
       })
       .then((res) => {
         if (res.data.errMsg) {
@@ -481,12 +482,12 @@ export default function OrderLabel() {
                 <h2>Sender address</h2>
                 <Checkbox
                   label="Save"
-                  isSelected={senderInfoChecked}
+                  isSelected={saveSenderInfo}
                   onCheckboxChange={() => {
-                    setSenderInfoChecked(!senderInfoChecked);
+                    setSaveSenderInfo(!saveSenderInfo);
                     dispatch(
                       setSenderInfo(
-                        senderInfoChecked ? null : formValues.senderInfo
+                        saveSenderInfo ? null : formValues.senderInfo
                       )
                     );
                   }}
