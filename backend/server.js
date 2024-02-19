@@ -158,7 +158,7 @@ app.post("/create-payment-intent", async (req, res) => {
                 email: email,
             },
         });
-        logger(`PaymentIntent created successfully: ${paymentIntent}`);
+        logger(`PaymentIntent created successfully: ${JSON.stringify(paymentIntent)}`);
         res.send({ clientSecret: paymentIntent.client_secret });
     } catch (err) {
         logger(`Error creating PaymentIntent: ${err}`, "error");
@@ -993,16 +993,15 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
     }
 });
 
-// TODO: Fix this email template for PDF handling
-function sendLabelInfoEmail(email, tracking, labelPDF, labelPDFFileName, receiptPDF) {
+function sendLabelInfoEmail(email, pdfContent, filename) {
     try {
-        const attachments = [];
-        attachments.push({ 
-            filename: 'shipping_label.pdf',
-            path: `./order_label_pdf/${labelPDFFileName}`,
-            content: labelPDF
-        });
-        // attachments.push({ filename: 'receipt_label.pdf', content: receiptPDF });
+        const attachments = [
+            {
+                filename: 'shipping_label.pdf',
+                path: `./order_label_pdf/${filename}`,
+                content: pdfContent
+            }
+        ];
 
         const content = `<h1 style="margin-bottom: 2rem;">Thank you for you order!</h1>
         <p>Your order has been received and we have attached your shipping label in a PDF attachment to this email.</p>
@@ -1090,51 +1089,74 @@ async function createLabel(endpoint, uuid, formValues, signature, country = null
     return res.json();
 }
 
-async function successOrderUpdateDB(email, totalPrice, formValues, saveSenderInfo) {
+// Updates the user's credits in the database
+async function updateUserCredits(email, totalPrice) {
     try {
         const user = await User.findOne({ email: email })
         if (!user) {
             logger(`User not found for email: ${email}`, "error");
             throw new Error('User not found.');
         }
-        const userExistingCredits = user.credits;
-        const newCredits = Number(userExistingCredits) - Number(totalPrice);
-        await User.updateOne({ "_id": user._id.toString() }, { "credits": newCredits });
-        logger(`User credits updated. New credits: ${newCredits}`);
 
-        //Put if statement here if the saveInfo is enabled
-        if (saveSenderInfo) {
-            const { senderInfo } = formValues;
-            const userSenderInfo = await senderInfoSchema.findOne({ userEmail: email })
-            if (!userSenderInfo) {
-                logger(`User not found error`);
-                throw new Error('User not found.');
-            }
-            await userSenderInfo.updateOne(
-                { "name": `${senderInfo.firstName} ${senderInfo.lastName}`},
-                { "address1": senderInfo.street },
-                { "address2": senderInfo.suite },
-                { "city": senderInfo.city },
-                { "state": senderInfo.state },
-                { "postal_code": senderInfo.zip },
-                { "phone": senderInfo.phone },
-                { "country": senderInfo.country },
-            );
-            logger(`User senderInfo updated.`);
+        const updatedCredits = Number(user.credits) - Number(totalPrice);
+        const res = await User.updateOne({ "_id": user._id.toString() }, { "credits": updatedCredits });
+        if (!res) {
+            logger(`Error updating user credits: ${err}`, "error");
+            throw new Error('Error updating user credits.');
         }
+        logger(`User credits updated balance: ${updatedCredits}`);
     } catch (error) {
         logger(`Error updating user credits: ${err}`, "error");
         res.status(500).end();
     }
 }
 
+// Saves the user's sender information to the database
+async function senderInfoUpdateDB(email, formValues) {
+    try {
+        const { senderInfo } = formValues;
+        const userSenderInfo = await senderInfoSchema.findOne({ userEmail: email })
+        if (!userSenderInfo) {
+            logger(`User not found for email: ${email}`, "error");
+            throw new Error('User not found.');
+        }
+        const updateSenderInfo = await userSenderInfo.updateOne(
+            { "name": `${senderInfo.firstName} ${senderInfo.lastName}` },
+            { "address1": senderInfo.street },
+            { "address2": senderInfo.suite },
+            { "city": senderInfo.city },
+            { "state": senderInfo.state },
+            { "postal_code": senderInfo.zip },
+            { "phone": senderInfo.phone },
+            { "country": senderInfo.country },
+        );
+        if (!updateSenderInfo) {
+            logger(`Error updating user senderInfo: ${err}`, "error");
+            throw new Error('Error updating user senderInfo.');
+        }
+        logger("User sender information updated successfully.");
+    } catch (error) {
+        logger(`Error updating user credits: ${err}`, "error");
+        res.status(500).end();
+    }
+}
+
+// Handle the shipping label PDF
+function handleLabelPDF(tracking, labelPDF, email, filename) {
+    try {
+        const decodedLabelPDF = Buffer.from(labelPDF, 'base64');
+        if (!fs.existsSync('./order_label_pdf')) fs.mkdirSync('./order_label_pdf');
+        if (fs.existsSync(`./order_label_pdf/${filename}`)) fs.unlinkSync(`./order_label_pdf/${filename}`);
+        fs.writeFileSync(`./order_label_pdf/${filename}`, decodedLabelPDF);
+        logger(`Shipping label PDF saved successfully for tracking number: ${tracking}`);
+        sendLabelInfoEmail(email, decodedLabelPDF, filename);
+    } catch (err) {
+        logger(`Error handling shipping label PDF: ${err}`, "error");
+    }
+}
+
 // Order Label
-// TODO: @Kian do the POST request here for DB update
-// 1) use the form values to send to our API
-// 2) update user's credits in DB by subtracting totalPrice from their total credits
-// 3) also save each order in a schema so we can keep track of all orders coming in. 
 // 4) Send email to both USER using email and OUR email so 2 emails to send
-// 5) also save senderInfo in formValues to DB so we can preload it to the frontend when they want to create more orders in the future
 app.post("/orderLabel", async (req, res) => {
     try {
         logger("Received orderLabel request.");
@@ -1182,20 +1204,19 @@ app.post("/orderLabel", async (req, res) => {
         try {
             // Create label
             const labelRes = await createLabel(endpoint, uuid, formValues, signature, country, satDelivery);
-            logger(`Create Label Response: ${JSON.stringify(labelRes)}`);
+            logger(`Create Label Response: ${labelRes.message}`);
             if (!labelRes || labelRes.status !== "success") {
                 logger(`API Error - Create Label: ${labelRes.status}, ${labelRes.message}`, "error");
                 throw new Error(labelRes.message);
             }
-            logger(`Create Label Data: ${JSON.stringify(labelRes.data)}`);
 
-            // await successOrderUpdateDB(email, totalPrice, formValues, saveSenderInfo);
+            if (saveSenderInfo) await senderInfoUpdateDB(email, formValues);
+            await updateUserCredits(email, totalPrice);
+
             const { tracking, label_pdf, receipt_pdf } = labelRes.data;
-            const decodedLabelPDF = Buffer.from(label_pdf, 'base64');
             const { firstName, lastName } = formValues.senderInfo;
             const filename = `${firstName}_${lastName}_shipping_label.pdf`;
-            fs.writeFileSync(`./order_label_pdf/${filename}`, decodedLabelPDF);
-            sendLabelInfoEmail(email, tracking, filename, label_pdf);
+            handleLabelPDF(tracking, label_pdf, email, filename);
         } catch (err) {
             logger(`Error creating label: ${err}`, "error");
             throw new Error("Error creating label");
