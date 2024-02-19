@@ -11,7 +11,7 @@ import Button from "../components/Button";
 import Checkbox from "../components/Checkbox";
 import axios from "../api/axios";
 import Log from "../components/Log";
-import mockData from "../content/mockOrderData";
+import mockData from "../content/mockOrderData.json";
 import { isDevelopmentEnv } from "../utils/Helpers";
 import {
   setSenderInfo,

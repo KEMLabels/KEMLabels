@@ -2,7 +2,7 @@ const courierTypes = ["USPS", "UPS CA", "UPS USA"];
 
 const classTypes = {
   USPS: [
-    "Priority Express: 1-2 days",
+    "Express: 1-2 days",
     "Priority: 1-3 days",
     "Ground Advantage: 1-5 days",
   ],
@@ -24,7 +24,7 @@ const classTypes = {
 
 const pricing = {
   USPS: {
-    "Priority Express: 1-2 days": 20,
+    "Express: 1-2 days": 20,
     "Priority: 1-3 days": 15,
     "Ground Advantage: 1-5 days": 10,
   },

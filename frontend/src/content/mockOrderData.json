@@ -1,6 +1,6 @@
 {
   "courier": "USPS",
-  "classType": "Priority Express: 1-2 days",
+  "classType": "Express: 1-2 days",
   "packageInfo": {
     "weight": 55.98,
     "length": 32.1,
