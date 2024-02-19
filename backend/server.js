@@ -990,11 +990,15 @@ app.post("/sendPasswordChangeConfirmation", async (req, res) => {
 });
 
 // TODO: Fix this email template for PDF handling
-function sendLabelInfoEmail(email, tracking, labelPDF, receiptPDF) {
+function sendLabelInfoEmail(email, tracking, labelPDF, labelPDFFileName, receiptPDF) {
     try {
         const attachments = [];
-        attachments.push({ filename: 'shipping_label.pdf', content: labelPDF });
-        attachments.push({ filename: 'receipt_label.pdf', content: receiptPDF });
+        attachments.push({ 
+            filename: 'shipping_label.pdf',
+            path: `./order_label_pdf/${labelPDFFileName}`,
+            content: labelPDF
+        });
+        // attachments.push({ filename: 'receipt_label.pdf', content: receiptPDF });
 
         const content = `<h1 style="margin-bottom: 2rem;">Thank you for you order!</h1>
         <p>Your order has been received and we have attached your shipping label in a PDF attachment to this email.</p>
@@ -1070,6 +1074,7 @@ async function createLabel(endpoint, uuid, formValues, signature, country = null
     if (satDelivery) body.package.saturday_delivery = satDelivery;
     if (country) body.country = country;
 
+    logger(`Create Label Request: ${JSON.stringify(body)}`);
     const res = await nodeFetch(
         endpoint,
         {
@@ -1095,19 +1100,19 @@ async function successOrderUpdateDB(email, totalPrice, formValues, saveSenderInf
 
         //Put if statement here if the saveInfo is enabled
         if (saveSenderInfo) {
-            const { courier, senderInfo, recipientInfo, packageInfo } = formValues;
+            const { senderInfo } = formValues;
             const userSenderInfo = await senderInfoSchema.findOne({ userEmail: email })
             if (!userSenderInfo) {
                 logger(`User not found error`);
                 throw new Error('User not found.');
             }
             await userSenderInfo.updateOne(
-                { "name": senderInfo.name },
-                { "address1": senderInfo.address1 },
-                { "address2": senderInfo.address2 },
+                { "name": `${senderInfo.firstName} ${senderInfo.lastName}`},
+                { "address1": senderInfo.street },
+                { "address2": senderInfo.suite },
                 { "city": senderInfo.city },
                 { "state": senderInfo.state },
-                { "postal_code": senderInfo.postal_code },
+                { "postal_code": senderInfo.zip },
                 { "phone": senderInfo.phone },
                 { "country": senderInfo.country },
             );
@@ -1179,12 +1184,14 @@ app.post("/orderLabel", async (req, res) => {
                 throw new Error(labelRes.message);
             }
             logger(`Create Label Data: ${JSON.stringify(labelRes.data)}`);
-            await successOrderUpdateDB(email, totalPrice, formValues, saveSenderInfo);
-            // Update user's credits, if "save" is checked on form (Towa has to send this info in req.body)
-            // save order info to DB 
-            // send email to user with PDF label attachment, and to our email with the same attachment
+
+            // await successOrderUpdateDB(email, totalPrice, formValues, saveSenderInfo);
             const { tracking, label_pdf, receipt_pdf } = labelRes.data;
-            sendLabelInfoEmail(email, tracking, label_pdf, receipt_pdf);
+            const decodedLabelPDF = Buffer.from(label_pdf, 'base64');
+            const { firstName, lastName } = formValues.senderInfo;
+            const filename = `${firstName}_${lastName}_shipping_label.pdf`;
+            fs.writeFileSync(`./order_label_pdf/${filename}`, decodedLabelPDF);
+            sendLabelInfoEmail(email, tracking, filename, label_pdf);
         } catch (err) {
             logger(`Error creating label: ${err}`, "error");
             throw new Error("Error creating label");
