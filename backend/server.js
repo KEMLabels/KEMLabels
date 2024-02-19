@@ -1153,7 +1153,8 @@ async function senderInfoUpdateDB(email, formValues) {
 }
 
 // Handle the shipping label PDF
-function handleLabelPDF(tracking, labelPDF, email, filename) {
+function handleLabelPDF(tracking, labelPDF, email) {
+    const filename = `${tracking}_shipping_label.pdf`;
     try {
         const decodedLabelPDF = Buffer.from(labelPDF, 'base64');
         if (!fs.existsSync('./order_label_pdf')) fs.mkdirSync('./order_label_pdf');
@@ -1227,9 +1228,7 @@ app.post("/orderLabel", async (req, res) => {
             await updateUserCredits(email, totalPrice);
 
             const { tracking, label_pdf, receipt_pdf } = labelRes.data;
-            const { firstName, lastName } = formValues.senderInfo;
-            const filename = `${firstName}_${lastName}_shipping_label.pdf`;
-            handleLabelPDF(tracking, label_pdf, email, filename);
+            handleLabelPDF(tracking, label_pdf, email);
         } catch (err) {
             logger(`Error creating label: ${err}`, "error");
             throw new Error("Error creating label");
