@@ -544,7 +544,7 @@ export default function OrderLabel() {
                   label="Suite / Apt / Unit"
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
                   minLength={1}
-                  maxLength={15}
+                  maxLength={10}
                   name="suite"
                   currentValue={formValues?.senderInfo?.suite}
                   shortField
@@ -555,7 +555,7 @@ export default function OrderLabel() {
                 <DefaultField
                   label="City"
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
-                  placeholder="Vancouver"
+                  placeholder="Los Angeles"
                   minLength={1}
                   maxLength={50}
                   name="city"
@@ -565,7 +565,7 @@ export default function OrderLabel() {
                   label="Zip / Postal code"
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
                   minLength={6}
-                  maxLength={6}
+                  maxLength={10}
                   name="zip"
                   currentValue={formValues?.senderInfo?.zip}
                   shortField
@@ -574,10 +574,11 @@ export default function OrderLabel() {
               <div className="formRow">
                 <DefaultField
                   label="Province / State"
+                  helpText="Please enter the abbreviation. (i.e. CA for California)"
                   onChangeEvent={(e) => saveInput(e, "senderInfo")}
-                  placeholder="British Columbia"
+                  placeholder="CA"
                   minLength={1}
-                  maxLength={50}
+                  maxLength={2}
                   name="state"
                   currentValue={formValues?.senderInfo?.state}
                 />
@@ -587,6 +588,7 @@ export default function OrderLabel() {
                   maxLength={50}
                   name="country"
                   currentValue={formValues?.senderInfo?.country}
+                  fixTextAlignment
                   disabled
                 />
               </div>
@@ -647,7 +649,7 @@ export default function OrderLabel() {
                   label="Suite / Apt / Unit"
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
                   minLength={1}
-                  maxLength={15}
+                  maxLength={10}
                   name="suite"
                   currentValue={formValues?.recipientInfo?.suite}
                   shortField
@@ -658,7 +660,7 @@ export default function OrderLabel() {
                 <DefaultField
                   label="City"
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
-                  placeholder="Vancouver"
+                  placeholder="Los Angeles"
                   minLength={1}
                   maxLength={50}
                   name="city"
@@ -668,7 +670,7 @@ export default function OrderLabel() {
                   label="Zip / Postal code"
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
                   minLength={6}
-                  maxLength={6}
+                  maxLength={10}
                   name="zip"
                   currentValue={formValues?.recipientInfo?.zip}
                   shortField
@@ -677,10 +679,11 @@ export default function OrderLabel() {
               <div className="formRow">
                 <DefaultField
                   label="Province / State"
+                  helpText="Please enter the abbreviation. (i.e. CA for California)"
                   onChangeEvent={(e) => saveInput(e, "recipientInfo")}
-                  placeholder="British Columbia"
+                  placeholder="CA"
                   minLength={1}
-                  maxLength={50}
+                  maxLength={2}
                   name="state"
                   currentValue={formValues?.recipientInfo?.state}
                 />
@@ -690,6 +693,7 @@ export default function OrderLabel() {
                   maxLength={50}
                   name="country"
                   currentValue={formValues?.recipientInfo?.country}
+                  fixTextAlignment
                   disabled
                 />
               </div>

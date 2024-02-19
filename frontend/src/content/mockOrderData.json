@@ -15,10 +15,10 @@
     "phone": "1234567890",
     "street": "1234 Test Street",
     "suite": "123",
-    "city": "Vancouver",
-    "state": "British Columbia",
-    "zip": "V1V1V1",
-    "country": "Canada"
+    "city": "Los Angeles",
+    "state": "CA",
+    "zip": "90028-6331",
+    "country": "USA"
   },
   "recipientInfo": {
     "firstName": "Jane",
@@ -26,9 +26,9 @@
     "phone": "1234567890",
     "street": "1234 Test Street",
     "suite": "123",
-    "city": "Vancouver",
-    "state": "British Columbia",
-    "zip": "V1V1V1",
-    "country": "Canada"
+    "city": "Los Angeles",
+    "state": "CA",
+    "zip": "90028-6331",
+    "country": "USA"
   }
 }
