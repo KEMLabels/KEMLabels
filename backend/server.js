@@ -62,7 +62,6 @@ const store = new MongoDBStore({
 const User = require('./model/users.js');
 const tempTokens = require('./model/tempToken.js');
 const tempOTPS = require('./model/tempOTPs.js');
-const senderInfoSchema = require('./model/senderInfo.js')
 
 //Start app
 app.use('/', express.static(__dirname + '/public'));
@@ -343,20 +342,6 @@ app.post("/signup", async (req, res) => {
         });
         await new_user.save()
         logger(`New user created: ID '${new_user._id}', Username '${new_user.userName}', Email '${new_user.email}'`);
-
-        const new_user_senderInfo = new senderInfoSchema({
-            userEmail: new_user.email,
-            name: " ",
-            address1: " ",
-            address2: " ",
-            city: " ",
-            state: " ",
-            postal_code: " ",
-            phone: " ",
-            country: " "
-        });
-        await new_user_senderInfo.save()
-        logger(`New senderInfo created for the user: ID ${new_user_senderInfo.userEmail}`);
 
         const token = crypto.randomBytes(32).toString("hex");
         const create_token = new tempTokens({
@@ -1032,12 +1017,28 @@ function sendLabelInfoEmail(email, pdfContent, filename) {
 app.post("/getUserSenderInfo", async (req, res) => {
     const { userEmail } = req.body;
     try {
-        const senderInfo = await senderInfoSchema.findOne({ userEmail: userEmail })
-        if (!senderInfo) {
+        const user = await User.findOne({ userEmail: userEmail })
+        if (!user) {
             logger(`User not found for email: ${email}`, "error");
             throw new Error('User not found.');
         }
-        res.send(senderInfo);
+        res.send(user.senderInfo);
+    } catch (error) {
+        logger(`Error processing request: ${err}`, "error");
+        return res.status(400).json({ msg: err.message });
+    }
+});
+
+//Get the user's custom pricing
+app.post("/getUserCustomPricing", async (req, res) => {
+    const { userEmail } = req.body;
+    try {
+        const user = await User.findOne({ userEmail: userEmail })
+        if (!user) {
+            logger(`User not found for email: ${email}`, "error");
+            throw new Error('User not found.');
+        }
+        res.send(user.customPricing);
     } catch (error) {
         logger(`Error processing request: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
@@ -1126,20 +1127,20 @@ async function updateUserCredits(email, totalPrice) {
 async function senderInfoUpdateDB(email, formValues) {
     try {
         const { senderInfo } = formValues;
-        const userSenderInfo = await senderInfoSchema.findOne({ userEmail: email })
-        if (!userSenderInfo) {
+        const user = await User.findOne({ userEmail: email })
+        if (!user) {
             logger(`User not found for email: ${email}`, "error");
             throw new Error('User not found.');
         }
-        const updateSenderInfo = await userSenderInfo.updateOne(
-            { "name": `${senderInfo.firstName} ${senderInfo.lastName}` },
-            { "address1": senderInfo.street },
-            { "address2": senderInfo.suite },
-            { "city": senderInfo.city },
-            { "state": senderInfo.state },
-            { "postal_code": senderInfo.zip },
-            { "phone": senderInfo.phone },
-            { "country": senderInfo.country },
+        const updateSenderInfo = await user.updateOne(
+            { "senderInfo.name": `${senderInfo.firstName} ${senderInfo.lastName}` },
+            { "senderInfo.address1": senderInfo.street },
+            { "senderInfo.address2": senderInfo.suite },
+            { "senderInfo.city": senderInfo.city },
+            { "senderInfo.state": senderInfo.state },
+            { "senderInfo.postal_code": senderInfo.zip },
+            { "senderInfo.phone": senderInfo.phone },
+            { "senderInfo.country": senderInfo.country },
         );
         if (!updateSenderInfo) {
             logger("Error updating user senderInfo", "error");
