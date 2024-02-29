@@ -1230,12 +1230,12 @@ app.post("/orderLabel", async (req, res) => {
             const { tracking, label_pdf, receipt_pdf } = labelRes.data;
             handleLabelPDF(tracking, label_pdf, email);
         } catch (err) {
-            logger(`Error creating label: ${err}`, "error");
-            throw new Error("Error creating label");
+            logger(`Error creating label: ${err.message}`, "error");
+            throw new Error(err);
         }
         return res.status(200).json({ msg: "OrderLabel request processed successfully." });
     } catch (err) {
-        logger(`Error processing orderLabel request: ${err}`, "error");
+        logger(`Error processing orderLabel request: ${err?.message || err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })

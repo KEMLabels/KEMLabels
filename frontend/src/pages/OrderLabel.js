@@ -309,9 +309,18 @@ export default function OrderLabel() {
       })
       .catch((e) => {
         Log("Error: ", e);
-        setSectionErrors({
-          container: "An unexpected error occurred. Please try again later.",
-        }); // Axios default error
+        if (e?.response?.data?.msg.startsWith("Error: not enough balance")) {
+          setSectionErrors({
+            container:
+              "You have insufficient funds to purchase. Please load your credits first to proceed with your purchase.",
+          });
+        } else {
+          setSectionErrors({
+            container: "An unexpected error occurred. Please try again later.",
+          }); // Axios default error
+        }
+      })
+      .finally(() => {
         setLoading(false);
         setShowOrderConfirmPopup(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
