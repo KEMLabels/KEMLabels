@@ -1029,18 +1029,19 @@ app.post("/getUserSenderInfo", async (req, res) => {
 });
 
 //Get the user's custom pricing
-app.post("/getUserCustomPricing", async (req, res) => {
-    const { userEmail } = req.body;
+app.post("/getUserLabelPricings", async (req, res) => {
+    const { email } = req.body;
+    console.log(email)
     try {
-        const user = await User.findOne({ userEmail: userEmail })
+        const user = await User.findOne({ email: email })
         if (!user) {
             logger(`User not found for email: ${email}`, "error");
             throw new Error('User not found.');
         }
         res.send(user.customPricing);
     } catch (error) {
-        logger(`Error processing request: ${err}`, "error");
-        return res.status(400).json({ msg: err.message });
+        logger(`Error processing request: ${error}`, "error");
+        return res.status(400).json({ msg: error.message });
     }
 });
 
