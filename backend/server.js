@@ -16,6 +16,7 @@ const emailTemplate = require('./emailTemplate');
 const nodeFetch = require('node-fetch');
 const logger = require('./log');
 const fs = require('fs');
+const multer = require('multer');
 
 //Configure mongoose, app, and dotenv
 mongoose.set('strictQuery', false);
@@ -112,6 +113,16 @@ const transporter = nodemailer.createTransport({
         pass: process.env.MAIL_PASS
     }
 });
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'bulkOrders/')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname)
+    }
+})
+const upload = multer({ storage: storage })
 
 //Middleware to check inactivity
 // app.get("/isSessionActive", (req, res) => {
@@ -1170,8 +1181,7 @@ function handleLabelPDF(tracking, labelPDF, email) {
     }
 }
 
-// Order Label
-// 4) Send email to both USER using email and OUR email so 2 emails to send
+// Order Label for single order
 app.post("/orderLabel", async (req, res) => {
     try {
         logger("Received orderLabel request.");
@@ -1179,7 +1189,6 @@ app.post("/orderLabel", async (req, res) => {
         const { email, totalPrice, formValues, signature, saveSenderInfo } = req.body;
         logger(`Email: ${email}, Total Amount: ${totalPrice}, Form Values: ${JSON.stringify(formValues)}`);
 
-        //Connect to the ORDER LABEL API
         const labelResponse = await nodeFetch(
             process.env.API_LABELS_USER_INFO,
             {
@@ -1225,9 +1234,11 @@ app.post("/orderLabel", async (req, res) => {
                 throw new Error(labelRes.message);
             }
 
+            // Update user credits and sender info
             if (saveSenderInfo) await senderInfoUpdateDB(email, formValues);
             await updateUserCredits(email, totalPrice);
 
+            // Handle the shipping label PDF
             const { tracking, label_pdf, receipt_pdf } = labelRes.data;
             handleLabelPDF(tracking, label_pdf, email);
         } catch (err) {
@@ -1237,6 +1248,29 @@ app.post("/orderLabel", async (req, res) => {
         return res.status(200).json({ msg: "OrderLabel request processed successfully." });
     } catch (err) {
         logger(`Error processing orderLabel request: ${err?.message || err}`, "error");
+        return res.status(400).json({ msg: err.message });
+    }
+})
+
+// Order Label for bulk orders (XLSX)
+app.post("/orderLabelBulk", upload.single('file'), async (req, res) => {
+    try {
+        logger("Received orderLabelBulk request.");
+        const uuid = "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf";
+        const { email } = req.body;
+        const bulkOrderFile = req.file;
+        logger(`Email: ${email}, Bulk Order File: ${JSON.stringify(bulkOrderFile)}`);
+
+        if (!bulkOrderFile) {
+            logger("No file uploaded.", "error");
+            throw new Error("No file uploaded.");
+        }
+
+        // TODO: Handle the file and send to API
+
+        return res.status(200).json({ msg: "OrderLabelBulk request processed successfully." });
+    } catch (err) {
+        logger(`Error processing orderLabelBulk request: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
