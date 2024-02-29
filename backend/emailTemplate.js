@@ -1,4 +1,4 @@
-module.exports = (email, subject, content, attachments={}) => ({
+module.exports = (email, subject, content, attachments=[]) => ({
   from: `KEMLabels <${process.env.MAIL_USER}>`,
   to: email,
   subject: subject,

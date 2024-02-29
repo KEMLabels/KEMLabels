@@ -354,7 +354,6 @@ app.post("/signup", async (req, res) => {
         const url = `${process.env.FRONTEND_SERVER}/users/${new_user._id}/verify/${token}`;
         logger(`Verification URL generated: ${url}`);
         await sendSignUpConfirmationEmail(data.email, url);
-        logger(`Signup confirmation email sent successfully to '${data.email}'.`);
 
         req.session.user = new_user;
         req.session.isLoggedIn = true;
