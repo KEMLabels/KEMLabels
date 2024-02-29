@@ -156,13 +156,14 @@ export default function OrderLabel() {
   };
 
   const isSectionEmpty = (section) => {
+    let isFieldEmpty = false;
     Object.keys(section).forEach((field) => {
       if (section[field] === "" && !optionalFields.includes(field)) {
         Log(`Missing field: ${field}`);
-        return true;
+        isFieldEmpty = true;
       }
     });
-    return false;
+    return isFieldEmpty;
   };
 
   function validatePackage(packageInfo) {
@@ -215,6 +216,8 @@ export default function OrderLabel() {
 
     if (!courier || !classType) {
       errors.courierClass = "Please select a courier and a class type.";
+      if (!courier) Log("Missing field: courier");
+      if (!classType) Log("Missing field: classType");
     }
 
     Object.keys(sections).forEach((sectionName) => {
@@ -224,9 +227,12 @@ export default function OrderLabel() {
       }
     });
 
-    if (!errors.package && validatePackage(packageInfo)) {
-      errors.package =
-        "Please review your package details and ensure that all fields are filled in correctly.";
+    // Additional validation when all fields are filled in
+    if (Object.keys(errors).length === 0) {
+      if (!errors.package && validatePackage(packageInfo)) {
+        errors.package =
+          "Please review your package details and ensure that all fields are filled in correctly.";
+      }
     }
 
     // If there are errors, display them and return
