@@ -29,6 +29,7 @@ import {
   validatePackageLength,
   validatePackageWeight,
   validatePackageWidth,
+  validatePhoneNumber,
 } from "../utils/Validation";
 
 export default function OrderLabel() {
@@ -191,6 +192,10 @@ export default function OrderLabel() {
     );
   }
 
+  function validatePhone(phone, fieldName) {
+    return !validatePhoneNumber(phone, setFieldErrors, fieldName);
+  }
+
   const submit = (e) => {
     e.preventDefault();
     setFieldErrors({}); // Clear any previous errors
@@ -229,9 +234,17 @@ export default function OrderLabel() {
 
     // Additional validation when all fields are filled in
     if (Object.keys(errors).length === 0) {
-      if (!errors.package && validatePackage(packageInfo)) {
+      if (validatePackage(packageInfo)) {
         errors.package =
-          "Please review your package details and ensure that all fields are filled in correctly.";
+          "Please review your package details and ensure that all fields are entered correctly.";
+      }
+      if (validatePhone(senderInfo.phone, "senderPhone")) {
+        errors.sender =
+          "Please review your phone number and ensure that it is entered correctly.";
+      }
+      if (validatePhone(recipientInfo.phone, "recipientPhone")) {
+        errors.recipient =
+          "Please review your phone number and ensure that it is entered correctly.";
       }
     }
 
@@ -609,11 +622,20 @@ export default function OrderLabel() {
                   label="Phone number"
                   fieldType="tel"
                   helpText="(XXX) XXX-XXXX"
-                  onChangeEvent={(e) => saveInput(e, "senderInfo")}
+                  onChangeEvent={(e) => {
+                    saveInput(e, "senderInfo");
+                    if (fieldErrors?.senderPhone) {
+                      setFieldErrors((prevErrors) => {
+                        delete prevErrors.senderPhone;
+                        return { ...prevErrors };
+                      });
+                    }
+                  }}
                   minLength={10}
                   maxLength={10}
                   name="phone"
                   currentValue={formValues?.senderInfo?.phone}
+                  error={fieldErrors?.senderPhone}
                   halfWidth
                 />
               </div>
@@ -714,11 +736,20 @@ export default function OrderLabel() {
                   label="Phone number"
                   fieldType="tel"
                   helpText="(XXX) XXX-XXXX"
-                  onChangeEvent={(e) => saveInput(e, "recipientInfo")}
+                  onChangeEvent={(e) => {
+                    saveInput(e, "recipientInfo");
+                    if (fieldErrors?.recipientPhone) {
+                      setFieldErrors((prevErrors) => {
+                        delete prevErrors.recipientPhone;
+                        return { ...prevErrors };
+                      });
+                    }
+                  }}
                   minLength={10}
                   maxLength={10}
                   name="phone"
                   currentValue={formValues?.recipientInfo?.phone}
+                  error={fieldErrors?.recipientPhone}
                   halfWidth
                 />
               </div>

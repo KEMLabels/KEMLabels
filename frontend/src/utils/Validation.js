@@ -163,3 +163,13 @@ export function validatePackageHeight(height, setFieldErrors) {
   }
   return true;
 }
+
+export function validatePhoneNumber(phone, setFieldErrors, fieldName = "phone") {
+  if (phone.length < 10) {
+    return setFieldErrors((currentErrors) => ({
+      ...currentErrors,
+      [fieldName]: "Phone number must be 10 digits.",
+    }));
+  }
+  return true;
+}
