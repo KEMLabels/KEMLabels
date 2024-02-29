@@ -82,7 +82,7 @@ export default function VerifyEmail() {
         <div className="authColumn">
           <div className="authHeader">
             <img src="/media/emailVerify.jpg" alt="Verify email illustration" />
-            <h1>Verify your email address</h1>
+            <h1 style={{ textAlign: "center" }}>Verify your email address</h1>
             <p>
               <span>You entered </span>
               <strong>{email}</strong>

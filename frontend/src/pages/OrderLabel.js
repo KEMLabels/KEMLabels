@@ -36,6 +36,7 @@ export default function OrderLabel() {
   const dispatch = useDispatch();
 
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const isUserVerified = useSelector((state) => state.user.isVerified);
   const email = useSelector((state) => state.user.email);
   const savedSenderInfo = useSelector((state) => state.user.senderInfo);
   const creditAmount = useSelector((state) => state.user.creditAmount);
@@ -85,14 +86,24 @@ export default function OrderLabel() {
   const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
+    if (!isUserVerified) navigate("/verify-email");
     if (!isLoggedIn) navigate("/");
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn, navigate, isUserVerified]);
 
   useEffect(() => {
     const scrollHandler = () => setShowFloatingBtn(window.scrollY > 100);
     window.addEventListener("scroll", scrollHandler);
     return () => window.removeEventListener("scroll", scrollHandler);
   }, []);
+
+  useEffect(() => {
+    if (creditAmount === 0 || creditAmount - totalPrice < 0) {
+      setSectionErrors({
+        container:
+          "You have insufficient funds to purchase. Please load your credits first to proceed with your purchase.",
+      });
+    }
+  }, [creditAmount, totalPrice]);
 
   function calculatePrice(courier, classType, isSignatureChecked) {
     const price = pricing[courier][classType] || 0;
@@ -184,7 +195,11 @@ export default function OrderLabel() {
     setFieldErrors({}); // Clear any previous errors
 
     // Check if user has enough credits, if not, display error message
-    if (creditAmount - totalPrice < 0) {
+    if (creditAmount === 0 || creditAmount - totalPrice < 0) {
+      setSectionErrors({
+        container:
+          "You have insufficient funds to purchase. Please load your credits first to proceed with your purchase.",
+      });
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -307,12 +322,6 @@ export default function OrderLabel() {
               Please complete all mandatory fields to proceed with placing your
               order.
             </p>
-            {(creditAmount === 0 || creditAmount - totalPrice < 0) && (
-              <AlertMessage
-                msg="You have insufficient funds to purchase. Please load your credits first to proceed with your purchase."
-                type="error"
-              />
-            )}
             {sectionErrors?.container && (
               <AlertMessage msg={sectionErrors.container} type="error" />
             )}
