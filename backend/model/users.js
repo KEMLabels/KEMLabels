@@ -84,7 +84,7 @@ const userSchema = new mongoose.Schema({
                 type: Number,
                 default: 10
             },
-            "Ground: Min. 3 days": {
+            "Ground: Min 3 days": {
                 type: Number,
                 default: 10
             }
