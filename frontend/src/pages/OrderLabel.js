@@ -15,6 +15,7 @@ import { courierTypes } from "../content/orderLabelsConstants";
 import OrderConfirmPopup from "../components/OrderConfirmPopup";
 import OrderSuccess from "../components/OrderSuccess";
 import OrderForm from "../components/OrderForm";
+import BulkOrder from "../components/BulkOrder";
 
 export default function OrderLabel() {
   const navigate = useNavigate();
@@ -65,6 +66,7 @@ export default function OrderLabel() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [pricing, setPricing] = useState({});
   const [isFetchingPricing, setIsFetchingPricing] = useState(true);
+  const [isBulkOrder, setIsBulkOrder] = useState(false);
 
   useEffect(() => {
     if (!isUserVerified) navigate("/verify-email");
@@ -205,6 +207,16 @@ export default function OrderLabel() {
             {successMsg && <AlertMessage msg={successMsg} type="success" />}
           </div>
           <div className="orderTotal orderHeader">
+            <Button
+              fill="outline"
+              title={
+                isBulkOrder ? "Switch to Single Order" : "Switch to Bulk Order"
+              }
+              text={
+                isBulkOrder ? "Switch to Single Order" : "Switch to Bulk Order"
+              }
+              onClickEvent={() => setIsBulkOrder((prev) => !prev)}
+            />
             <p>
               Order Total: <strong>${totalPrice.toFixed(2)}</strong>
             </p>
@@ -214,6 +226,15 @@ export default function OrderLabel() {
               <FiLoader className="loading" size={50} />
               <span className="loadingText">Loading...</span>
             </div>
+          ) : isBulkOrder ? (
+            <BulkOrder
+              email={email}
+              fieldErrors={fieldErrors}
+              setFieldErrors={setFieldErrors}
+              setSectionErrors={setSectionErrors}
+              setSuccessMsg={setSuccessMsg}
+              setOrderSuccess={setOrderSuccess}
+            />
           ) : (
             <OrderForm
               pricing={pricing}
