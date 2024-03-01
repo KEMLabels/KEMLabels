@@ -18,7 +18,7 @@ const classTypes = {
     "Next Day Air: 1 day",
     "2nd Day Air: 2 days",
     "3 Day Select: 3 days",
-    "Ground: Min. 3 days",
+    "Ground: Min 3 days",
   ],
 };
 
