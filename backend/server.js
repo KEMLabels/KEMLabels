@@ -16,6 +16,8 @@ const emailTemplate = require('./emailTemplate');
 const nodeFetch = require('node-fetch');
 const logger = require('./log');
 const fs = require('fs');
+const csv = require('csv-parser')
+const XLSX = require('xlsx');
 const multer = require('multer');
 
 //Configure mongoose, app, and dotenv
@@ -1252,6 +1254,68 @@ app.post("/orderLabel", async (req, res) => {
     }
 })
 
+async function readCsvFile() {
+    const workbook = XLSX.readFile('./bulkOrders/kemlabels-bulk-order-template.xlsx');
+    const sheetNames = workbook.SheetNames;
+    const firstSheetName = sheetNames[0];
+    const firstSheet = workbook.Sheets[firstSheetName];
+    const csvData = XLSX.utils.sheet_to_csv(firstSheet);
+    fs.writeFileSync('./bulkOrders/test.csv', csvData, 'utf8');
+
+    const csvFilePath = './bulkOrders/test.csv';
+    const results = [];
+    let rowCount = 0;
+    let courier, serviceSpeed, signatureRequest;
+
+    fs.createReadStream(csvFilePath)
+        .pipe(csv({headers: false}))
+        .on('data', (data) => {
+            if (rowCount === 0) {
+                courier = data[0];
+                serviceSpeed = data[1];
+                signatureRequest = data[2];
+                rowCount++;
+                return;
+            }
+
+            if (Object.values(data).length !== 24) {
+                logger('Error: Incorrect number of columns in row ' + rowCount);
+                return;
+            }
+            if (rowCount >= 20) {
+                logger('Error: Maximum row limit exceeded');
+                return;
+            }
+            const transformedData = Object.values(data).map((value, index) => {
+                if (index > 18 && index < 23) {
+                    return parseFloat(value);
+                } else {
+                    return value.toString();
+                }
+            });
+            const exceededColumnIndex = transformedData.findIndex(value => typeof value === 'string' && value.length > 50);
+            if (exceededColumnIndex !== -1) {
+                logger(`Error: Character limit exceeded in column ${exceededColumnIndex + 1} of row ${rowCount}`);
+                return;
+            }
+            results.push(transformedData);
+            rowCount++;
+        })
+        .on('end', () => {
+            const finalData = {
+                courier: courier,
+                serviceSpeed: serviceSpeed,
+                signatureRequest: signatureRequest,
+                resultsData : results
+            }
+            logger('Courier:' + courier);
+            logger('Service Speed:' + serviceSpeed);
+            logger('Signature Request:' + signatureRequest);
+            logger('Results:' + results);
+            logger('Total labels: ' + results.length);
+        });
+}
+
 // Order Label for bulk orders (XLSX)
 app.post("/orderLabelBulk", upload.single('file'), async (req, res) => {
     try {
@@ -1267,6 +1331,7 @@ app.post("/orderLabelBulk", upload.single('file'), async (req, res) => {
         }
 
         // TODO: Handle the file and send to API
+        await readCsvFile();
 
         return res.status(200).json({ msg: "OrderLabelBulk request processed successfully." });
     } catch (err) {
