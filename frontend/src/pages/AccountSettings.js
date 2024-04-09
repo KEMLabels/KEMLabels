@@ -273,9 +273,19 @@ export default function AccountSettings({ currentPage = "username" }) {
         }
         setTimeout(() => {
           setSuccessMsg("");
-          axios.get("/logout", { withCredentials: true });
-          dispatch(clearSession());
-          navigate("/signin");
+          axios
+            .get("/logout", { withCredentials: true })
+            .then((res) => {
+              Log(res);
+              dispatch(clearSession());
+              navigate("/signin");
+            })
+            .catch((e) => {
+              Log("Error: ", e);
+              setErrMsg(
+                "An unexpected error occurred. Please try again later."
+              ); // Axios default error
+            });
         }, 3000);
       })
       .catch((e) => {

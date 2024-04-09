@@ -18,6 +18,7 @@ import axios from "../api/axios";
 import { clearSession } from "../redux/actions/UserAction";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
+import Log from "./Log";
 
 export default function NavLink({
   type,
@@ -68,8 +69,13 @@ export default function NavLink({
         if (linkOnClick) {
           e.preventDefault();
           if (type === "logout") {
-            await axios.get("/logout", { withCredentials: true });
-            dispatch(clearSession());
+            await axios
+              .get("/logout", { withCredentials: true })
+              .then((res) => {
+                Log(res);
+                dispatch(clearSession());
+              })
+              .catch((err) => Log("Error: ", err));
           }
           navigate(`${link}`);
         }

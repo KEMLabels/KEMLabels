@@ -12,6 +12,7 @@ import axios from "../api/axios";
 import { clearSession } from "../redux/actions/UserAction";
 import "../styles/Global.css";
 import "../styles/Navbar.css";
+import Log from "./Log";
 
 export default function AccountDropdownLink({ type, link, text }) {
   const dispatch = useDispatch();
@@ -38,8 +39,13 @@ export default function AccountDropdownLink({ type, link, text }) {
       onClick={async (e) => {
         e.preventDefault();
         if (type === "logout") {
-          await axios.get("/logout", { withCredentials: true });
-          dispatch(clearSession());
+          await axios
+            .get("/logout", { withCredentials: true })
+            .then((res) => {
+              Log(res);
+              dispatch(clearSession());
+            })
+            .catch((err) => Log("Error: ", err));
         }
         navigate(`${link}`);
       }}

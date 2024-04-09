@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearSession } from "../redux/actions/UserAction";
 import axios from "../api/axios";
+import Log from "./Log";
 
 export default function InactivityTimer() {
   const dispatch = useDispatch();
@@ -14,22 +15,27 @@ export default function InactivityTimer() {
       const checkInactivity = async () => {
         const currentTime = Date.now();
         if (currentTime - lastActivityTime > inactivityThreshold) {
-          await axios.get("/logout", { withCredentials: true });
-          dispatch(clearSession()); // Dispatch logout action after inactivity
-          window.location.reload();
+          await axios
+            .get("/logout", { withCredentials: true })
+            .then((res) => {
+              Log(res);
+              dispatch(clearSession());
+              window.location.reload();
+            })
+            .catch((err) => Log("Error: ", err));
         }
       };
-  
+
       const resetActivityTimer = () => {
         setLastActivityTime(Date.now());
       };
-  
+
       const intervalId = setInterval(checkInactivity, 1000); // Check every second
-  
+
       // Reset the activity timer when there is user activity (e.g., mousemove, keydown)
       window.addEventListener("mousemove", resetActivityTimer);
       window.addEventListener("keydown", resetActivityTimer);
-  
+
       return () => {
         clearInterval(intervalId);
         window.removeEventListener("mousemove", resetActivityTimer);

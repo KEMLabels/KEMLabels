@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import { BiErrorCircle } from "react-icons/bi";
 import VerificationInput from "react-verification-input";
@@ -16,9 +16,7 @@ import { validatePasswordOnTyping } from "../utils/Helpers";
 import Log from "../components/Log";
 
 export default function ForgotPassword() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   const [loading, setLoading] = useState(false);
@@ -46,7 +44,7 @@ export default function ForgotPassword() {
     } else {
       setIsLoading(false);
     }
-  }, [isLoggedIn, dispatch, navigate]);
+  }, [isLoggedIn, navigate]);
 
   const sendVerificationCode = (e) => {
     e.preventDefault();

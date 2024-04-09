@@ -1044,7 +1044,7 @@ app.post("/getUserSenderInfo", async (req, res) => {
 //Get the user's custom pricing
 app.post("/getUserLabelPricings", async (req, res) => {
     const { email } = req.body;
-    console.log(email)
+    logger(`Received request to fetch custom pricing for user: ${email}`);
     try {
         const user = await User.findOne({ email: email })
         if (!user) {
