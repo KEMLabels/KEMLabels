@@ -51,10 +51,10 @@ export default function BulkOrder({
       }));
       return;
     }
-    if (file.type !== "text/csv") {
+    if (file.type !== "text/xlsx") {
       setFieldErrors((prev) => ({
         ...prev,
-        bulkOrderFile: "Invalid file format. Please upload a CSV file.",
+        bulkOrderFile: "Invalid file format. Please upload a XLSX file.",
       }));
       return;
     }
@@ -161,7 +161,7 @@ export default function BulkOrder({
         </div>
       )}
       <div className="dragDropFooter">
-        <p>Supported formats: CSV</p>
+        <p>Supported formats: XLSX</p>
         <p>Max file size: 2MB</p>
       </div>
       <div className="bulkOrderTemplate">
@@ -175,7 +175,7 @@ export default function BulkOrder({
             point to fill in your bulk order details.
           </p>
         </div>
-        <a href="./media/kemlabels-bulk-order-template.csv" download>
+        <a href="./media/kemlabels-bulk-order-template.xlsx" download>
           Download
         </a>
       </div>
