@@ -51,7 +51,7 @@ export default function BulkOrder({
       }));
       return;
     }
-    if (file.type !== "text/xlsx") {
+    if (file.type !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
       setFieldErrors((prev) => ({
         ...prev,
         bulkOrderFile: "Invalid file format. Please upload a XLSX file.",
@@ -105,6 +105,15 @@ export default function BulkOrder({
     <div id="bulkOrderContainer">
       {bulkOrderFile ? (
         <>
+          <div className="bulkOrderSubmit">
+            <h2>Submit Bulk Order</h2>
+            <Button
+              text="Submit order"
+              title="Submit order"
+              onClickEvent={submitBulkOrder}
+              customStyle={{ height: "fit-content" }}
+            />
+          </div>
           <div className="bulkOrderTemplate">
             <div className="instructions">
               <div className="instructionHeading">
@@ -124,14 +133,6 @@ export default function BulkOrder({
                 value="Remove"
               />
             </div>
-          </div>
-          <div className="bulkOrderSubmit">
-            <Button
-              text="Submit order"
-              title="Submit order"
-              onClickEvent={submitBulkOrder}
-              customStyle={{ margin: "1.5rem auto" }}
-            />
           </div>
         </>
       ) : (
