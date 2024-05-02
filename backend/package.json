@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "adm-zip": "^0.5.12",
     "bcryptjs": "^2.4.3",
     "coinbase-commerce-node": "^1.0.4",
     "connect-mongodb-session": "^3.1.1",

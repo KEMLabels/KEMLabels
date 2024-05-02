@@ -19,6 +19,7 @@ const fs = require('fs');
 const csv = require('csv-parser')
 const XLSX = require('xlsx');
 const multer = require('multer');
+const AdmZip = require('adm-zip');
 
 //Configure mongoose, app, and dotenv
 mongoose.set('strictQuery', false);
@@ -260,7 +261,8 @@ app.post('/crypto/webhook', express.raw({ type: "application/json" }), async (re
 
             // paymentIntent.amount is in cents so convert to dollars
             const userExistingCredits = user.credits;
-            const newCredits = Number(userExistingCredits) + Number(event.local.amount);
+            const bonusCredit = event.local.amount * 1.1;
+            const newCredits = Number(userExistingCredits) + Number(bonusCredit);
             await User.updateOne(
                 { "_id": user._id.toString() },
                 { "credits": newCredits }
@@ -1058,6 +1060,78 @@ app.post("/getUserLabelPricings", async (req, res) => {
     }
 });
 
+// Updates the user's credits in the database
+async function updateUserCredits(email, totalPrice) {
+    try {
+        const user = await User.findOne({ email: email })
+        if (!user) {
+            logger(`updateCredits: User not found for email: ${email}`, "error");
+            throw new Error('User not found.');
+        }
+
+        console.log(totalPrice);
+        const updatedCredits = Number(user.credits) - Number(totalPrice);
+        console.log(updatedCredits);
+        const res = await User.updateOne({ "_id": user._id.toString() }, { "credits": updatedCredits });
+        if (!res) {
+            logger(`Error updating user credits: ${err}`, "error");
+            throw new Error('Error updating user credits.');
+        }
+        logger(`User credits updated balance: ${updatedCredits}`);
+    } catch (error) {
+        logger(`Error updating user credits: ${err}`, "error");
+        res.status(500).end();
+    }
+}
+
+// Saves the user's sender information to the database
+async function senderInfoUpdateDB(email, formValues) {
+    try {
+        const { senderInfo } = formValues;
+        const user = await User.findOne({ email: email })
+        if (!user) {
+            logger(`senderInfo: User not found for email: ${email}`, "error");
+            throw new Error('User not found.');
+        }
+        const updateSenderInfo = await user.updateOne(
+            { "senderInfo.name": `${senderInfo.firstName} ${senderInfo.lastName}` },
+            { "senderInfo.address1": senderInfo.street },
+            { "senderInfo.address2": senderInfo.suite },
+            { "senderInfo.city": senderInfo.city },
+            { "senderInfo.state": senderInfo.state },
+            { "senderInfo.postal_code": senderInfo.zip },
+            { "senderInfo.phone": senderInfo.phone },
+            { "senderInfo.country": senderInfo.country },
+        );
+        if (!updateSenderInfo) {
+            logger("Error updating user senderInfo", "error");
+            throw new Error('Error updating user senderInfo.');
+        }
+        logger("User sender information updated successfully.");
+    } catch (error) {
+        logger(`Error updating user credits: ${error}`, "error");
+        res.status(500).end();
+    }
+}
+
+// Handle the shipping label PDF
+function handleLabelPDF(tracking, labelPDF, email) {
+    const filename = `${tracking}_shipping_label.pdf`;
+    try {
+        const decodedLabelPDF = Buffer.from(labelPDF, 'base64');
+        if (!fs.existsSync('./order_label_pdf')) fs.mkdirSync('./order_label_pdf');
+        if (fs.existsSync(`./order_label_pdf/${filename}`)) fs.unlinkSync(`./order_label_pdf/${filename}`);
+        fs.writeFileSync(`./order_label_pdf/${filename}`, decodedLabelPDF);
+        logger(`Shipping label PDF saved successfully for tracking number: ${tracking}`);
+
+        // Send email to customer and KEMLabels
+        sendLabelInfoEmail(email, decodedLabelPDF, filename);
+    } catch (err) {
+        logger(`Error handling shipping label PDF: ${err}`, "error");
+    }
+}
+
+//Create single label order
 async function createLabel(endpoint, uuid, formValues, signature, country = null, satDelivery = null) {
     const { courier, senderInfo, recipientInfo, packageInfo } = formValues;
     const references = [];
@@ -1112,75 +1186,6 @@ async function createLabel(endpoint, uuid, formValues, signature, country = null
         }
     )
     return res.json();
-}
-
-// Updates the user's credits in the database
-async function updateUserCredits(email, totalPrice) {
-    try {
-        const user = await User.findOne({ email: email })
-        if (!user) {
-            logger(`User not found for email: ${email}`, "error");
-            throw new Error('User not found.');
-        }
-
-        const updatedCredits = Number(user.credits) - Number(totalPrice);
-        const res = await User.updateOne({ "_id": user._id.toString() }, { "credits": updatedCredits });
-        if (!res) {
-            logger(`Error updating user credits: ${err}`, "error");
-            throw new Error('Error updating user credits.');
-        }
-        logger(`User credits updated balance: ${updatedCredits}`);
-    } catch (error) {
-        logger(`Error updating user credits: ${err}`, "error");
-        res.status(500).end();
-    }
-}
-
-// Saves the user's sender information to the database
-async function senderInfoUpdateDB(email, formValues) {
-    try {
-        const { senderInfo } = formValues;
-        const user = await User.findOne({ userEmail: email })
-        if (!user) {
-            logger(`User not found for email: ${email}`, "error");
-            throw new Error('User not found.');
-        }
-        const updateSenderInfo = await user.updateOne(
-            { "senderInfo.name": `${senderInfo.firstName} ${senderInfo.lastName}` },
-            { "senderInfo.address1": senderInfo.street },
-            { "senderInfo.address2": senderInfo.suite },
-            { "senderInfo.city": senderInfo.city },
-            { "senderInfo.state": senderInfo.state },
-            { "senderInfo.postal_code": senderInfo.zip },
-            { "senderInfo.phone": senderInfo.phone },
-            { "senderInfo.country": senderInfo.country },
-        );
-        if (!updateSenderInfo) {
-            logger("Error updating user senderInfo", "error");
-            throw new Error('Error updating user senderInfo.');
-        }
-        logger("User sender information updated successfully.");
-    } catch (error) {
-        logger(`Error updating user credits: ${error}`, "error");
-        res.status(500).end();
-    }
-}
-
-// Handle the shipping label PDF
-function handleLabelPDF(tracking, labelPDF, email) {
-    const filename = `${tracking}_shipping_label.pdf`;
-    try {
-        const decodedLabelPDF = Buffer.from(labelPDF, 'base64');
-        if (!fs.existsSync('./order_label_pdf')) fs.mkdirSync('./order_label_pdf');
-        if (fs.existsSync(`./order_label_pdf/${filename}`)) fs.unlinkSync(`./order_label_pdf/${filename}`);
-        fs.writeFileSync(`./order_label_pdf/${filename}`, decodedLabelPDF);
-        logger(`Shipping label PDF saved successfully for tracking number: ${tracking}`);
-
-        // Send email to customer and KEMLabels
-        sendLabelInfoEmail(email, decodedLabelPDF, filename);
-    } catch (err) {
-        logger(`Error handling shipping label PDF: ${err}`, "error");
-    }
 }
 
 // Order Label for single order
@@ -1240,6 +1245,7 @@ app.post("/orderLabel", async (req, res) => {
             if (saveSenderInfo) await senderInfoUpdateDB(email, formValues);
             await updateUserCredits(email, totalPrice);
 
+            console.log('labelRes.data: ' + labelRes.data);
             // Handle the shipping label PDF
             const { tracking, label_pdf, receipt_pdf } = labelRes.data;
             handleLabelPDF(tracking, label_pdf, email);
@@ -1254,69 +1260,7 @@ app.post("/orderLabel", async (req, res) => {
     }
 })
 
-async function readCsvFile() {
-    const workbook = XLSX.readFile('./bulkOrders/kemlabels-bulk-order-template.xlsx');
-    const sheetNames = workbook.SheetNames;
-    const firstSheetName = sheetNames[0];
-    const firstSheet = workbook.Sheets[firstSheetName];
-    const csvData = XLSX.utils.sheet_to_csv(firstSheet);
-    fs.writeFileSync('./bulkOrders/test.csv', csvData, 'utf8');
-
-    const csvFilePath = './bulkOrders/test.csv';
-    const results = [];
-    let rowCount = 0;
-    let courier, serviceSpeed, signatureRequest;
-
-    fs.createReadStream(csvFilePath)
-        .pipe(csv({headers: false}))
-        .on('data', (data) => {
-            if (rowCount === 0) {
-                courier = data[0];
-                serviceSpeed = data[1];
-                signatureRequest = data[2];
-                rowCount++;
-                return;
-            }
-
-            if (Object.values(data).length !== 24) {
-                logger('Error: Incorrect number of columns in row ' + rowCount);
-                return;
-            }
-            if (rowCount >= 20) {
-                logger('Error: Maximum row limit exceeded');
-                return;
-            }
-            const transformedData = Object.values(data).map((value, index) => {
-                if (index > 18 && index < 23) {
-                    return parseFloat(value);
-                } else {
-                    return value.toString();
-                }
-            });
-            const exceededColumnIndex = transformedData.findIndex(value => typeof value === 'string' && value.length > 50);
-            if (exceededColumnIndex !== -1) {
-                logger(`Error: Character limit exceeded in column ${exceededColumnIndex + 1} of row ${rowCount}`);
-                return;
-            }
-            results.push(transformedData);
-            rowCount++;
-        })
-        .on('end', () => {
-            const finalData = {
-                courier: courier,
-                serviceSpeed: serviceSpeed,
-                signatureRequest: signatureRequest,
-                resultsData : results
-            }
-            logger('Courier:' + courier);
-            logger('Service Speed:' + serviceSpeed);
-            logger('Signature Request:' + signatureRequest);
-            logger('Results:' + results);
-            logger('Total labels: ' + results.length);
-        });
-}
-
-// Order Label for bulk orders (XLSX)
+// Bulk orders
 app.post("/orderLabelBulk", upload.single('file'), async (req, res) => {
     try {
         logger("Received orderLabelBulk request.");
@@ -1325,20 +1269,216 @@ app.post("/orderLabelBulk", upload.single('file'), async (req, res) => {
         const bulkOrderFile = req.file;
         logger(`Email: ${email}, Bulk Order File: ${JSON.stringify(bulkOrderFile)}`);
 
+        const user = User.findOne({ email: email })
+        if (!user) {
+            logger(`User not found for email: ${email}`, "error");
+            throw new Error('User not found.');
+        }
+        let clientsPrice = user.customPricing;
+
         if (!bulkOrderFile) {
             logger("No file uploaded.", "error");
             throw new Error("No file uploaded.");
         }
 
-        // TODO: Handle the file and send to API
-        await readCsvFile();
+        const labelResponse = await nodeFetch(
+            process.env.API_LABELS_USER_INFO,
+            {
+                headers: { "Content-Type": "application/json" },
+                method: "POST",
+                body: JSON.stringify({ "uuid": uuid })
+            }
+        );
+        const userInfo = await labelResponse.json();
+        logger(`User info: ${JSON.stringify(userInfo)}`);
+        if (!userInfo || userInfo.status !== "success") {
+            logger(`API Error - User Info: ${userInfo.status}, ${userInfo.message}`, "error");
+            throw new Error(userInfo.message);
+        }
 
-        return res.status(200).json({ msg: "OrderLabelBulk request processed successfully." });
-    } catch (err) {
+        let country, satDelivery, endpoint, finalData, totalPrice = null;
+        // TODO: call function to read xsls file
+
+        console.log(finalData);
+        totalPrice = clientsPrice * finalData.totalLabels;
+        // TODO: match the label price from client to the one from the bulk order
+        
+        if(user.credits < totalPrice) {
+            logger('Insufficient balance');
+            throw new Error("Insufficient balance.");
+        }
+
+        switch (finalData.courier) {
+            case "UPS USA":
+                country = "US";
+                satDelivery = false;
+                endpoint = process.env.API_LABELS_ORDER_CREATE_UPS;
+                break;
+            case "UPS CA":
+                country = "CA";
+                satDelivery = false;
+                endpoint = process.env.API_LABELS_ORDER_CREATE_UPS;
+                break;
+            case "USPS":
+                endpoint = process.env.API_LABELS_ORDER_CREATE_USPS;
+                break;
+            default:
+                break;
+        }
+
+        try {
+            const createdPDFs = [];
+            return new Promise(async (resolve) => {
+                for (let i = 0; i < finalData.length; i++) {
+                    const labelData = finalData[i];
+                    const labelRes = await createLabelBulk(endpoint, uuid, labelData, country, satDelivery);
+                    logger(`Label Response for row ${i + 1}: ${JSON.stringify(labelRes)}`);
+                    if (!labelRes || labelRes.status !== "success") {
+                        logger(`API Error - Create Label: ${labelRes.status}, ${labelRes.message}`, "error");
+                        throw new Error(labelRes.message);
+                    }
+                    const { tracking, label_pdf, receipt_pdf } = labelRes.data;
+                    const filename = handleLabelPDFBulk(tracking, i, label_pdf, email);
+                    createdPDFs.push(filename);
+                }
+                resolve(res.status(200).json({ msg: "OrderLabel request processed successfully." }));
+            }).then( (result) =>{
+                updateUserCredits(email, totalPrice);
+                pdfToZipFile(createdPDFs, email);
+            })
+        } catch (error) {
+            logger(`Error creating label: ${err.message}`, "error");
+            throw new Error(err);
+        }
+
+    } catch (error) {
         logger(`Error processing orderLabelBulk request: ${err}`, "error");
         return res.status(400).json({ msg: err.message });
     }
 })
+
+async function createLabelBulk(endpoint, uuid, finalData, country = null, satDelivery = null) {
+    const { courier, senderInfo, recipientInfo, packageInfo } = finalData;
+    const references = [];
+    let classType = finalData.serviceSpeed;
+    if (finalData.signatureRequest === "YES") classType = classType.split(':')[0] + ' Signature';
+    else classType = classType.split(':')[0];
+
+
+    //make dynamic per row
+    if (packageInfo.referenceNumber) references.push(packageInfo.referenceNumber);
+    if (packageInfo.referenceNumber2) references.push(packageInfo.referenceNumber2);
+
+    const body = {
+        uuid: uuid,
+        service_speed: `${courier} ${classType}`,
+        sender: {
+            name: `${senderInfo.firstName} ${senderInfo.lastName}`,
+            address1: senderInfo.street,
+            address2: senderInfo.suite,
+            city: senderInfo.city,
+            state: senderInfo.state,
+            postal_code: senderInfo.zip,
+            phone: senderInfo.phone,
+        },
+        recipient: {
+            name: `${recipientInfo.firstName} ${recipientInfo.lastName}`,
+            address1: recipientInfo.street,
+            address2: recipientInfo.suite,
+            city: recipientInfo.city,
+            state: recipientInfo.state,
+            postal_code: recipientInfo.zip,
+            phone: recipientInfo.phone,
+        },
+        package: {
+            length: packageInfo.length,
+            width: packageInfo.width,
+            height: packageInfo.height,
+            weight: packageInfo.weight,
+            description: packageInfo.description,
+            references: references,
+        }
+    }
+
+    // Optional fields
+    if (satDelivery) body.package.saturday_delivery = satDelivery;
+    if (country) body.country = country;
+
+    logger(`Create Label Request: ${JSON.stringify(body)}`);
+    const res = await nodeFetch(
+        endpoint,
+        {
+            headers: { "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify(body)
+        }
+    )
+    return res.json();
+}
+
+function handleLabelPDFBulk(tracking, labelPDF, email) {
+    const filename = `${tracking}_shipping_label_.pdf`;
+    try {
+        const decodedLabelPDF = Buffer.from(labelPDF, 'base64');
+        if (!fs.existsSync('./order_label_pdf')) fs.mkdirSync('./order_label_pdf');
+        if (fs.existsSync(`./order_label_pdf/${filename}`)) fs.unlinkSync(`./order_label_pdf/${filename}`);
+        fs.writeFileSync(`./order_label_pdf/${filename}`, decodedLabelPDF);
+        logger(`Shipping label PDF saved successfully for tracking number: ${tracking}`);
+        return filename;
+    } catch (err) {
+        logger(`Error handling shipping label PDF: ${err}`, "error");
+        return null;
+    }
+}
+
+function pdfToZipFile(pdfFiles, email) {
+    const zip = new AdmZip();
+
+    pdfFiles.forEach((pdfFile) => {
+        zip.addLocalFile(`./order_label_pdf/${pdfFile}`);
+    });
+
+    const currentDate = new Date();
+    zip.writeZip(`./order_label_pdf/${email}_${currentDate}.zip`);
+    const filename = `${email}_${currentDate}.zip`;
+
+    sendLabelInfoEmailBulk(email, filename);
+}
+
+function sendLabelInfoEmailBulk(email, filename) {
+    try {
+        const attachments = [
+            {
+                filename: 'shipping_label.pdf',
+                path: `./order_label_pdf/${filename}`,
+                content: "application/zip"
+            }
+        ];
+
+        // Customer email content
+        const customerContent = `<h1 style="margin-bottom: 2rem;">Thank you for you order!</h1>
+        <p>Your order has been received and we have attached your shipping labels in a ZIP attachment to this email.</p>
+        <p>For any questions or concerns, please contact our support team at <strong>${process.env.MAIL_USER}</strong> or <strong>6041231234</strong>.</p>`;
+        const customerOrderConfirm = emailTemplate(email, 'KEMLabels - Your Bulk Shipping Label Order is Ready', customerContent, attachments);
+
+        transporter.sendMail(customerOrderConfirm, (err, info) => {
+            if (err) logger(`Error sending shipping label order confirmation to customer: ${err}`, "error");
+            else logger(`Shipping label order confirmation email sent successfully to ${email}.`);
+        });
+
+        // KEMLabels email content
+        const kemContent = `<h1 style="margin-bottom: 2rem;">New Bulk Shipping Label Order</h1>
+        <p>A new shipping label order has been placed by ${email}. The shipping label has been attached to this email.</p>`;
+        const kemlabelsOrderConfirm = emailTemplate(process.env.MAIL_USER, 'KEMLabels - New Shipping Label Order', kemContent, attachments);
+
+        transporter.sendMail(kemlabelsOrderConfirm, (err, info) => {
+            if (err) logger(`Error sending shipping label order confirmation to KEMLabels: ${err}`, "error");
+            else logger(`Shipping label order confirmation email sent successfully to KEMLabels.`);
+        });
+    } catch (err) {
+        logger(`Error sending email for updating email: ${err}`, "error");
+    }
+}
 
 //CRON
 // Schedule a task to run every 24 hours
