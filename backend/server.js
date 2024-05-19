@@ -63,9 +63,9 @@ const store = new MongoDBStore({
 });
 
 //Import schema modules
-const User = require('./model/users.js');
-const tempTokens = require('./model/tempToken.js');
-const tempOTPS = require('./model/tempOTPs.js');
+const User = require('./models/users.js');
+const tempTokens = require('./models/tempToken.js');
+const tempOTPS = require('./models/tempOTPs.js');
 
 //Start app
 app.use('/', express.static(__dirname + '/public'));
