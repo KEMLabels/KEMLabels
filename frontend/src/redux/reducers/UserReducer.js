@@ -1,4 +1,5 @@
 import {
+  SET_USER,
   SET_USER_EMAIL,
   SET_USER_USERNAME,
   SET_USER_CREDIT_AMOUNT,
@@ -24,6 +25,17 @@ export const initialState = {
 
 export default function UserReducer(state = initialState, action) {
   switch (action.type) {
+    case SET_USER:
+      return {
+        ...state,
+        email: action.payload.email,
+        username: action.payload.username,
+        creditAmount: action.payload.creditAmount,
+        loadAmount: action.payload.loadAmount,
+        joinedDate: action.payload.joinedDate,
+        isLoggedIn: action.payload.isLoggedIn,
+        isVerified: action.payload.isVerified,
+      };
     case SET_USER_EMAIL:
       return { ...state, email: action.payload };
     case SET_USER_USERNAME:

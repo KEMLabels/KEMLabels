@@ -1,3 +1,4 @@
+export const SET_USER = "SET_USER";
 export const SET_USER_EMAIL = "SET_USER_EMAIL";
 export const SET_USER_USERNAME = "SET_USER_USERNAME";
 export const SET_USER_CREDIT_AMOUNT = "SET_USER_CREDIT_AMOUNT";

@@ -1,4 +1,5 @@
 import {
+  SET_USER,
   SET_USER_EMAIL,
   SET_USER_USERNAME,
   SET_USER_CREDIT_AMOUNT,
@@ -10,6 +11,31 @@ import {
   CLEAR_SESSION,
   CLEAR_USER,
 } from "../Types";
+
+export const setUser =
+  (
+    username,
+    email,
+    creditAmount,
+    loadAmount,
+    joinedDate,
+    isLoggedIn,
+    isVerified
+  ) =>
+  (dispatch) => {
+    dispatch({
+      type: SET_USER,
+      payload: {
+        username,
+        email,
+        creditAmount,
+        loadAmount,
+        joinedDate,
+        isLoggedIn,
+        isVerified,
+      },
+    });
+  };
 
 export const setUserEmail = (email) => (dispatch) => {
   dispatch({
@@ -65,7 +91,7 @@ export const setSenderInfo = (setSenderInfo) => (dispatch) => {
     type: SET_SENDER_INFO,
     payload: setSenderInfo,
   });
-}
+};
 
 export const clearSession = () => (dispatch) => {
   dispatch({

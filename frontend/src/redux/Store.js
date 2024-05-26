@@ -5,7 +5,7 @@ import thunk from "redux-thunk";
 import RootReducer from "./reducers/RootReducer";
 
 const persistConfig = {
-  key: "root", // The key to use for local storage
+  key: "kemlabels", // The key to use for local storage
   storage,
 };
 
