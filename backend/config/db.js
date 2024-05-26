@@ -10,7 +10,8 @@ const connectDB = async () => {
     });
     logger("Connected to DB", "info");
   } catch (err) {
-    logger("Error connecting to DB:\n" + err, "error");
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger("Error connecting to DB:\n" + error, "error");
     process.exit(1);
   }
 };

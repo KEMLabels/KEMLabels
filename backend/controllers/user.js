@@ -39,7 +39,8 @@ const emailExists = async (req, res) => {
     logger(`Email found for ${emailLower}.`, "info");
     res.status(200).json({ user: user });
   } catch (err) {
-    logger(`Error checking if email exists: ${JSON.stringify(err)}`, "error");
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error checking if email exists: ${error}`, "error");
     return res.status(500).json({
       msg: err.message || "Internal server error.",
     });
@@ -60,7 +61,8 @@ const forgotPassword = async (req, res) => {
     await sendForgotPasswordEmail(email, otp);
     res.status(200).json({ msg: "OTP sent to email successfully." });
   } catch (err) {
-    logger(`Error generating or sending OTP: ${JSON.stringify(err)}`, "error");
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error generating or sending OTP: ${error}`, "error");
     return res.status(500).json({
       msg: err.message || "Internal server error.",
     });
@@ -85,7 +87,7 @@ const validateOtp = async (req, res) => {
         `OTP verification failed: OTP Code not found for ${emailLower}.`,
         "error"
       );
-      return res.status(400).json({
+      return res.status(404).json({
         msg: "An unexpected error occurred. Please try again later.",
       });
     }
@@ -102,7 +104,8 @@ const validateOtp = async (req, res) => {
     logger(`OTP verification successful for ${emailLower}.`, "info");
     res.status(200).json({ msg: "Verification successful." });
   } catch (err) {
-    logger(`Error validating OTP: ${JSON.stringify(err)}`, "error");
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error validating OTP: ${error}`, "error");
     return res.status(500).json({
       msg: err.message || "Internal server error.",
     });
@@ -114,7 +117,7 @@ const verifyEmail = async (req, res) => {
     const { user } = req.session;
     if (!user || !user._id || !user.email) {
       logger("Email verification failed: User ID or email missing.", "error");
-      return res.status(404).json({ msg: "User ID or email missing." });
+      return res.status(404).json({ msg: "User not found from session." });
     }
 
     const token = await VerificationTokenModel.findOne({ userid: user._id });
@@ -129,10 +132,11 @@ const verifyEmail = async (req, res) => {
     const verificationUrl = await generateVerificationUrl(user._id);
     await sendSignUpEmail(user.email, verificationUrl);
   } catch (err) {
-    logger(`Error verifying email: ${JSON.stringify(err)}`, "error");
-    return res
-      .status(500)
-      .json({ msg: err.message || "Internal server error." });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error verifying email: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error.",
+    });
   }
 };
 
@@ -174,7 +178,8 @@ const verifyUser = async (req, res) => {
     }
 
     // Update user verification status
-    await UserModel.updateOne({ _id: id }, { verified: true });
+    user.verified = true;
+    await user.save();
     logger(`User ${id} verified successfully.`, "info");
 
     // Update the session
@@ -186,10 +191,11 @@ const verifyUser = async (req, res) => {
 
     res.status(200).json({ redirect: "/" });
   } catch (err) {
-    logger(`Error verifying user: ${JSON.stringify(err)}`, "error");
-    return res
-      .status(500)
-      .json({ msg: err.message || "Internal server error." });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error verifying user: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error.",
+    });
   }
 };
 
@@ -216,8 +222,11 @@ const checkUserVerification = async (req, res) => {
     logger(`User is verified: ${user.email}`, "info");
     res.status(200).json({ redirect: "/" });
   } catch (err) {
-    logger(`Error checking user verification: ${JSON.stringify(err)}`, "error");
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error checking user verification: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error.",
+    });
   }
 };
 
@@ -243,14 +252,18 @@ const updatePassword = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
-    await UserModel.updateOne({ _id: user._id }, { password: hashedPassword });
+    user.password = hashedPassword;
+    await user.save();
 
     await sendPasswordUpdateEmail(emailLower);
     logger(`Password updated successfully for ${emailLower}.`, "info");
     res.status(200).json({ redirect: "/signin" });
   } catch (err) {
-    logger(`Error updating password: ${JSON.stringify(err)}`, "error");
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error updating password: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error.",
+    });
   }
 };
 
@@ -335,10 +348,9 @@ const updateUsername = async (req, res) => {
     }
 
     // Update the username and the last changed date
-    await UserModel.updateOne(
-      { _id: user._id },
-      { userName: newUserNameLower, userNameLastChanged: new Date() }
-    );
+    user.userName = newUserNameLower;
+    user.userNameLastChanged = new Date();
+    await user.save();
 
     // Update the session
     req.session.user.userName = newUserNameLower;
@@ -350,8 +362,11 @@ const updateUsername = async (req, res) => {
     );
     res.status(200).json({ msg: "Username updated successfully." });
   } catch (err) {
-    logger(`Error updating username: ${JSON.stringify(err)}`, "error");
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error updating username: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error.",
+    });
   }
 };
 
@@ -359,12 +374,14 @@ const updateEmail = async (req, res) => {
   try {
     const { newEmail } = req.body;
     const userId = req.session.user._id;
+
     if (!newEmail) {
       logger("Email update failed: Email missing.", "error");
       return res.status(404).json({
         msg: "An unexpected error occurred. Please try again later.",
       });
     }
+
     if (!userId) {
       logger("Email update failed: User id missing from session.", "error");
       return res.status(404).json({
@@ -382,10 +399,9 @@ const updateEmail = async (req, res) => {
 
     // Update the email and set the user to unverified
     const newEmailLower = newEmail.toLowerCase();
-    await UserModel.updateOne(
-      { _id: user._id },
-      { email: newEmailLower, verified: false }
-    );
+    user.email = newEmailLower;
+    user.verified = false;
+    await user.save();
     logger(
       `Email updated successfully for user ${user.email} to ${newEmailLower}.`,
       "info"
@@ -397,8 +413,11 @@ const updateEmail = async (req, res) => {
     await sendEmailUpdateEmail(newEmailLower);
     res.status(200).json({ msg: "Email updated successfully." });
   } catch (err) {
-    logger(`Error updating email: ${JSON.stringify(err)}`, "error");
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error updating email: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error.",
+    });
   }
 };
 
@@ -407,12 +426,14 @@ const updateEmailRequest = async (req, res) => {
   try {
     const { newEmail } = req.body;
     const user = req.session.user;
+
     if (!newEmail) {
       logger("Email update request failed: Email missing.", "error");
       return res.status(404).json({
         msg: "An unexpected error occurred. Please try again later.",
       });
     }
+
     if (!user || !user.email) {
       logger("Email update request failed: User session missing.", "error");
       return res.status(404).json({
@@ -453,11 +474,11 @@ const updateEmailRequest = async (req, res) => {
       msg: `An email to verify your new email with instructions has been sent to ${newEmailLower}.`,
     });
   } catch (err) {
-    logger(
-      `Error processing email update request: ${JSON.stringify(err)}`,
-      "error"
-    );
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error processing email update request: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error.",
+    });
   }
 };
 
@@ -466,6 +487,7 @@ const updatePasswordRequest = async (req, res) => {
   try {
     const { enteredPassword, newPassword } = req.body;
     const user = req.session.user;
+
     if (!enteredPassword || !newPassword) {
       logger("Password update request failed: Password missing.", "error");
       return res.status(404).json({
@@ -515,11 +537,11 @@ const updatePasswordRequest = async (req, res) => {
       msg: `An email with instructions to reset your password has been sent to ${user.email}.`,
     });
   } catch (err) {
-    logger(
-      `Error processing password update request: ${JSON.stringify(err)}`,
-      "error"
-    );
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error processing password update request: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error.",
+    });
   }
 };
 
@@ -527,6 +549,7 @@ const updatePasswordRequest = async (req, res) => {
 const resendOtpEmail = async (req, res) => {
   try {
     const { email, type } = req.body;
+
     if (!email || !type) {
       logger("Resend request failed: Email or type missing.", "error");
       return res.status(404).json({
@@ -552,11 +575,11 @@ const resendOtpEmail = async (req, res) => {
       msg: `An email with instructions to reset your ${type} has been sent to ${emailLower}.`,
     });
   } catch (err) {
-    logger(
-      `Error resending update ${type} request: ${JSON.stringify(err)}`,
-      "error"
-    );
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error resending update '${type}' request: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error.",
+    });
   }
 };
 

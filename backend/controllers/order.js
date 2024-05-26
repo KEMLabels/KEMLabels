@@ -20,7 +20,7 @@ const updateSenderInfoDb = async (email, senderInfo) => {
         `DB failed to update sender info: User not found for email: ${email}`,
         "error"
       );
-      throw new Error("User not found.");
+      throw new Error("User not found for the given email.");
     }
 
     // Update the sender info in the database
@@ -38,7 +38,8 @@ const updateSenderInfoDb = async (email, senderInfo) => {
 
     logger(`Sender Info updated in the database for email: ${email}`, "info");
   } catch (err) {
-    logger(`DB failed to update sender info: ${JSON.stringify(err)}`, "error");
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`DB failed to update sender info: ${error}`, "error");
     throw new Error("DB failed to update sender info.");
   }
 };
@@ -53,7 +54,7 @@ const updateCreditBalanceDb = async (email, totalPrice) => {
         `DB failed to update user's credit balance: User not found for email: ${email}`,
         "error"
       );
-      throw new Error("User not found.");
+      throw new Error("User not found for the given email.");
     }
 
     // Update the user's credit balance in the database
@@ -64,10 +65,8 @@ const updateCreditBalanceDb = async (email, totalPrice) => {
       "info"
     );
   } catch (err) {
-    logger(
-      `DB failed to update user's credit balance: ${JSON.stringify(err)}`,
-      "error"
-    );
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`DB failed to update user's credit balance: ${error}`, "error");
     throw new Error("DB failed to update user's credit balance.");
   }
 };
@@ -97,7 +96,7 @@ const getLabelEndpointAndOptions = (courier) => {
   return { status: "success", data: { country, satDelivery, endpoint } };
 };
 
-// Hekoer function to upload the shipping label PDF to the server
+// Helper function to upload the shipping label PDF to the server
 const uploadShippingLabelPdf = async (buffer, filename, email) => {
   try {
     if (!fs.existsSync("../shippingLabels")) fs.mkdirSync("../shippingLabels");
@@ -110,10 +109,8 @@ const uploadShippingLabelPdf = async (buffer, filename, email) => {
       "info"
     );
   } catch (err) {
-    logger(
-      `Error uploading shipping label PDF: ${JSON.stringify(err)}`,
-      "error"
-    );
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error uploading shipping label PDF: ${error}`, "error");
     throw new Error("Error uploading shipping label PDF.");
   }
 };
@@ -136,10 +133,8 @@ const handleSingleLabelOrderPdf = async (tracking, labelPdf, email) => {
       "info"
     );
   } catch (err) {
-    logger(
-      `Error handling shipping label order PDF: ${JSON.stringify(err)}`,
-      "error"
-    );
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error handling shipping label order PDF: ${error}`, "error");
     throw new Error("Error handling shipping label order PDF.");
   }
 };
@@ -349,10 +344,8 @@ const createSingleLabel = async (req, res) => {
       msg: "Single Label Order created successfully.",
     });
   } catch (err) {
-    logger(
-      `Error processing Single Label Order Request: ${JSON.stringify(err)}`,
-      "error"
-    );
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error processing Single Label Order Request: ${error}`, "error");
     return res.status(500).json({
       msg: err.message || "Internal server error.",
     });
@@ -378,6 +371,15 @@ const parseBulkOrderFile = async (bulkOrderFile) => {
 
     const labels = parsedData[0];
     const orders = parsedData.slice(2);
+
+    // Check if there are more than 100 orders in the bulk order file
+    if (orders.length > 100) {
+      logger(
+        "Bulk Label Order creation failed: Maximum 100 orders allowed in a bulk order file.",
+        "error"
+      );
+      return null;
+    }
 
     const data = {
       signature: labels[2].toLowerCase() === "yes",
@@ -425,7 +427,8 @@ const parseBulkOrderFile = async (bulkOrderFile) => {
 
     return data;
   } catch (err) {
-    logger(`Error parsing bulk order file: ${JSON.stringify(err)}`, "error");
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error parsing bulk order file: ${error}`, "error");
     return null;
   }
 };
@@ -456,10 +459,8 @@ const handleBulkOrderPdf = async (trackingNumbers, pdfBuffers, email) => {
       "info"
     );
   } catch (err) {
-    logger(
-      `Error handling bulk label order PDF: ${JSON.stringify(err)}`,
-      "error"
-    );
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error handling bulk label order PDF: ${error}`, "error");
     throw new Error("Error handling bulk label order PDF.");
   }
 };
@@ -614,10 +615,8 @@ const createBulkLabels = async (req, res) => {
       msg: "Bulk Label Order created successfully.",
     });
   } catch (err) {
-    logger(
-      `Error processing Bulk Label Order Request: ${JSON.stringify(err)}`,
-      "error"
-    );
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error processing Bulk Label Order Request: ${error}`, "error");
     return res.status(500).json({
       msg: err.message || "Internal server error.",
     });
@@ -658,7 +657,8 @@ const getSenderInfo = async (req, res) => {
     logger(`Sender Info fetched successfully for email: ${email}`, "info");
     return res.status(200).json({ senderInfo: user.senderInfo });
   } catch (err) {
-    logger(`Error fetching Sender Info: ${JSON.stringify(err)}`, "error");
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error fetching Sender Info: ${error}`, "error");
     return res.status(500).json({
       msg: err.message || "Internal server error.",
     });
@@ -691,7 +691,8 @@ const getLabelPricings = async (req, res) => {
     logger(`Label Pricings fetched successfully for email: ${email}`, "info");
     return res.status(200).json({ pricing: user.customPricing });
   } catch (err) {
-    logger(`Error fetching Label Pricings: ${JSON.stringify(err)}`, "error");
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error fetching Label Pricings: ${error}`, "error");
     return res.status(500).json({
       msg: err.message || "Internal server error.",
     });

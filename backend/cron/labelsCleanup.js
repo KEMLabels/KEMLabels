@@ -18,13 +18,13 @@ const labelsCleanupCronJob = () => {
       const files = fs.readdirSync(directory);
       for (const file of files) {
         fs.unlinkSync(`${directory}/${file}`, (err) => {
-          if (err)
+          if (err) {
+            const error = typeof err === Object ? JSON.stringify(err) : err;
             logger(
-              `Failed to delete shipping label PDF file: ${JSON.stringify(
-                err
-              )}`,
+              `Failed to delete shipping label PDF file: ${error}`,
               "error"
             );
+          }
         });
       }
       logger(
@@ -32,10 +32,9 @@ const labelsCleanupCronJob = () => {
         "info"
       );
     } catch (err) {
+      const error = typeof err === Object ? JSON.stringify(err) : err;
       logger(
-        `Cron Job Error: Failed to cleanup shipping label files: ${JSON.stringify(
-          err
-        )}`,
+        `Cron Job Error: Failed to cleanup shipping label files: ${error}`,
         "error"
       );
     }

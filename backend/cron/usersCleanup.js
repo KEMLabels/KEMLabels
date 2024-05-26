@@ -21,10 +21,9 @@ const usersCleanupCronJob = () => {
         "info"
       );
     } catch (err) {
+      const error = typeof err === Object ? JSON.stringify(err) : err;
       logger(
-        `Cron Job Error: Failed to cleanup unverified users: ${JSON.stringify(
-          err
-        )}`,
+        `Cron Job Error: Failed to cleanup unverified users: ${error}`,
         "error"
       );
     }

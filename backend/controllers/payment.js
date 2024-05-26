@@ -41,10 +41,8 @@ const createStripePaymentIntent = async (req, res) => {
     );
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
-    logger(
-      `Error creating Stripe Payment Intent: ${JSON.stringify(err)}`,
-      "error"
-    );
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error creating Stripe Payment Intent: ${error}`, "error");
     return res.status(500).json({ msg: err.message });
   }
 };
@@ -58,9 +56,9 @@ const stripeWebhook = async (req, res) => {
 
   if (!signature) {
     logger("Stripe Webhook error: No Stripe signature found.", "error");
-    return res
-      .status(500)
-      .send("An unexpected error occurred. Please try again later.");
+    return res.status(404).json({
+      msg: "An unexpected error occurred. Please try again later.",
+    });
   }
 
   try {
@@ -72,9 +70,9 @@ const stripeWebhook = async (req, res) => {
 
     if (!event) {
       logger("Stripe Webhook error: Event not constructed.", "error");
-      return res
-        .status(500)
-        .send("An unexpected error occurred. Please try again later.");
+      return res.status(500).json({
+        msg: "An unexpected error occurred. Please try again later.",
+      });
     }
 
     if (event.type !== "payment_intent.succeeded") {
@@ -85,8 +83,11 @@ const stripeWebhook = async (req, res) => {
       return res.status(500).end();
     }
   } catch (err) {
-    logger(`Stripe Webhook error: ${JSON.stringify(err)}`, "error");
-    return res.status(500).send(`Webhook Error: ${err.message}`);
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Stripe Webhook error: ${error}`, "error");
+    return res.status(500).json({
+      msg: `Stripe Webhook Error: ${err.message}`,
+    });
   }
 
   // Handle the event and update the database
@@ -105,7 +106,7 @@ const stripeWebhook = async (req, res) => {
     });
     if (!user) {
       logger("Stripe Webhook error: User not found.", "error");
-      return res.status(404).json({ msg: "User not found." });
+      return res.status(404).json({ msg: "User not found for this payment." });
     }
 
     // Update user's credits
@@ -116,10 +117,11 @@ const stripeWebhook = async (req, res) => {
       "info"
     );
   } catch (err) {
-    logger(`Error updating user credits: ${JSON.stringify(err)}`, "error");
-    return res
-      .status(500)
-      .json({ msg: err.message || "Internal server error" });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error updating user credits: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error",
+    });
   }
   res.status(200).end();
 };
@@ -161,8 +163,11 @@ const createCryptoPaymentIntent = async (req, res) => {
     );
     res.status(200).json({ redirect: cryptoCharge.hosted_url });
   } catch (err) {
-    logger(`Error creating Crypto Payment Intent: ${err}`, "error");
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error creating Crypto Payment Intent: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error",
+    });
   }
 };
 
@@ -173,9 +178,9 @@ const cryptoWebhook = async (req, res) => {
 
   if (!signature) {
     logger("Coinbase Webhook error: No Coinbase signature found.", "error");
-    return res
-      .status(400)
-      .send("An unexpected error occurred. Please try again later.");
+    return res.status(404).json({
+      msg: "An unexpected error occurred. Please try again later.",
+    });
   }
 
   try {
@@ -187,9 +192,9 @@ const cryptoWebhook = async (req, res) => {
 
     if (!event) {
       logger("Coinbase Webhook error: Event not verified.", "error");
-      return res
-        .status(500)
-        .send("An unexpected error occurred. Please try again later.");
+      return res.status(500).json({
+        msg: "An unexpected error occurred. Please try again later.",
+      });
     }
 
     if (event.type !== "charge:confirmed" && event.type !== "charge:resolved") {
@@ -200,8 +205,11 @@ const cryptoWebhook = async (req, res) => {
       return res.status(500).end();
     }
   } catch (err) {
-    logger(`Coinbase Webhook error: ${JSON.stringify(err)}`, "error");
-    return res.status(500).send(`Coinbase Webhook Error: ${err.message}`);
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Coinbase Webhook error: ${error}`, "error");
+    return res.status(500).json({
+      msg: `Coinbase Webhook Error: ${err.message}`,
+    });
   }
 
   // Handle the event and update the database
@@ -210,7 +218,7 @@ const cryptoWebhook = async (req, res) => {
     const user = await UserModel.findOne({ email: event.metadata.email });
     if (!user) {
       logger("Coinbase Webhook error: User not found.", "error");
-      return res.status(404).json({ msg: "User not found." });
+      return res.status(404).json({ msg: "User not found for this payment." });
     }
 
     // Update user's credits with a 10% bonus
@@ -221,10 +229,11 @@ const cryptoWebhook = async (req, res) => {
       "info"
     );
   } catch (err) {
-    logger(`Error updating user credits: ${JSON.stringify(err)}`, "error");
-    return res
-      .status(500)
-      .json({ msg: err.message || "Internal server error" });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error updating user credits: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error",
+    });
   }
   res.status(200).end();
 };
@@ -260,7 +269,8 @@ const getStripePayments = async (email) => {
     }
     return payments;
   } catch (err) {
-    logger(`Error retrieving Stripe payments: ${JSON.stringify(err)}`, "error");
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error retrieving Stripe payments: ${error}`, "error");
     return [];
   }
 };
@@ -273,10 +283,8 @@ const getCoinbasePayments = async (email) => {
       {},
       (err, list, pagination) => {
         if (err) {
-          logger(
-            `Error retrieving Coinbase payments: ${JSON.stringify(err)}`,
-            "error"
-          );
+          const error = typeof err === Object ? JSON.stringify(err) : err;
+          logger(`Error retrieving Coinbase payments: ${error}`, "error");
           return [];
         }
       }
@@ -328,10 +336,8 @@ const getCoinbasePayments = async (email) => {
     }
     return payments;
   } catch (err) {
-    logger(
-      `Error retrieving Coinbase payments: ${JSON.stringify(err)}`,
-      "error"
-    );
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error retrieving Coinbase payments: ${error}`, "error");
     return [];
   }
 };
@@ -370,8 +376,11 @@ const getCreditHistory = async (req, res) => {
     logger(`Successfully retrieved ${payments.length} payments.`, "info");
     res.status(200).json({ payments: payments });
   } catch (err) {
-    logger(`Error retrieving credit history: ${JSON.stringify(err)}`, "error");
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error retrieving credit history: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error",
+    });
   }
 };
 

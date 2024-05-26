@@ -40,8 +40,9 @@ function sendMail(recipientEmail, subject, content, attachments = []) {
   return new Promise((res, rej) => {
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
-        logger(`Error sending email: ${JSON.stringify(err)}`, "error");
-        rej(err);
+        const error = typeof err === Object ? JSON.stringify(err) : err;
+        logger(`Error sending email: ${error}`, "error");
+        rej(err.message || err);
       } else res("Email sent successfully");
     });
   });

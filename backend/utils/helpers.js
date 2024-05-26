@@ -22,8 +22,9 @@ async function generateOtp(email) {
     logger(`OTP generated and saved for ${email}.`, "info");
     return otp;
   } catch (err) {
-    logger(`Error generating OTP: ${JSON.stringify(err)}`, "error");
-    throw new Error(`Error generating OTP: ${JSON.stringify(err)}`);
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error generating OTP: ${error}`, "error");
+    throw new Error(`Error generating OTP: ${error}`);
   }
 }
 
@@ -42,13 +43,9 @@ async function generateVerificationUrl(userId) {
     const server = isDevelopment() ? clientDevServer : clientProdServer;
     return `${server}/users/${userId}/verify/${token}`;
   } catch (err) {
-    logger(
-      `Error generating verification token or URL: ${JSON.stringify(err)}`,
-      "error"
-    );
-    throw new Error(
-      `Error generating verification token or URL: ${JSON.stringify(err)}`
-    );
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error generating verification token or URL: ${error}`, "error");
+    throw new Error(`Error generating verification token or URL: ${error}`);
   }
 }
 

@@ -10,8 +10,9 @@ const store = new MongoDBStore({
 });
 
 // Catch errors in session store
-store.on("error", (error) => {
-  logger(`Session store error: ${JSON.stringify(error)}`, "error");
+store.on("error", (err) => {
+  const error = typeof err === Object ? JSON.stringify(err) : err;
+  logger(`Session store error:\n${error}`, "error");
 });
 
 // Session middleware configuration options for express-session

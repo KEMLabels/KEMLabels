@@ -35,7 +35,8 @@ const signIn = async (req, res) => {
     req.session.user = user;
     await req.session.save((err) => {
       if (err) {
-        logger(`Error saving session: ${JSON.stringify(err)}`, "error");
+        const error = typeof err === Object ? JSON.stringify(err) : err;
+        logger(`Error saving session: ${error}`, "error");
         return res.status(500).json({ msg: "Failed to save session." });
       }
       logger(`User ${emailLower} signed in successfully.`, "info");
@@ -50,15 +51,19 @@ const signIn = async (req, res) => {
       });
     });
   } catch (err) {
-    logger(`Error signing in: ${JSON.stringify(err)}`, "error");
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error signing in: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error",
+    });
   }
 };
 
 const logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      logger(`Error logging out: ${JSON.stringify(err)}`, "error");
+      const error = typeof err === Object ? JSON.stringify(err) : err;
+      logger(`Error logging out: ${error}`, "error");
       return res.status(500).json({ msg: "Error logging out." });
     }
     res.clearCookie("sessionID");
@@ -84,9 +89,9 @@ const signUp = async (req, res) => {
         `Signup failed: User already exists for email '${emailLower}'.`,
         "error"
       );
-      return res
-        .status(400)
-        .json({ msg: "This email is already associated with an account." });
+      return res.status(400).json({
+        msg: "This email is already associated with an account.",
+      });
     }
 
     const userNameExists = await UserModel.findOne({ userName: userNameLower });
@@ -114,15 +119,19 @@ const signUp = async (req, res) => {
     req.session.user = newUser;
     await req.session.save((err) => {
       if (err) {
-        logger(`Error saving session: ${JSON.stringify(err)}`, "error");
+        const error = typeof err === Object ? JSON.stringify(err) : err;
+        logger(`Error saving session: ${error}`, "error");
         return res.status(500).json({ msg: "Failed to save session." });
       }
       logger(`User ${emailLower} signed up successfully.`, "info");
       res.status(201).json({ redirect: "/verify-email" });
     });
   } catch (err) {
-    logger(`Error signing up: ${JSON.stringify(err)}`, "error");
-    return res.status(500).json({ msg: err.message });
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error signing up: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error",
+    });
   }
 };
 

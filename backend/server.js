@@ -30,7 +30,8 @@ app.use("/api/v1/order", orderRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {
-  logger(`Error Handler: ${err.message}`, "error");
+  const error = typeof err === Object ? JSON.stringify(err) : err;
+  logger(`Error Handler: ${error}`, "error");
   res.status(500).json({ msg: "Internal server error" });
 });
 
@@ -53,5 +54,6 @@ try {
     logger(`Server is running on port ${PORT}`, "info");
   });
 } catch (err) {
-  logger("Error starting server:\n" + err, "error");
+  const error = typeof err === Object ? JSON.stringify(err) : err;
+  logger("Error starting server:\n" + error, "error");
 }
