@@ -9,15 +9,7 @@ import Button from "../components/Button";
 import { DefaultField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
-import {
-  setUserCreditAmount,
-  setUserEmail,
-  setUserJoinedDate,
-  setUserLoadAmount,
-  setUserLoggedIn,
-  setUserName,
-  setUserVerified,
-} from "../redux/actions/UserAction";
+import { setUser } from "../redux/actions/UserAction";
 import {
   validateEmailOnSubmit,
   validatePasswordOnSubmit,
@@ -87,24 +79,29 @@ export default function Signup() {
 
     axios
       .post(
-        "/Signup",
+        "/auth/signup",
         { userName: inputUserName, email: inputEmail, password: inputPassword },
         { withCredentials: true }
       )
       .then((res) => {
-        Log(res);
-        dispatch(setUserName(inputUserName));
-        dispatch(setUserEmail(inputEmail));
-        dispatch(setUserCreditAmount(0));
-        dispatch(setUserLoadAmount(0));
-        dispatch(setUserJoinedDate(getCurrDateTimeInISO()));
-        dispatch(setUserVerified(false));
-        dispatch(setUserLoggedIn(true));
+        Log("Signup Response: ", res);
+        dispatch(
+          setUser(
+            inputUserName,
+            inputEmail,
+            0,
+            0,
+            getCurrDateTimeInISO(),
+            true,
+            false
+          )
+        );
+        navigate(res.data.redirect || "/verify-email");
       })
       .catch((e) => {
         const resp = e?.response?.data?.msg;
         Log("Error: ", e);
-        if (resp === "This username is already associated with an account.") {
+        if (resp === "This username is already taken.") {
           setFieldErrors((currentErrors) => ({
             ...currentErrors,
             username: e.response.data.msg,

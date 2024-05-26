@@ -91,15 +91,12 @@ export default function OrderLabel() {
   // Fetch user's custom pricing on page load
   useEffect(() => {
     axios
-      .post("/getUserLabelPricings", {
-        email: email,
-        withCredentials: true,
-      })
+      .get("/order/label/pricings", { withCredentials: true })
       .then((res) => {
         if (res.data.errMsg) {
           setSectionErrors({ container: res.data.errMsg });
           window.scrollTo({ top: 0, behavior: "smooth" });
-        } else setPricing(res.data);
+        } else setPricing(res.data.pricing);
       })
       .catch((e) => {
         Log("Error: ", e);
@@ -130,14 +127,17 @@ export default function OrderLabel() {
     setLoading(true);
     const formValues = trimFormValues();
     axios
-      .post("/OrderLabel", {
-        email: email,
-        withCredentials: true,
-        formValues: formValues,
-        totalPrice: totalPrice,
-        signature: signatureChecked,
-        saveSenderInfo: saveSenderInfo,
-      })
+      .post(
+        "/order/label/single",
+        {
+          email: email,
+          formValues: formValues,
+          totalPrice: totalPrice,
+          signature: signatureChecked,
+          isSenderInfoSaved: saveSenderInfo,
+        },
+        { withCredentials: true }
+      )
       .then((res) => {
         if (res.data.errMsg) {
           setSectionErrors({ container: res.data.errMsg });

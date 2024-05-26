@@ -11,7 +11,10 @@ import Button from "../components/Button";
 import { DefaultField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
-import { validatePasswordOnSubmit } from "../utils/Validation";
+import {
+  validateEmailOnSubmit,
+  validatePasswordOnSubmit,
+} from "../utils/Validation";
 import { validatePasswordOnTyping } from "../utils/Helpers";
 import Log from "../components/Log";
 
@@ -56,8 +59,14 @@ export default function ForgotPassword() {
       setErrMsg("Please fill out all fields.");
       return;
     }
+
+    if (!validateEmailOnSubmit(email, setFieldErrors)) {
+      setLoading(false);
+      return;
+    }
+
     axios
-      .post("/emailExists", { email }, { withCredentials: true })
+      .post("/user/emailExists", { email }, { withCredentials: true })
       .then((res) => {
         Log(res.data);
         sendInitialRequest();
@@ -82,11 +91,7 @@ export default function ForgotPassword() {
     setResentEmail(true);
     setTimeout(() => setResentEmail(false), 15000);
     axios
-      .post(
-        "/forgotpassword",
-        { email: email, type: "resetPassword" },
-        { withCredentials: true }
-      )
+      .post("/user/forgotPassword", { email: email }, { withCredentials: true })
       .then((res) => Log(res.data))
       .catch((e) => {
         Log("Error: ", e);
@@ -101,7 +106,7 @@ export default function ForgotPassword() {
 
     axios
       .post(
-        "/generateNewOTP",
+        "/user/forgotPassword",
         { email: email, type: "resetPassword" },
         { withCredentials: true }
       )
@@ -124,13 +129,17 @@ export default function ForgotPassword() {
     setInfoMsg("");
 
     axios
-      .post("/checkOTP", { enteredOTP, email }, { withCredentials: true })
+      .post(
+        "/user/validateOtp",
+        { enteredOtp: enteredOTP, email },
+        { withCredentials: true }
+      )
       .then((res) => {
         Log(res);
         document.getElementById("resetPasswordForm").reset();
         setResetPasswordStep("changePassword");
         setErrMsg("");
-        setSuccessMsg("Verification successful.");
+        setSuccessMsg(res.data.msg);
         setTimeout(() => {
           setSuccessMsg("");
         }, 5000);
@@ -161,7 +170,11 @@ export default function ForgotPassword() {
     }
 
     axios
-      .post("/updateUserPass", { email, password }, { withCredentials: true })
+      .post(
+        "/user/updatePassword",
+        { email, newPassword: password },
+        { withCredentials: true }
+      )
       .then((res) => {
         Log(res);
         setRedirecting(true);

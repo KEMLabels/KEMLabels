@@ -125,8 +125,8 @@ export default function AccountSettings({ currentPage = "username" }) {
 
     axios
       .post(
-        "/UpdateUsername",
-        { userName: inputUserName },
+        "/user/updateUsername",
+        { newUserName: inputUserName },
         { withCredentials: true }
       )
       .then((res) => {
@@ -138,10 +138,11 @@ export default function AccountSettings({ currentPage = "username" }) {
       .catch((e) => {
         Log("Error: ", e);
         if (
+          e?.response?.data?.msg === "Please enter a username." ||
           e?.response?.data?.msg ===
-            "This username is already associated with an account." ||
+            "Please enter a new username that is different from the current one." ||
           e?.response?.data?.msg ===
-            "You cannot change your username to the same one you currently have."
+            "This username is already taken. Please try another one."
         ) {
           setFieldErrors({
             username: e.response.data.msg,
@@ -162,14 +163,16 @@ export default function AccountSettings({ currentPage = "username" }) {
   function updateEmailCall() {
     axios
       .post(
-        "/updateEmailAddress",
+        "/user/updateEmail",
         { newEmail: confirmInputEmail },
         { withCredentials: true }
       )
       .then((res) => Log(res))
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
+        throw new Error(
+          "An unexpected error occurred. Please try again later."
+        ); // Axios default error
       });
   }
 
@@ -205,7 +208,7 @@ export default function AccountSettings({ currentPage = "username" }) {
 
     axios
       .post(
-        "/sendEmailChangeConfirmation",
+        "/user/updateEmailRequest",
         { newEmail: confirmInputEmail },
         { withCredentials: true }
       )
@@ -226,11 +229,11 @@ export default function AccountSettings({ currentPage = "username" }) {
         Log("Error: ", e);
         if (
           e?.response?.data?.msg ===
-            "You cannot change your email to the one you currently have." ||
+            "Please enter a new email that is different from the current one." ||
           e?.response?.data?.msg ===
-            "This email is already associated with an account."
+            "This email is already taken. Please try another one."
         ) {
-          setFieldErrors({ newEmail: e.response.data.msg });
+          setFieldErrors({ email: e.response.data.msg });
         } else {
           setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
         }
@@ -251,9 +254,9 @@ export default function AccountSettings({ currentPage = "username" }) {
 
     axios
       .post(
-        "/checkOTP",
+        "/user/validateOtp",
         {
-          enteredOTP,
+          enteredOtp: enteredOTP,
           email: currentPage === "email" ? confirmInputEmail : email,
         },
         { withCredentials: true }
@@ -274,7 +277,7 @@ export default function AccountSettings({ currentPage = "username" }) {
         setTimeout(() => {
           setSuccessMsg("");
           axios
-            .get("/logout", { withCredentials: true })
+            .get("/auth/logout", { withCredentials: true })
             .then((res) => {
               Log(res);
               dispatch(clearSession());
@@ -321,10 +324,10 @@ export default function AccountSettings({ currentPage = "username" }) {
 
     axios
       .post(
-        "/generateNewOTP",
+        "/user/resendOtpEmail",
         {
           email: currentPage === "email" ? confirmInputEmail : email,
-          type: currentPage === "email" ? "changeEmail" : "changePassword",
+          type: currentPage === "email" ? "email" : "password",
         },
         { withCredentials: true }
       )
@@ -348,14 +351,16 @@ export default function AccountSettings({ currentPage = "username" }) {
   function updatePasswordCall() {
     axios
       .post(
-        "/updateUserPass",
-        { email: email, password: confirmInputPassword },
+        "/user/updatePassword",
+        { email: email, newPassword: confirmInputPassword },
         { withCredentials: true }
       )
       .then((res) => Log(res))
       .catch((e) => {
         Log("Error: ", e);
-        setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
+        throw new Error(
+          "An unexpected error occurred. Please try again later."
+        ); // Axios default error
       });
   }
 
@@ -390,7 +395,7 @@ export default function AccountSettings({ currentPage = "username" }) {
 
     axios
       .post(
-        "/sendPasswordChangeConfirmation",
+        "/user/updatePasswordRequest",
         {
           enteredPassword: currentInputPassword,
           newPassword: confirmInputPassword,
@@ -419,7 +424,7 @@ export default function AccountSettings({ currentPage = "username" }) {
           setFieldErrors({ password: e.response.data.msg });
         } else if (
           e?.response?.data?.msg ===
-          "Looks like you have entered the same password that you are using now. Please enter a differernt password."
+          "Please enter a new password that is different from the current one."
         ) {
           setFieldErrors({ newPassword: e.response.data.msg });
         } else {

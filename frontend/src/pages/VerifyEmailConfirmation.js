@@ -16,22 +16,30 @@ export default function VerifyEmailConfirmation() {
 
   const [fetching, setIsFetching] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [validURL, setvalidURL] = useState(false);
+  const [validURL, setValidURL] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [linkErrMsg, setLinkErrMsg] = useState("");
 
   useEffect(() => {
-    const url = `${process.env.REACT_APP_BACKEND_SERVER}/users/${param.id}/verify/${param.token}`;
+    if (!param.id || !param.token) {
+      setIsFetching(false);
+      setValidURL(false);
+      setErrMsg("An unexpected error occurred. Please try again later.");
+      return;
+    }
+
     axios
-      .get(url, { withCredentials: true })
+      .get(`/user/${param.id}/verify/${param.token}`, {
+        withCredentials: true,
+      })
       .then((res) => {
         Log(res);
         dispatch(setUserVerified(true));
-        setvalidURL(true);
+        setValidURL(true);
       })
       .catch((e) => {
         Log("Error: ", e);
-        setvalidURL(false);
+        setValidURL(false);
         if (
           e?.response?.data?.msg === "Link Invalid" ||
           e?.response?.data?.msg === "Link Expired"

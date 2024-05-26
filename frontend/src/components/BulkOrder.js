@@ -51,7 +51,10 @@ export default function BulkOrder({
       }));
       return;
     }
-    if (file.type !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+    if (
+      file.type !==
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) {
       setFieldErrors((prev) => ({
         ...prev,
         bulkOrderFile: "Invalid file format. Please upload a XLSX file.",
@@ -72,14 +75,13 @@ export default function BulkOrder({
     formData.append("email", email);
     formData.append("withCredentials", true);
 
-    const axiosConfig = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    };
-
     axios
-      .post("/orderLabelBulk", formData, axiosConfig)
+      .post("/order/label/bulk", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((res) => {
         if (res.data.errMsg) {
           setSectionErrors({ container: res.data.errMsg });

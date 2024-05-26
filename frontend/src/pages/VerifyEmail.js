@@ -6,6 +6,7 @@ import AlertMessage from "../components/AlertMessage";
 import PageLayout from "../components/PageLayout";
 import Button from "../components/Button";
 import Log from "../components/Log";
+import { setUserVerified } from "../redux/actions/UserAction";
 
 export default function VerifyEmail() {
   const dispatch = useDispatch();
@@ -22,10 +23,12 @@ export default function VerifyEmail() {
   useEffect(() => {
     if (isLoggedIn) {
       axios
-        .get("/isUserVerified", { withCredentials: true })
+        .get("/user/checkVerification", { withCredentials: true })
         .then((res) => {
-          if (res.status === 200) navigate(res.data.redirect);
-          else {
+          if (res.status === 200) {
+            dispatch(setUserVerified(true));
+            navigate(res.data.redirect || "/");
+          } else {
             setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
           }
         })
@@ -50,7 +53,7 @@ export default function VerifyEmail() {
     setResentEmail(true);
 
     axios
-      .get("/generateToken", { withCredentials: true })
+      .get("/user/verifyEmail", { withCredentials: true })
       .then((res) => {
         Log(res);
       })

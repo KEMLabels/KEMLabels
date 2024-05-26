@@ -11,6 +11,7 @@ import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
 import Log from "../components/Log";
+import { isDevelopmentEnv } from "../utils/Helpers";
 
 export default function CreditCard() {
   const navigate = useNavigate();
@@ -20,10 +21,10 @@ export default function CreditCard() {
   const loadedAmount = useSelector((state) => state.user.loadAmount);
   const creditAmount = useSelector((state) => state.user.creditAmount);
   const isUserVerified = useSelector((state) => state.user.isVerified);
-
+  const stripePublicKey = isDevelopmentEnv()
+    ? process.env.REACT_APP_DEV_STRIPE_PUBLIC_KEY
+    : process.env.REACT_APP_PROD_STRIPE_PUBLIC_KEY;
   const [clientSecret, setClientSecret] = useState("");
-  const [stripeKey, setStripeKey] = useState("");
-  const [hasStripeKey, SetHasStripeKey] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [loadCreditSuccess, setLoadCreditSuccess] = useState(false);
@@ -33,18 +34,6 @@ export default function CreditCard() {
   useEffect(() => {
     if (!isLoggedIn) navigate("/");
     if (!isUserVerified) navigate("/verify-email");
-    axios
-      .get("/getStripePublicKey")
-      .then((res) => {
-        if (res) {
-          setStripeKey(res.data);
-          SetHasStripeKey(true);
-        }
-      })
-      .catch((e) => {
-        Log("Error: ", e);
-        setErrMsg("An unexpected error occurred. Please try again later.");
-      });
   }, [isLoggedIn, navigate, isUserVerified]);
 
   useEffect(() => {
@@ -62,10 +51,10 @@ export default function CreditCard() {
     if (loadedAmount < 1) return;
     axios
       .post(
-        "/create-payment-intent",
+        "/payment/stripe/create",
         {
           email: email,
-          amount: Number(loadedAmount),
+          amount: Number(loadedAmount) * 100, // Convert to cents
         },
         {
           headers: {
@@ -81,19 +70,17 @@ export default function CreditCard() {
       .catch((error) => {
         // Handle errors here
         Log("An error occurred:", error);
+        setErrMsg("An error occurred. Please try again later.");
       });
   }, [email, loadedAmount]);
 
-  // Only load stripePromise if stripeKey is obtained
-  const stripePromise =
-    hasStripeKey && stripeKey ? loadStripe(stripeKey) : null;
-
-  const appearance = {
-    theme: "stripe",
-  };
+  // Only load stripePromise if stripePublicKey is obtained
+  const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
   const options = {
     clientSecret,
-    appearance,
+    appearance: {
+      theme: "stripe",
+    },
   };
 
   return (
@@ -135,8 +122,7 @@ export default function CreditCard() {
           </div>
           {!loadCreditSuccess ? (
             clientSecret &&
-            hasStripeKey &&
-            stripeKey && (
+            stripePublicKey && (
               <Elements options={options} stripe={stripePromise}>
                 <CheckoutForm
                   errorMsg={errMsg}

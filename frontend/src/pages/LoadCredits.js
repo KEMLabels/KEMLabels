@@ -116,7 +116,7 @@ export default function LoadCredits() {
                   if (!handleLoadCredits(e)) return;
                   axios
                     .post(
-                      "/payWithCrypto",
+                      "/payment/crypto/create",
                       { amount: loadAmount, email: userEmail },
                       { withCredentials: true }
                     )
