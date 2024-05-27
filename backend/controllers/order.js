@@ -391,36 +391,36 @@ const parseBulkOrderFile = async (bulkOrderFile) => {
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
       data.orders.push({
-        courier: labels[0].toString() || "",
-        classType: labels[1].toString() || "",
+        courier: labels[0]?.toString() || "",
+        classType: labels[1]?.toString() || "",
         senderInfo: {
-          country: order[0].toString() || "",
-          name: order[1].toString() || "",
-          phone: order[2].toString() || "",
-          street: order[3].toString() || "",
-          suite: order[4].toString() || "",
-          city: order[5].toString() || "",
-          zip: order[6].toString() || "",
-          state: order[7].toString() || "",
+          country: order[0]?.toString() || "",
+          name: order[1]?.toString() || "",
+          phone: order[2]?.toString() || "",
+          street: order[3]?.toString() || "",
+          suite: order[4]?.toString() || "",
+          city: order[5]?.toString() || "",
+          zip: order[6]?.toString() || "",
+          state: order[7]?.toString() || "",
         },
         recipientInfo: {
-          country: order[8].toString() || "",
-          name: order[9].toString() || "",
-          phone: order[10].toString() || "",
-          street: order[11].toString() || "",
-          suite: order[12].toString() || "",
-          city: order[13].toString() || "",
-          zip: order[14].toString() || "",
-          state: order[15].toString() || "",
+          country: order[8]?.toString() || "",
+          name: order[9]?.toString() || "",
+          phone: order[10]?.toString() || "",
+          street: order[11]?.toString() || "",
+          suite: order[12]?.toString() || "",
+          city: order[13]?.toString() || "",
+          zip: order[14]?.toString() || "",
+          state: order[15]?.toString() || "",
         },
         packageInfo: {
           length: order[16],
           height: order[17],
           width: order[18],
           weight: order[19],
-          description: order[20].toString() || "",
-          referenceNumber: order[21].toString() || "",
-          referenceNumber2: order[22].toString() || "",
+          description: order[20]?.toString() || "",
+          referenceNumber: order[21]?.toString() || "",
+          referenceNumber2: order[22]?.toString() || "",
         },
       });
     }
@@ -529,8 +529,9 @@ const createBulkLabels = async (req, res) => {
     }
 
     // Check if the user has enough credits to create the labels
-    const totalPrice =
-      user.customPricing[parsedData.courier] * parsedData.orders.length;
+    const { courier, classType, orders } = parsedData;
+    const pricing = user.customPricing[courier][classType];
+    const totalPrice = pricing * orders.length;
     if (user.credits < totalPrice) {
       logger(
         `Bulk Label Order creation failed: Insufficient credits for email: ${email}`,
@@ -543,10 +544,10 @@ const createBulkLabels = async (req, res) => {
     logger(`Total Price for Bulk Label Order: ${totalPrice}`, "info");
 
     // Get country, saturday delivery, and endpoint based on courier
-    const labelEndpointData = getLabelEndpointAndOptions(parsedData.courier);
+    const labelEndpointData = getLabelEndpointAndOptions(courier);
     if (!labelEndpointData || labelEndpointData.status !== "success") {
       logger(
-        `Bulk Label Order creation failed: Invalid courier. Courier: ${parsedData.courier}`,
+        `Bulk Label Order creation failed: Invalid courier. Courier: ${courier}`,
         "error"
       );
       return res.status(400).json({ msg: labelEndpointData.msg });
@@ -558,8 +559,8 @@ const createBulkLabels = async (req, res) => {
 
     // Fetch a label for each order in the bulk order file
     // and store the tracking number and PDF buffer
-    for (let i = 0; i < parsedData.orders.length; i++) {
-      const order = parsedData.orders[i];
+    for (let i = 0; i < orders.length; i++) {
+      const order = orders[i];
       const fetchLabelResponse = await fetchSingleLabel(
         endpoint,
         uuid,
@@ -615,7 +616,7 @@ const createBulkLabels = async (req, res) => {
     return res.status(200).json({
       msg: "Bulk Label Order created successfully.",
       totalPrice: totalPrice,
-      numOrders: parsedData.orders.length,
+      numOrders: orders.length,
     });
   } catch (err) {
     const error = typeof err === Object ? JSON.stringify(err) : err;
