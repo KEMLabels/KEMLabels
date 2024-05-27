@@ -101,7 +101,7 @@ const uploadShippingLabelPdf = async (buffer, filename, email) => {
   try {
     if (!fs.existsSync("../shippingLabels")) fs.mkdirSync("../shippingLabels");
     if (!fs.existsSync(`../shippingLabels/${email}`)) {
-      fs.mkdirSync(`../shippingLabels/${email}`);
+      fs.mkdirSync(`../shippingLabels/${email}`, { recursive: true });
     }
     fs.writeFileSync(`../shippingLabels/${email}/${filename}`, buffer);
     logger(
@@ -119,7 +119,7 @@ const uploadShippingLabelPdf = async (buffer, filename, email) => {
 // and send an email with PDF label to the customer and KEMLabels
 const handleSingleLabelOrderPdf = async (tracking, labelPdf, email) => {
   try {
-    const filename = `label_${tracking}_${new Date().toISOString()}.pdf`;
+    const filename = `label_${tracking}_${Date.now()}.pdf`;
     const buffer = Buffer.from(labelPdf, "base64");
 
     // Upload the shipping label PDF to the server
@@ -391,36 +391,36 @@ const parseBulkOrderFile = async (bulkOrderFile) => {
     for (let i = 0; i < orders.length; i++) {
       const order = orders[i];
       data.orders.push({
-        courier: labels[0],
-        classType: labels[1],
+        courier: labels[0].toString() || "",
+        classType: labels[1].toString() || "",
         senderInfo: {
-          country: order[0],
-          name: order[1],
-          phone: order[2],
-          street: order[3],
-          suite: order[4],
-          city: order[5],
-          zip: order[6],
-          state: order[7],
+          country: order[0].toString() || "",
+          name: order[1].toString() || "",
+          phone: order[2].toString() || "",
+          street: order[3].toString() || "",
+          suite: order[4].toString() || "",
+          city: order[5].toString() || "",
+          zip: order[6].toString() || "",
+          state: order[7].toString() || "",
         },
         recipientInfo: {
-          country: order[8],
-          name: order[9],
-          phone: order[10],
-          street: order[11],
-          suite: order[12],
-          city: order[13],
-          zip: order[14],
-          state: order[15],
+          country: order[8].toString() || "",
+          name: order[9].toString() || "",
+          phone: order[10].toString() || "",
+          street: order[11].toString() || "",
+          suite: order[12].toString() || "",
+          city: order[13].toString() || "",
+          zip: order[14].toString() || "",
+          state: order[15].toString() || "",
         },
         packageInfo: {
           length: order[16],
           height: order[17],
           width: order[18],
           weight: order[19],
-          description: order[20],
-          referenceNumber: order[21],
-          referenceNumber2: order[22],
+          description: order[20].toString() || "",
+          referenceNumber: order[21].toString() || "",
+          referenceNumber2: order[22].toString() || "",
         },
       });
     }
@@ -441,15 +441,13 @@ const handleBulkOrderPdf = async (trackingNumbers, pdfBuffers, email) => {
 
     // For each PDF buffer, upload the PDF to the server and add it to the zip
     for (let i = 0; i < pdfBuffers.length; i++) {
-      const filename = `label_${
-        trackingNumbers[i]
-      }_${new Date().toISOString()}.pdf`;
+      const filename = `label_${trackingNumbers[i]}_${Date.now()}.pdf`;
       await uploadShippingLabelPdf(pdfBuffers[i], filename, email);
       zip.addFile(filename, pdfBuffers[i]);
     }
 
     const zipBuffer = zip.toBuffer();
-    const zipFilename = `bulk_labels_${new Date().toISOString()}.zip`;
+    const zipFilename = `bulk_labels_${Date.now()}.zip`;
     fs.writeFileSync(`../shippingLabels/${email}/${zipFilename}`, zipBuffer);
 
     await sendLabelOrderCustomerEmail(email, zipBuffer, zipFilename);
@@ -469,7 +467,7 @@ const handleBulkOrderPdf = async (trackingNumbers, pdfBuffers, email) => {
 const createBulkLabels = async (req, res) => {
   try {
     const email = req.body.email;
-    const bulkOrderFile = req.file;
+    const bulkOrderFile = req.body.file;
     const uuid = "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf"; // @TODO: Hardcoded UUID
 
     if (!email || !bulkOrderFile) {
@@ -516,6 +514,8 @@ const createBulkLabels = async (req, res) => {
         msg: "Error parsing bulk order file.",
       });
     }
+    logger("Bulk Order File parsed successfully.", "info");
+    logger(`Parsed Bulk Order Data: ${JSON.stringify(parsedData)}`, "info");
 
     const user = await UserModel.findOne({ email: email });
     if (!user) {
@@ -540,6 +540,7 @@ const createBulkLabels = async (req, res) => {
         msg: "Insufficient credit balance.",
       });
     }
+    logger(`Total Price for Bulk Label Order: ${totalPrice}`, "info");
 
     // Get country, saturday delivery, and endpoint based on courier
     const labelEndpointData = getLabelEndpointAndOptions(parsedData.courier);
@@ -613,6 +614,8 @@ const createBulkLabels = async (req, res) => {
 
     return res.status(200).json({
       msg: "Bulk Label Order created successfully.",
+      totalPrice: totalPrice,
+      numOrders: parsedData.orders.length,
     });
   } catch (err) {
     const error = typeof err === Object ? JSON.stringify(err) : err;

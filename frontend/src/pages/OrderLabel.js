@@ -90,6 +90,7 @@ export default function OrderLabel() {
 
   // Fetch user's custom pricing on page load
   useEffect(() => {
+    if (!email) return;
     axios
       .get("/order/label/pricings", { withCredentials: true })
       .then((res) => {
