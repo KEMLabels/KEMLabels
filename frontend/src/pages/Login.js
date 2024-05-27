@@ -27,7 +27,7 @@ export default function Login() {
   useEffect(() => {
     if (isLoggedIn) {
       ReactGA.set({ userId: inputEmail });
-      navigate("/verify-email");
+      navigate("/");
     }
   }, [isLoggedIn, navigate, inputEmail]);
 
@@ -59,6 +59,7 @@ export default function Login() {
               res.data.userInfo.isVerified
             )
           );
+          navigate(res.data.redirect);
         }
       })
       .catch((e) => {

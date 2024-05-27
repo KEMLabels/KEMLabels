@@ -41,7 +41,7 @@ const signIn = async (req, res) => {
       }
       logger(`User ${emailLower} signed in successfully.`, "info");
       res.status(200).json({
-        redirect: "/",
+        redirect: user.verified ? "/" : "/verify-email",
         userInfo: {
           username: user.userName,
           creditAmount: user.credits,
