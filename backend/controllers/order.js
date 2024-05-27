@@ -329,7 +329,7 @@ const createSingleLabel = async (req, res) => {
 
     // Create a shipping label order PDF and send it to the user
     const { tracking, label_pdf, receipt_pdf } = fetchLabelResponse.data;
-    if (!tracking || !label_pdf || !receipt_pdf) {
+    if (!tracking || !label_pdf) {
       logger(
         `Single Label Order creation failed: Missing data in API response. API Response: ${JSON.stringify(
           fetchLabelResponse
