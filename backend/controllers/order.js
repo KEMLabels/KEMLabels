@@ -529,7 +529,16 @@ const createBulkLabels = async (req, res) => {
     }
 
     // Check if the user has enough credits to create the labels
-    const { courier, classType, orders } = parsedData;
+    const { classType, orders } = parsedData;
+    let courier = "";
+    if (courier === "UPSUSA") courier = "UPS USA";
+    else if (courier === "UPSCA") courier = "UPS CA";
+    else if (courier === "USPS") courier = "USPS";
+    else {
+      logger(`Bulk Label Order creation failed: Invalid courier: ${courier}`, "error");
+      return res.status(400).json({ msg: "Please select a valid courier." });
+    }
+
     const pricing = user.customPricing[courier][classType];
     const totalPrice = pricing * orders.length;
     if (user.credits < totalPrice) {
