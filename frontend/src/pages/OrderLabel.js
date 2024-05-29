@@ -24,7 +24,7 @@ export default function OrderLabel() {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const isUserVerified = useSelector((state) => state.user.isVerified);
   const email = useSelector((state) => state.user.email);
-  const savedSenderInfo = useSelector((state) => state.user.senderInfo);
+  const senderInfoRedux = useSelector((state) => state.user.senderInfo);
   const creditAmount = useSelector((state) => state.user.creditAmount);
 
   const senderAndRecipientInfo = {
@@ -50,7 +50,7 @@ export default function OrderLabel() {
       referenceNumber: "",
       referenceNumber2: "",
     },
-    senderInfo: { ...senderAndRecipientInfo, ...savedSenderInfo },
+    senderInfo: { ...senderAndRecipientInfo, ...senderInfoRedux },
     recipientInfo: { ...senderAndRecipientInfo },
   };
   const [formValues, setFormValues] = useState(initialFormValues);
@@ -58,7 +58,7 @@ export default function OrderLabel() {
   const [successMsg, setSuccessMsg] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
-  const [saveSenderInfo, setSaveSenderInfo] = useState(!!savedSenderInfo);
+  const [saveSenderInfo, setSaveSenderInfo] = useState(!!senderInfoRedux);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [showOrderConfirmPopup, setShowOrderConfirmPopup] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);

@@ -24,8 +24,8 @@ export default function OrderForm({
   setSectionErrors,
   formValues,
   setFormValues,
-  saveSenderInfo,
-  setSaveSenderInfo,
+  saveSenderInfo, // True if user wants to save sender info
+  setSaveSenderInfo, // Function to toggle saveSenderInfo
   totalPrice,
   setTotalPrice,
   signatureChecked,
@@ -36,7 +36,7 @@ export default function OrderForm({
 }) {
   const dispatch = useDispatch();
 
-  const savedSenderInfo = useSelector((state) => state.user.senderInfo);
+  const senderInfoRedux = useSelector((state) => state.user.senderInfo);
   const creditAmount = useSelector((state) => state.user.creditAmount);
   const optionalFields = [
     "referenceNumber",
@@ -83,7 +83,7 @@ export default function OrderForm({
     if (saveSenderInfo && section === "senderInfo") {
       dispatch(
         setSenderInfo({
-          ...savedSenderInfo,
+          ...senderInfoRedux,
           [e.target.name]: e.target.value.trim(),
         })
       );
