@@ -1,6 +1,6 @@
 const nodeFetch = require("node-fetch");
 const fs = require("fs");
-const path = require('path');
+const path = require("path");
 const XLSX = require("xlsx");
 const AdmZip = require("adm-zip");
 require("express-async-errors");
@@ -230,13 +230,7 @@ const createSingleLabel = async (req, res) => {
       req.body;
     const uuid = "6c66fbee-ef2e-4358-a28b-c9dc6a7eccaf"; // @TODO: Hardcoded UUID
 
-    if (
-      !email ||
-      !totalPrice ||
-      !formValues ||
-      !signature ||
-      !isSenderInfoSaved
-    ) {
+    if (!email || !totalPrice || !formValues) {
       logger("Single Label Order creation failed: Missing data.", "error");
       return res.status(404).json({
         msg: "An unexpected error occurred. Please try again.",
@@ -443,7 +437,7 @@ const handleBulkOrderPdf = async (trackingNumbers, pdfBuffers, email) => {
   try {
     const zip = new AdmZip();
 
-    // For each PDF buffer, upload the shipping label PDF to the server 
+    // For each PDF buffer, upload the shipping label PDF to the server
     // and add it to the zip file to send to the customer
     for (let i = 0; i < pdfBuffers.length; i++) {
       const filename = `label_${trackingNumbers[i]}_${Date.now()}.pdf`;

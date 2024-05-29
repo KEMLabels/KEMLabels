@@ -21,7 +21,7 @@ function sendMail(recipientEmail, subject, content, attachments = []) {
     attachments: [
       {
         filename: "logo.png",
-        path: path.join(__dirname, "..", "public", "logo.png"),
+        path: path.join(__dirname, "../public/logo.png"),
         cid: "logo",
       },
       ...attachments,
@@ -182,7 +182,7 @@ async function sendLabelOrderCustomerEmail(
   const attachments = [
     {
       filename: newFilename,
-      path: `../shippingLabels/${email}/${filename}`,
+      path: path.join(__dirname, "../shippingLabels/", email, filename),
       content: fileContent,
     },
   ];
@@ -218,7 +218,7 @@ async function sendLabelOrderAdminEmail(
   const attachments = [
     {
       filename: newFilename,
-      path: `../shippingLabels/${email}/${filename}`,
+      path: path.join(__dirname, "../shippingLabels/", email, filename),
       content: fileContent,
     },
   ];

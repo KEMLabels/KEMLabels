@@ -9,7 +9,7 @@ const logger = require("../utils/logger");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "shippingLabels/");
+    cb(null, path.join(__dirname, "../shippingLabels"));
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -31,7 +31,7 @@ router.post(
     }
 
     // Create a directory for the user if it doesn't exist
-    const uploadPath = path.join("shippingLabels", email);
+    const uploadPath = path.join(__dirname, "../shippingLabels", email);
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }
@@ -42,7 +42,11 @@ router.post(
     const newFileName = `${oldFileName[0]}-${date}.${oldFileName[1]}`;
 
     // Move the file to the user's directory
-    const oldPath = path.join("shippingLabels", req.file.originalname);
+    const oldPath = path.join(
+      __dirname,
+      "../shippingLabels",
+      req.file.originalname
+    );
     const newPath = path.join(uploadPath, newFileName);
     fs.rename(oldPath, newPath, (err) => {
       if (err) {
@@ -55,10 +59,10 @@ router.post(
     // Update the file contents in the request body
     req.body.file = {
       ...req.file,
-      path: `shippingLabels/${email}/${newFileName}`,
+      path: newPath,
       originalname: newFileName,
       filename: newFileName,
-      destination: `shippingLabels/${email}`,
+      destination: path.join(__dirname, "../shippingLabels", email),
     };
     next();
   },

@@ -1,5 +1,6 @@
 const cron = require("node-cron");
 const fs = require("fs");
+const path = require("path");
 const logger = require("../utils/logger");
 
 const labelsCleanupCronJob = () => {
@@ -9,8 +10,8 @@ const labelsCleanupCronJob = () => {
       "info"
     );
     try {
-      const directory = "shippingLabels/";
-      if (!fs.existsSync) {
+      const directory = path.join(__dirname, "../shippingLabels");
+      if (!fs.existsSync(directory)) {
         logger("Shipping labels directory does not exist", "error");
         return;
       }
