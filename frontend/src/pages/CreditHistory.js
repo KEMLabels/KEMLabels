@@ -34,9 +34,13 @@ export default function CreditHistory() {
 
   useEffect(() => {
     axios
-      .post("/getCreditHistory", { email: email }, { withCredentials: true })
+      .get("/payment/creditHistory", { withCredentials: true })
       .then((res) => {
-        if (res) setCreditHistoryData(res.data);
+        const payments = res.data.payments;
+        if (payments) {
+          setCreditHistoryData(payments);
+          setTotalRows(payments.length);
+        }
       })
       .catch((e) => {
         Log("Error: ", e);

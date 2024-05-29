@@ -4,6 +4,8 @@ import axios from "../api/axios";
 import Log from "./Log";
 import Button from "./Button";
 import AlertMessage from "./AlertMessage";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserCreditAmount } from "../redux/actions/UserAction";
 
 export default function BulkOrder({
   email,
@@ -13,8 +15,12 @@ export default function BulkOrder({
   setOrderSuccess,
   setSuccessMsg,
 }) {
+  const dispatch = useDispatch();
+  const creditAmount = useSelector((state) => state.user.creditAmount);
+
   const [isFileDragEnter, setIsFileDragEnter] = useState(false);
   const [bulkOrderFile, setBulkOrderFile] = useState(null);
+  const [numOrders, setNumOrders] = useState(0);
 
   function handleFileDragEnter(e) {
     e.preventDefault();
@@ -51,7 +57,10 @@ export default function BulkOrder({
       }));
       return;
     }
-    if (file.type !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+    if (
+      file.type !==
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) {
       setFieldErrors((prev) => ({
         ...prev,
         bulkOrderFile: "Invalid file format. Please upload a XLSX file.",
@@ -72,14 +81,13 @@ export default function BulkOrder({
     formData.append("email", email);
     formData.append("withCredentials", true);
 
-    const axiosConfig = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    };
-
     axios
-      .post("/orderLabelBulk", formData, axiosConfig)
+      .post("/order/label/bulk", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((res) => {
         if (res.data.errMsg) {
           setSectionErrors({ container: res.data.errMsg });
@@ -87,6 +95,8 @@ export default function BulkOrder({
         } else {
           setSectionErrors({});
           setSuccessMsg("Your order has been placed. Redirecting...");
+          dispatch(setUserCreditAmount(creditAmount - res.data.totalPrice));
+          setNumOrders(res.data.numOrders);
           setTimeout(() => {
             setOrderSuccess(true);
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -95,6 +105,13 @@ export default function BulkOrder({
       })
       .catch((e) => {
         Log("Error: ", e);
+        if (e?.response?.data?.msg === "Insufficient credit balance.") {
+          setSectionErrors({
+            container:
+              "You have insufficient funds to purchase. Please load your credits first to proceed with your purchase.",
+          });
+          return;
+        }
         setSectionErrors({
           container: "An unexpected error occurred. Please try again later.",
         }); // Axios default error

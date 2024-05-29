@@ -14,6 +14,7 @@ import AlertMessage from "./AlertMessage";
 import Button from "./Button";
 import { Link } from "react-router-dom";
 import Log from "./Log";
+import { isDevelopmentEnv } from "../utils/Helpers";
 
 export default function CheckoutForm({
   useremail,
@@ -119,7 +120,11 @@ export default function CheckoutForm({
         elements,
         confirmParams: {
           // Make sure to change this to your payment completion page
-          return_url: `${process.env.REACT_APP_FRONTEND_SERVER}/pay/credit-card`,
+          return_url: `${
+            isDevelopmentEnv()
+              ? process.env.REACT_APP_DEV_FRONTEND_SERVER
+              : process.env.REACT_APP_PROD_FRONTEND_SERVER
+          }/pay/credit-card`,
           receipt_email: useremail,
         },
       })

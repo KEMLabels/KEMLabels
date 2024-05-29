@@ -10,15 +10,7 @@ import Button from "../components/Button";
 import { DefaultField, PasswordField } from "../components/Field";
 import PageLayout from "../components/PageLayout";
 import AlertMessage from "../components/AlertMessage";
-import {
-  setUserCreditAmount,
-  setUserEmail,
-  setUserJoinedDate,
-  setUserLoadAmount,
-  setUserLoggedIn,
-  setUserName,
-  setUserVerified,
-} from "../redux/actions/UserAction";
+import { setUser } from "../redux/actions/UserAction";
 import Log from "../components/Log";
 
 export default function Login() {
@@ -35,30 +27,9 @@ export default function Login() {
   useEffect(() => {
     if (isLoggedIn) {
       ReactGA.set({ userId: inputEmail });
-      axios
-        .get("/checkVerification", {
-          withCredentials: true,
-        })
-        .then((res) => {
-          if (res.data.errMsg) {
-            dispatch(setUserVerified(false));
-            navigate("/verify-email");
-          } else {
-            dispatch(setUserVerified(true));
-            navigate(res.data.redirect);
-          }
-        })
-        .catch((e) => {
-          Log("Error: ", e);
-          if (e?.response?.data?.msg === "User is not verified") {
-            dispatch(setUserVerified(false));
-            navigate("/verify-email");
-          } else {
-            setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
-          }
-        });
+      navigate("/");
     }
-  }, [isLoggedIn, navigate, dispatch, inputEmail]);
+  }, [isLoggedIn, navigate, inputEmail]);
 
   const submit = (e) => {
     e.preventDefault();
@@ -70,19 +41,25 @@ export default function Login() {
     }
     axios
       .post(
-        "/Signin",
+        "/auth/signin",
         { email: inputEmail, password: inputPassword },
         { withCredentials: true }
       )
       .then((res) => {
         if (res.data.errMsg) setErrMsg(res.data.errMsg);
         else {
-          dispatch(setUserName(res.data.userInfo.userName));
-          dispatch(setUserCreditAmount(res.data.userInfo.credits));
-          dispatch(setUserLoadAmount(0));
-          dispatch(setUserJoinedDate(res.data.userInfo.joinedDate));
-          dispatch(setUserEmail(inputEmail));
-          dispatch(setUserLoggedIn(true));
+          dispatch(
+            setUser(
+              res.data.userInfo.username,
+              inputEmail,
+              res.data.userInfo.creditAmount,
+              0,
+              res.data.userInfo.joinedDate,
+              true,
+              res.data.userInfo.isVerified
+            )
+          );
+          navigate(res.data.redirect);
         }
       })
       .catch((e) => {

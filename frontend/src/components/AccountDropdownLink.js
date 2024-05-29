@@ -40,7 +40,7 @@ export default function AccountDropdownLink({ type, link, text }) {
         e.preventDefault();
         if (type === "logout") {
           await axios
-            .get("/logout", { withCredentials: true })
+            .get("/auth/logout", { withCredentials: true })
             .then((res) => {
               Log(res);
               dispatch(clearSession());

@@ -24,7 +24,7 @@ export default function OrderLabel() {
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const isUserVerified = useSelector((state) => state.user.isVerified);
   const email = useSelector((state) => state.user.email);
-  const savedSenderInfo = useSelector((state) => state.user.senderInfo);
+  const senderInfoRedux = useSelector((state) => state.user.senderInfo);
   const creditAmount = useSelector((state) => state.user.creditAmount);
 
   const senderAndRecipientInfo = {
@@ -50,7 +50,7 @@ export default function OrderLabel() {
       referenceNumber: "",
       referenceNumber2: "",
     },
-    senderInfo: { ...senderAndRecipientInfo, ...savedSenderInfo },
+    senderInfo: { ...senderAndRecipientInfo, ...senderInfoRedux },
     recipientInfo: { ...senderAndRecipientInfo },
   };
   const [formValues, setFormValues] = useState(initialFormValues);
@@ -58,7 +58,7 @@ export default function OrderLabel() {
   const [successMsg, setSuccessMsg] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showFloatingBtn, setShowFloatingBtn] = useState(false);
-  const [saveSenderInfo, setSaveSenderInfo] = useState(!!savedSenderInfo);
+  const [saveSenderInfo, setSaveSenderInfo] = useState(!!senderInfoRedux);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [showOrderConfirmPopup, setShowOrderConfirmPopup] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -90,16 +90,14 @@ export default function OrderLabel() {
 
   // Fetch user's custom pricing on page load
   useEffect(() => {
+    if (!email) return;
     axios
-      .post("/getUserLabelPricings", {
-        email: email,
-        withCredentials: true,
-      })
+      .get("/order/label/pricings", { withCredentials: true })
       .then((res) => {
         if (res.data.errMsg) {
           setSectionErrors({ container: res.data.errMsg });
           window.scrollTo({ top: 0, behavior: "smooth" });
-        } else setPricing(res.data);
+        } else setPricing(res.data.pricing);
       })
       .catch((e) => {
         Log("Error: ", e);
@@ -130,14 +128,17 @@ export default function OrderLabel() {
     setLoading(true);
     const formValues = trimFormValues();
     axios
-      .post("/OrderLabel", {
-        email: email,
-        withCredentials: true,
-        formValues: formValues,
-        totalPrice: totalPrice,
-        signature: signatureChecked,
-        saveSenderInfo: saveSenderInfo,
-      })
+      .post(
+        "/order/label/single",
+        {
+          email: email,
+          formValues: formValues,
+          totalPrice: totalPrice,
+          signature: signatureChecked,
+          isSenderInfoSaved: saveSenderInfo,
+        },
+        { withCredentials: true }
+      )
       .then((res) => {
         if (res.data.errMsg) {
           setSectionErrors({ container: res.data.errMsg });

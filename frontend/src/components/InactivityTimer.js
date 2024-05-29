@@ -16,11 +16,10 @@ export default function InactivityTimer() {
         const currentTime = Date.now();
         if (currentTime - lastActivityTime > inactivityThreshold) {
           await axios
-            .get("/logout", { withCredentials: true })
+            .get("/auth/logout", { withCredentials: true })
             .then((res) => {
               Log(res);
               dispatch(clearSession());
-              window.location.reload();
             })
             .catch((err) => Log("Error: ", err));
         }
