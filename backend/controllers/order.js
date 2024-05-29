@@ -1,5 +1,6 @@
 const nodeFetch = require("node-fetch");
 const fs = require("fs");
+const path = require('path');
 const XLSX = require("xlsx");
 const AdmZip = require("adm-zip");
 require("express-async-errors");
@@ -99,11 +100,12 @@ const getLabelEndpointAndOptions = (courier) => {
 // Helper function to upload the shipping label PDF to the server
 const uploadShippingLabelPdf = async (buffer, filename, email) => {
   try {
-    if (!fs.existsSync("../shippingLabels")) fs.mkdirSync("../shippingLabels");
-    if (!fs.existsSync(`../shippingLabels/${email}`)) {
-      fs.mkdirSync(`../shippingLabels/${email}`, { recursive: true });
+    const uploadPath = path.join(__dirname, "../shippingLabels", email);
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
     }
-    fs.writeFileSync(`../shippingLabels/${email}/${filename}`, buffer);
+
+    fs.writeFileSync(path.join(uploadPath, filename), buffer);
     logger(
       `Shipping Label PDF uploaded successfully for email: ${email}`,
       "info"
@@ -441,17 +443,24 @@ const handleBulkOrderPdf = async (trackingNumbers, pdfBuffers, email) => {
   try {
     const zip = new AdmZip();
 
-    // For each PDF buffer, upload the PDF to the server and add it to the zip
+    // For each PDF buffer, upload the shipping label PDF to the server 
+    // and add it to the zip file to send to the customer
     for (let i = 0; i < pdfBuffers.length; i++) {
       const filename = `label_${trackingNumbers[i]}_${Date.now()}.pdf`;
       await uploadShippingLabelPdf(pdfBuffers[i], filename, email);
       zip.addFile(filename, pdfBuffers[i]);
     }
 
+    // Save the zip file to the server
     const zipBuffer = zip.toBuffer();
     const zipFilename = `bulk_labels_${Date.now()}.zip`;
-    fs.writeFileSync(`../shippingLabels/${email}/${zipFilename}`, zipBuffer);
+    const uploadPath = path.join(__dirname, "../shippingLabels", email);
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    fs.writeFileSync(path.join(uploadPath, zipFilename), zipBuffer);
 
+    // Send email with the bulk order PDF to customer and KEMLabels
     await sendLabelOrderCustomerEmail(email, zipBuffer, zipFilename);
     await sendLabelOrderAdminEmail(email, zipBuffer, zipFilename);
     logger(
