@@ -170,7 +170,7 @@ const fetchSingleLabel = async (
     uuid: uuid,
     service_speed: `${courier} ${classType}`,
     sender: {
-      name: `${senderInfo.firstName} ${senderInfo.lastName}`,
+      name: senderInfo.name || `${senderInfo.firstName} ${senderInfo.lastName}`,
       address1: senderInfo.street,
       address2: senderInfo.suite,
       city: senderInfo.city,
@@ -179,7 +179,9 @@ const fetchSingleLabel = async (
       phone: senderInfo.phone,
     },
     recipient: {
-      name: `${recipientInfo.firstName} ${recipientInfo.lastName}`,
+      name:
+        recipientInfo.name ||
+        `${recipientInfo.firstName} ${recipientInfo.lastName}`,
       address1: recipientInfo.street,
       address2: recipientInfo.suite,
       city: recipientInfo.city,
@@ -529,18 +531,29 @@ const createBulkLabels = async (req, res) => {
     }
 
     // Check if the user has enough credits to create the labels
-    const { classType, orders } = parsedData;
+    const { classType, orders, signature } = parsedData;
     let courier = "";
-    if (courier === "UPSUSA") courier = "UPS USA";
-    else if (courier === "UPSCA") courier = "UPS CA";
-    else if (courier === "USPS") courier = "USPS";
-    else {
-      logger(`Bulk Label Order creation failed: Invalid courier: ${courier}`, "error");
-      return res.status(400).json({ msg: "Please select a valid courier." });
+    switch (parsedData.courier) {
+      case "UPSUSA":
+        courier = "UPS USA";
+        break;
+      case "UPSCA":
+        courier = "UPS CA";
+        break;
+      case "USPS":
+        courier = "USPS";
+        break;
+      default:
+        logger(
+          `Bulk Label Order creation failed: Invalid courier: ${parsedData.courier}`,
+          "error"
+        );
+        return res.status(400).json({ msg: "Please select a valid courier." });
     }
 
+    // if signature is true add $1 to the pricing
     const pricing = user.customPricing[courier][classType];
-    const totalPrice = pricing * orders.length;
+    const totalPrice = orders.length * (pricing + (signature ? 1 : 0));
     if (user.credits < totalPrice) {
       logger(
         `Bulk Label Order creation failed: Insufficient credits for email: ${email}`,
@@ -574,7 +587,7 @@ const createBulkLabels = async (req, res) => {
         endpoint,
         uuid,
         order,
-        parsedData.signature,
+        signature,
         country,
         satDelivery
       );
@@ -593,7 +606,7 @@ const createBulkLabels = async (req, res) => {
 
       // Create a shipping label order PDF and store it in a buffer
       const { tracking, label_pdf, receipt_pdf } = fetchLabelResponse.data;
-      if (!tracking || !label_pdf || !receipt_pdf) {
+      if (!tracking || !label_pdf) {
         logger(
           `Bulk Label Order creation failed: Missing data in API response. API Response: ${JSON.stringify(
             fetchLabelResponse
@@ -609,7 +622,7 @@ const createBulkLabels = async (req, res) => {
 
     if (trackingNumbers.length !== pdfBuffers.length) {
       logger(
-        "Bulk Label Order creation failed: Tracking numbers and PDF buffers mismatch.",
+        `Bulk Label Order creation failed: Tracking numbers and PDF buffers mismatch. Tracking Numbers: ${trackingNumbers.length}, PDF Buffers: ${pdfBuffers.length}`,
         "error"
       );
       return res.status(500).json({ msg: "Internal server error." });
