@@ -10,7 +10,10 @@ import AlertMessage from "../components/AlertMessage";
 import Button from "../components/Button";
 import axios from "../api/axios";
 import Log from "../components/Log";
-import { setUserCreditAmount } from "../redux/actions/UserAction";
+import {
+  setSenderInfo,
+  setUserCreditAmount,
+} from "../redux/actions/UserAction";
 import { courierTypes } from "../content/orderLabelsConstants";
 import OrderConfirmPopup from "../components/OrderConfirmPopup";
 import OrderSuccess from "../components/OrderSuccess";
@@ -90,7 +93,6 @@ export default function OrderLabel() {
 
   // Fetch user's custom pricing on page load
   useEffect(() => {
-    if (!email) return;
     axios
       .get("/order/label/pricings", { withCredentials: true })
       .then((res) => {
@@ -106,7 +108,41 @@ export default function OrderLabel() {
         }); // Axios default error
       })
       .finally(() => setIsFetchingPricing(false));
-  }, [email]);
+  }, []);
+
+  // Fetch user's sender info on page load
+  useEffect(() => {
+    axios
+      .get("/order/senderInfo", { withCredentials: true })
+      .then((res) => {
+        if (res.data.errMsg) {
+          setSectionErrors({ container: res.data.errMsg });
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          const fetchedSenderInfo = res.data.senderInfo;
+          Log("Fetched sender info:", fetchedSenderInfo);
+          const senderInfo = {
+            firstName: fetchedSenderInfo.name.split(" ")[0],
+            lastName: fetchedSenderInfo.name.split(" ")[1],
+            phone: fetchedSenderInfo.phone,
+            street: fetchedSenderInfo.address1,
+            suite: fetchedSenderInfo.address2,
+            city: fetchedSenderInfo.city,
+            state: fetchedSenderInfo.state,
+            zip: fetchedSenderInfo.postal_code,
+            country: fetchedSenderInfo.country,
+          };
+          dispatch(setSenderInfo(senderInfo));
+          setFormValues((prev) => ({ ...prev, senderInfo: senderInfo }));
+        }
+      })
+      .catch((e) => {
+        Log("Error: ", e);
+        setSectionErrors({
+          container: "An unexpected error occurred. Please try again later.",
+        }); // Axios default error
+      });
+  }, [dispatch]);
 
   function trimFormValues() {
     const formValuesCopy = { ...formValues };
