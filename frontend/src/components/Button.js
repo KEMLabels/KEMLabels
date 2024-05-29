@@ -22,7 +22,7 @@ export default function Button({
       }`}
       title={title}
       style={{ ...customStyle }}
-      disabled={disabled}
+      disabled={disabled || loading}
       onClick={(e) => {
         if (onClickEvent) onClickEvent(e);
       }}
