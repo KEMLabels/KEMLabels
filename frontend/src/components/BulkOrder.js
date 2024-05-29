@@ -21,6 +21,10 @@ export default function BulkOrder({
   const [isFileDragEnter, setIsFileDragEnter] = useState(false);
   const [bulkOrderFile, setBulkOrderFile] = useState(null);
   const [numOrders, setNumOrders] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [courier, setCourier] = useState("");
+  const [classType, setClassType] = useState("");
+  const [hasSignature, setHasSignature] = useState(false);
 
   function handleFileDragEnter(e) {
     e.preventDefault();
@@ -95,8 +99,12 @@ export default function BulkOrder({
         } else {
           setSectionErrors({});
           setSuccessMsg("Your order has been placed. Redirecting...");
-          dispatch(setUserCreditAmount(creditAmount - res.data.totalPrice));
           setNumOrders(res.data.numOrders);
+          setTotalPrice(res.data.totalPrice);
+          setCourier(res.data.courier);
+          setClassType(res.data.classType);
+          setHasSignature(res.data.signature);
+          dispatch(setUserCreditAmount(creditAmount - res.data.totalPrice));
           setTimeout(() => {
             setOrderSuccess(true);
             window.scrollTo({ top: 0, behavior: "smooth" });

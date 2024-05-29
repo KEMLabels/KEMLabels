@@ -644,6 +644,9 @@ const createBulkLabels = async (req, res) => {
       msg: "Bulk Label Order created successfully.",
       totalPrice: totalPrice,
       numOrders: orders.length,
+      courier: courier,
+      classType: classType,
+      signature: signature,
     });
   } catch (err) {
     const error = typeof err === Object ? JSON.stringify(err) : err;
