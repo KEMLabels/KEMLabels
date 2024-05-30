@@ -33,6 +33,8 @@ export default function CreditHistory() {
   }, [isLoggedIn, navigate, isUserVerified]);
 
   useEffect(() => {
+    if (!email) return;
+
     axios
       .get("/payment/creditHistory", { withCredentials: true })
       .then((res) => {

@@ -48,7 +48,7 @@ export default function CreditCard() {
 
   // Create PaymentIntent on page load
   useEffect(() => {
-    if (loadedAmount < 1) return;
+    if (loadedAmount < 1 || !email) return;
     axios
       .post(
         "/payment/stripe/create",
