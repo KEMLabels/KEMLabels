@@ -521,8 +521,6 @@ const createBulkLabels = async (req, res) => {
     }
     logger("Bulk Order File parsed successfully.", "info");
     logger(`Parsed Bulk Order Data: ${JSON.stringify(parsedData)}`, "info");
-    logger(`Total Orders in Bulk Order File: ${orders.length}`, "info");
-    logger(`Total Price for Bulk Label Order: ${totalPrice}`, "info");
 
     const user = await UserModel.findOne({ email: email });
     if (!user) {
@@ -568,6 +566,7 @@ const createBulkLabels = async (req, res) => {
         msg: "Insufficient credit balance.",
       });
     }
+    logger(`Total Orders in Bulk Order File: ${orders.length}`, "info");
     logger(`Total Price for Bulk Label Order: ${totalPrice}`, "info");
 
     // Get country, saturday delivery, and endpoint based on courier
