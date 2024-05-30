@@ -35,7 +35,7 @@ jobs:
           password: ${{ secrets.FTP_BACKEND_PASSWORD }}
           protocol: ${{ secrets.FTP_PROTOCOL }}
           local-dir: ./backend/
-          exclude: ".gitignore stripe.exe .env.development .env-production node_modules/"
+          exclude: ".gitignore stripe.exe node_modules/"
       - name: 📂 Deploying frontend to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
