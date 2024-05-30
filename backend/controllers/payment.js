@@ -297,10 +297,6 @@ const getCoinbasePayments = async (email) => {
       logger(`No Coinbase payments found for user: ${email}.`, "info");
       return [];
     }
-    logger(
-      `Successfully retrieved ${charges.length} Coinbase payments.`,
-      "info"
-    );
 
     const payments = [];
     for (const charge of charges) {
@@ -309,16 +305,6 @@ const getCoinbasePayments = async (email) => {
         pending: "Processing",
         confirmed: "Success",
       };
-
-      // @TODO: Double check which one fetches correctly.
-      // payments.push({
-      //   refId: charge.id,
-      //   paymentDate: format(new Date(charge.created_at), "MMMM dd, yyyy"),
-      //   paymentTime: format(new Date(charge.created_at), "hh:mm a"),
-      //   amount: charge.pricing.local.amount,
-      //   type: "Crypto",
-      //   status: statusMapping[charge.timeline[0].status] || "Failed",
-      // });
 
       for (const payment of charge.payments) {
         const createdTimestamp = payment.detected_at;
@@ -334,6 +320,10 @@ const getCoinbasePayments = async (email) => {
         });
       }
     }
+    logger(
+      `Successfully retrieved ${payments.length} Coinbase payments.`,
+      "info"
+    );
     return payments;
   } catch (err) {
     const error = typeof err === Object ? JSON.stringify(err) : err;
