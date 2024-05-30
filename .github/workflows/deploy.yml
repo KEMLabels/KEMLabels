@@ -16,6 +16,13 @@ jobs:
         with:
           node-version: "16"
       - name: 🔨 Install and build frontend project dependencies
+        env:
+          REACT_APP_DEV_FRONTEND_SERVER: ${{ secrets.REACT_APP_DEV_FRONTEND_SERVER }}
+          REACT_APP_DEV_BACKEND_SERVER: ${{ secrets.REACT_APP_DEV_BACKEND_SERVER }}
+          REACT_APP_PROD_FRONTEND_SERVER: ${{ secrets.REACT_APP_PROD_FRONTEND_SERVER }}
+          REACT_APP_PROD_BACKEND_SERVER: ${{ secrets.REACT_APP_PROD_BACKEND_SERVER }}
+          REACT_APP_DEV_STRIPE_PUBLIC_KEY: ${{ secrets.REACT_APP_DEV_STRIPE_PUBLIC_KEY }}
+          REACT_APP_PROD_STRIPE_PUBLIC_KEY: ${{ secrets.REACT_APP_PROD_STRIPE_PUBLIC_KEY }}
         run: |
           cd frontend
           npm install
