@@ -16,7 +16,6 @@ export default function CreditHistory() {
 
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const isUserVerified = useSelector((state) => state.user.isVerified);
-  const email = useSelector((state) => state.user.email);
 
   const [errMsg, setErrMsg] = useState("");
   const [infoMsg, setInfoMsg] = useState("");
@@ -33,7 +32,7 @@ export default function CreditHistory() {
   }, [isLoggedIn, navigate, isUserVerified]);
 
   useEffect(() => {
-    if (!email) return;
+    if (!isLoggedIn || !isUserVerified) return;
 
     axios
       .get("/payment/creditHistory", { withCredentials: true })
@@ -51,7 +50,7 @@ export default function CreditHistory() {
       .finally(() => {
         setIsFetching(false);
       });
-  }, [email]);
+  }, [isLoggedIn, isUserVerified]);
 
   /** @type import('@tanstack/react-table').ColumnDef<any> */
   const creditHistoryColumns = [

@@ -19,6 +19,7 @@ export default function SingleLabelOrder({ setIsBulkOrder }) {
   const email = useSelector((state) => state.user.email);
   const senderInfoRedux = useSelector((state) => state.user.senderInfo);
   const creditAmount = useSelector((state) => state.user.creditAmount);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   const senderAndRecipientInfo = {
     firstName: "",
@@ -72,6 +73,8 @@ export default function SingleLabelOrder({ setIsBulkOrder }) {
 
   // Fetch user's sender info on page load
   useEffect(() => {
+    if (!isLoggedIn) return;
+
     axios
       .get("/order/senderInfo", { withCredentials: true })
       .then((res) => {
@@ -102,11 +105,11 @@ export default function SingleLabelOrder({ setIsBulkOrder }) {
           container: "An unexpected error occurred. Please try again later.",
         }); // Axios default error
       });
-  }, [dispatch]);
+  }, [dispatch, isLoggedIn]);
 
   // Fetch user's custom pricing on page load
   useEffect(() => {
-    if (pricing && Object.keys(pricing).length > 0) return;
+    if (!isLoggedIn || !pricing || Object.keys(pricing).length > 0) return;
 
     axios
       .get("/order/label/pricings", { withCredentials: true })
@@ -126,7 +129,7 @@ export default function SingleLabelOrder({ setIsBulkOrder }) {
         }); // Axios default error
       })
       .finally(() => setIsFetchingPricing(false));
-  }, [pricing]);
+  }, [pricing, isLoggedIn]);
 
   function trimFormValues() {
     const formValuesCopy = { ...formValues };
