@@ -144,7 +144,7 @@ export default function Navbar({ hideNavAndFooter = false }) {
                 to="/order-label"
                 activeclassname="active"
               >
-                Order a Label
+                Order Label
               </NavLink>
               <div
                 className="accountIconContainer"

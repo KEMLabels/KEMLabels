@@ -135,7 +135,7 @@ export default function OrderForm({
     return isFieldEmpty;
   };
 
-  const submit = (e) => {
+  const validateForm = (e) => {
     e.preventDefault();
     setFieldErrors({}); // Clear any previous errors
 
@@ -677,7 +677,11 @@ export default function OrderForm({
             onClickEvent={() => setFormValues(initialFormValues)}
             text="Clear form"
           />
-          <Button btnType="submit" onClickEvent={submit} text="Submit order" />
+          <Button
+            btnType="submit"
+            onClickEvent={validateForm}
+            text="Submit order"
+          />
         </div>
       </div>
     </form>

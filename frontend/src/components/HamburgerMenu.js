@@ -72,7 +72,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
             </>
           ) : (
             <>
-              <NavLink type="order" text="Order a Label" link="/order-label" />
+              <NavLink type="order" text="Order Label" link="/order-label" />
               <hr />
               <NavLink
                 type="account"

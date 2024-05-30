@@ -1,7 +1,7 @@
 import React from "react";
 import { FaCheckCircle } from "react-icons/fa";
 
-export default function OrderSuccess({ formValues }) {
+export default function SingleOrderSuccess({ formValues }) {
   const packageInfoLabels = {
     weight: "Weight",
     length: "Length",
@@ -86,7 +86,10 @@ export default function OrderSuccess({ formValues }) {
           <FaCheckCircle size={80} color="#00cc66" />
         </div>
         <h1>Thank you for your Order!</h1>
-        <p>You will recieve an email of your order details.</p>
+        <p>
+          You will recieve an email of your order details and the label in a PDF
+          file.
+        </p>
       </div>
       {orderSummary()}
     </div>
