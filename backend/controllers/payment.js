@@ -196,14 +196,6 @@ const cryptoWebhook = async (req, res) => {
         msg: "An unexpected error occurred. Please try again later.",
       });
     }
-
-    if (event.type !== "charge:confirmed" && event.type !== "charge:resolved") {
-      logger(
-        `Coinbase Webhook error: Unexpected event type: ${event.type}`,
-        "error"
-      );
-      return res.status(500).end();
-    }
   } catch (err) {
     const error = typeof err === Object ? JSON.stringify(err) : err;
     logger(`Coinbase Webhook error: ${error}`, "error");
@@ -215,19 +207,27 @@ const cryptoWebhook = async (req, res) => {
   // Handle the event and update the database
   try {
     logger(`Coinbase Webhook received: ${JSON.stringify(event)}`, "info");
-    const user = await UserModel.findOne({ email: event.metadata.email });
-    if (!user) {
-      logger("Coinbase Webhook error: User not found.", "error");
-      return res.status(404).json({ msg: "User not found for this payment." });
-    }
+    if (event.type === "charge:confirmed" || event.type === "charge:resolved") {
+      logger(
+        `Coinbase payment succeeded for email: ${event.metadata.email}, amount: ${event.local.amount}`,
+        "info"
+      );
+      const user = await UserModel.findOne({ email: event.metadata.email });
+      if (!user) {
+        logger("Coinbase Webhook error: User not found.", "error");
+        return res
+          .status(404)
+          .json({ msg: "User not found for this payment." });
+      }
 
-    // Update user's credits with a 10% bonus
-    user.credits += Number(event.local.amount) * 1.1;
-    await user.save();
-    logger(
-      `User credits updated successfully for ${user.email}, credits: ${user.credits}`,
-      "info"
-    );
+      // Update user's credits with a 10% bonus
+      user.credits += Number(event.local.amount) * 1.1;
+      await user.save();
+      logger(
+        `User credits updated successfully for ${user.email}, credits: ${user.credits}`,
+        "info"
+      );
+    }
   } catch (err) {
     const error = typeof err === Object ? JSON.stringify(err) : err;
     logger(`Error updating user credits: ${error}`, "error");
