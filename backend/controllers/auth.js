@@ -60,16 +60,30 @@ const signIn = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      const error = typeof err === Object ? JSON.stringify(err) : err;
-      logger(`Error logging out: ${error}`, "error");
-      return res.status(500).json({ msg: "Error logging out." });
+  try {
+    const email = req.session.user.email;
+    if (!email) {
+      logger("Error logging out: No user found in session.", "error");
+      return res.status(404).json({ msg: "No user found in session." });
     }
-    res.clearCookie("sessionID");
-    logger("User logged out successfully.", "info");
-    res.status(200).json({ redirect: "/signin" });
-  });
+
+    req.session.destroy((err) => {
+      if (err) {
+        const error = typeof err === Object ? JSON.stringify(err) : err;
+        logger(`Error logging out: ${error}`, "error");
+        return res.status(500).json({ msg: "Error logging out." });
+      }
+      res.clearCookie("sessionID");
+      logger(`User ${email} logged out successfully.`, "info");
+      res.status(200).json({ redirect: "/signin" });
+    });
+  } catch (err) {
+    const error = typeof err === Object ? JSON.stringify(err) : err;
+    logger(`Error logging out: ${error}`, "error");
+    return res.status(500).json({
+      msg: err.message || "Internal server error",
+    });
+  }
 };
 
 const signUp = async (req, res) => {
