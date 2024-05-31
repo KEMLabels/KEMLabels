@@ -69,7 +69,7 @@ export default function Login() {
         // } else {
         //   setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
         // }
-        setErrMsg(JSON.stringify(e));
+        setErrMsg(JSON.stringify(e.response));
       })
       .finally(() => {
         setLoading(false);
