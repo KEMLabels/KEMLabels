@@ -74,14 +74,6 @@ const stripeWebhook = async (req, res) => {
         msg: "An unexpected error occurred. Please try again later.",
       });
     }
-
-    if (event.type !== "payment_intent.succeeded") {
-      logger(
-        `Stripe Webhook error: Unexpected event type: ${event.type}`,
-        "error"
-      );
-      return res.status(500).end();
-    }
   } catch (err) {
     const error = typeof err === Object ? JSON.stringify(err) : err;
     logger(`Stripe Webhook error: ${error}`, "error");
@@ -93,29 +85,33 @@ const stripeWebhook = async (req, res) => {
   // Handle the event and update the database
   try {
     logger(`Stripe Webhook received: ${JSON.stringify(event)}`, "info");
-    const paymentIntent = event.data.object;
-    logger(
-      `Stripe payment succeeded, PaymentIntent: ${JSON.stringify(
-        paymentIntent
-      )}`,
-      "info"
-    );
+    if (event.type === "payment_intent.succeeded") {
+      const paymentIntent = event.data.object;
+      logger(
+        `Stripe payment succeeded, PaymentIntent: ${JSON.stringify(
+          paymentIntent
+        )}`,
+        "info"
+      );
 
-    const user = await UserModel.findOne({
-      email: paymentIntent.metadata.email,
-    });
-    if (!user) {
-      logger("Stripe Webhook error: User not found.", "error");
-      return res.status(404).json({ msg: "User not found for this payment." });
+      const user = await UserModel.findOne({
+        email: paymentIntent.metadata.email,
+      });
+      if (!user) {
+        logger("Stripe Webhook error: User not found.", "error");
+        return res.status(404).json({
+          msg: "User not found for this payment.",
+        });
+      }
+
+      // Update user's credits
+      user.credits += Number(paymentIntent.amount) / 100;
+      await user.save();
+      logger(
+        `User credits updated successfully for ${user.email}, credits: ${user.credits}`,
+        "info"
+      );
     }
-
-    // Update user's credits
-    user.credits += Number(paymentIntent.amount) / 100;
-    await user.save();
-    logger(
-      `User credits updated successfully for ${user.email}, credits: ${user.credits}`,
-      "info"
-    );
   } catch (err) {
     const error = typeof err === Object ? JSON.stringify(err) : err;
     logger(`Error updating user credits: ${error}`, "error");
