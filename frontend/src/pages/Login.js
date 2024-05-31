@@ -64,11 +64,12 @@ export default function Login() {
       })
       .catch((e) => {
         Log("Error: ", e);
-        if (e?.response?.data?.msg === "Incorrect email or password.") {
-          setErrMsg(e.response.data.msg);
-        } else {
-          setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
-        }
+        // if (e?.response?.data?.msg === "Incorrect email or password.") {
+        //   setErrMsg(e.response.data.msg);
+        // } else {
+        //   setErrMsg("An unexpected error occurred. Please try again later."); // Axios default error
+        // }
+        setErrMsg(JSON.stringify(e));
       })
       .finally(() => {
         setLoading(false);
