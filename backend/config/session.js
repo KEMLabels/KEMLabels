@@ -22,7 +22,7 @@ const sessionConfig = {
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  maxAge: 1000 * 60 * 60 * 24, // 1 day
+  maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
   cookie: {
     httpOnly: true,
     secure: !isDevelopment(), // true in production
