@@ -3,9 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearSession } from "../redux/actions/UserAction";
 import axios from "../api/axios";
 import Log from "./Log";
+import { useNavigate } from "react-router-dom";
 
 export default function InactivityTimer() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const inactivityThreshold = 600000; // 10 minutes (600000 milliseconds)
   const [lastActivityTime, setLastActivityTime] = useState(Date.now());
@@ -17,18 +20,16 @@ export default function InactivityTimer() {
         if (currentTime - lastActivityTime > inactivityThreshold) {
           await axios
             .get("/auth/logout", { withCredentials: true })
-            .then((res) => {
-              Log(res);
+            .then((res) => Log(res))
+            .catch((err) => Log("Error: ", err))
+            .finally(() => {
               dispatch(clearSession());
-            })
-            .catch((err) => Log("Error: ", err));
+              navigate("/signin");
+            });
         }
       };
 
-      const resetActivityTimer = () => {
-        setLastActivityTime(Date.now());
-      };
-
+      const resetActivityTimer = () => setLastActivityTime(Date.now());
       const intervalId = setInterval(checkInactivity, 1000); // Check every second
 
       // Reset the activity timer when there is user activity (e.g., mousemove, keydown)
@@ -41,7 +42,7 @@ export default function InactivityTimer() {
         window.removeEventListener("keydown", resetActivityTimer);
       };
     }
-  }, [dispatch, isLoggedIn, inactivityThreshold, lastActivityTime]);
+  }, [dispatch, navigate, isLoggedIn, inactivityThreshold, lastActivityTime]);
 
   return null; // This component doesn't render anything
 }

@@ -55,7 +55,7 @@ export default function AccountDropdownMenu({
         text="Credit history"
         link="/credit-history"
       />
-      <AccountDropdownLink type="logout" text="Logout" link="/" />
+      <AccountDropdownLink type="logout" text="Logout" link="/signin" />
     </div>
   );
 }

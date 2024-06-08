@@ -278,16 +278,16 @@ export default function AccountSettings({ currentPage = "username" }) {
           setSuccessMsg("");
           axios
             .get("/auth/logout", { withCredentials: true })
-            .then((res) => {
-              Log(res);
-              dispatch(clearSession());
-              navigate("/signin");
-            })
+            .then((res) => Log(res))
             .catch((e) => {
               Log("Error: ", e);
               setErrMsg(
                 "An unexpected error occurred. Please try again later."
               ); // Axios default error
+            })
+            .finally(() => {
+              dispatch(clearSession());
+              navigate("/signin");
             });
         }, 3000);
       })

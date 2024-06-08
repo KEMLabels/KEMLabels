@@ -88,7 +88,7 @@ export default function HamburgerMenu({ sessionStatus = false }) {
               <NavLink
                 type="logout"
                 text="Logout"
-                link="/"
+                link="/signin"
                 isNavlink={false}
                 linkOnClick
               />

@@ -71,13 +71,11 @@ export default function NavLink({
           if (type === "logout") {
             await axios
               .get("/auth/logout", { withCredentials: true })
-              .then((res) => {
-                Log(res);
-                dispatch(clearSession());
-              })
-              .catch((err) => Log("Error: ", err));
+              .then((res) => Log(res))
+              .catch((err) => Log("Error: ", err))
+              .finally(() => dispatch(clearSession()));
           }
-          navigate(`${link}`);
+          navigate(link);
         }
       }}
     >
