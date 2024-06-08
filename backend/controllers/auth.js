@@ -32,6 +32,19 @@ const signIn = async (req, res) => {
       return res.status(400).json({ msg: "Incorrect email or password." });
     }
 
+    // Check if session exists and destroy it
+    if (req.session.user) {
+      req.session.destroy((err) => {
+        if (err) {
+          const error = typeof err === Object ? JSON.stringify(err) : err;
+          logger(`Error destroying existing session: ${error}`, "error");
+          return res.status(500).json({
+            msg: "An unexpected error occurred. Please try again.",
+          });
+        }
+      });
+    }
+
     req.session.user = user;
     await req.session.save((err) => {
       if (err) {
