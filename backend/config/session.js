@@ -28,7 +28,7 @@ const sessionConfig = {
     secure: !isDevelopment(), // true in production
     maxAge: 1000 * 60 * 60 * 24, // 1 day
     sameSite: isDevelopment() ? "lax" : "none",
-    domain: isDevelopment() ? "localhost" : "kemlabels.com",
+    domain: isDevelopment() ? "localhost" : ".towaquimbayo.com",
   },
 };
 
